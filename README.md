@@ -1,4 +1,14 @@
 # FreecellDemo
+## Creation
+```sh
+# Create a workspace and initial application
+ng new freecell-demo
+cd freecell-demo
+
+# Push an existing repository from the command line
+git remote add origin https://github.com/constf1/angular.git
+git push -u origin master
+```
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.19.
 
