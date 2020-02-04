@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FreecellLayout } from '../freecell-layout';
 import { toPercent } from '../common/math-utils';
+import { suitFullNameOf } from '../common/deck';
 
 interface Place {
   style: { top: string, left: string, width: string, height: string };
@@ -27,6 +28,7 @@ function createFreecellPlaceholders(layout: FreecellLayout): Place[] {
 
     if (basis.isBase(i)) {
       place.classNames.base = true;
+      place.classNames[suitFullNameOf(i - basis.BASE_START)] = true;
     } else if (basis.isCell(i)) {
       place.classNames.cell = true;
     } else if (basis.isPile(i)) {
