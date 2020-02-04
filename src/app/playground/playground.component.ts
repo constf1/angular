@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FreecellLayout } from '../freecell-layout';
 import { toPercent } from '../common/math-utils';
-import { suitFullNameOf } from '../common/deck';
+import { suitFullNameOf, rankFullNameOf } from '../common/deck';
 
 interface Place {
   style: { top: string, left: string, width: string, height: string };
@@ -40,6 +40,29 @@ function createFreecellPlaceholders(layout: FreecellLayout): Place[] {
   return placeholders;
 }
 
+function createFreecellCards(layout: FreecellLayout): Place[] {
+  const basis = layout.basis;
+  const W = layout.width;
+  const H = layout.height;
+
+  const width = toPercent(layout.itemWidth, W);
+  const height = toPercent(layout.itemHeight, H);
+
+  const cards: Place[] = [];
+  for (let i = 0; i < basis.CARD_NUM; i++) {
+    const left = toPercent(i, basis.CARD_NUM);
+    const top = toPercent(0, H);
+
+    const place: Place = {
+      style: { left, top, width, height },
+      classNames: { card: true, [rankFullNameOf(i)]: true, [suitFullNameOf(i)]: true  }
+    };
+
+    cards.push(place);
+  }
+  return cards;
+}
+
 @Component({
   selector: 'app-playground',
   templateUrl: './playground.component.html',
@@ -51,6 +74,7 @@ export class PlaygroundComponent implements OnInit, OnChanges {
   layout: FreecellLayout;
 
   placeholders: Place[] = [];
+  cards: Place[] = [];
 
   constructor() { }
 
@@ -60,6 +84,7 @@ export class PlaygroundComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes.layout) {
       this.placeholders = this.layout ? createFreecellPlaceholders(this.layout) : [];
+      this.cards = this.layout ? createFreecellCards(this.layout) : [];
     }
   }
 
