@@ -1,4 +1,8 @@
 <div class="game">
   <div *ngFor="let place of placeholders; index as i" [ngClass]="place.classNames" [ngStyle]="place.style"></div>
-  <div *ngFor="let card of cards; index as i" [ngClass]="card.classNames" [ngStyle]="card.style"></div>
+  <div *ngFor="let card of cards; index as i"
+    [ngClass]="card.classNames"
+    [ngStyle]="card.style"
+    (mousedown)="onMouseDown($event, i)"
+    ></div>
 </div>

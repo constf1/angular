@@ -61,5 +61,13 @@
     &.Jack { @include bg_rank(10); }
     &.Queen { @include bg_rank(11); }
     &.King { @include bg_rank(12); }
+
+    transition-property: transform;
+    transition-duration: 1s;
+    transition-timing-function: cubic-bezier(.5,1,.5,1);
+
+    &.dragged {
+      transition-property: none;
+    }
   }
 }
