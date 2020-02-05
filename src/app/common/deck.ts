@@ -11,7 +11,7 @@ export const SUIT_FULL_NAMES: Readonly<string[]> = [
   'diamonds',
   'clubs',
   'hearts'
-];
+] as const;
 export const SUIT_HTML_CODES: Readonly<string[]> = [
   '&spades;',
   '&diams;',
