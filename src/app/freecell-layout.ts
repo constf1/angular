@@ -99,8 +99,8 @@ export function createFreecellLayout(basis: FreecellBasis, dx = 1, dy = 1, cx = 
       if (basis.isBase(spotIndex)) {
         return this.getBaseX(spotIndex - basis.BASE_START);
       }
-      if (basis.isPile(spotIndex - basis.PILE_START)) {
-        return this.getPileX(spotIndex);
+      if (basis.isPile(spotIndex)) {
+        return this.getPileX(spotIndex - basis.PILE_START);
       }
       return 0;
     },
