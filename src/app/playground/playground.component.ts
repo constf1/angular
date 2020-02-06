@@ -3,6 +3,8 @@ import { FreecellLayout } from '../freecell-layout';
 import { toPercent } from '../common/math-utils';
 import { suitFullNameOf, rankFullNameOf, deck, CARD_NUM } from '../common/deck';
 import { Dragger } from '../common/dragger';
+import { FreecellGame } from '../freecell-game';
+import { type } from 'os';
 
 interface Place {
   style: {
@@ -71,6 +73,16 @@ function createFreecellCards(layout: FreecellLayout): Place[] {
   return cards;
 }
 
+const Transitions = ['transition_deal', 'transition_norm', 'transition_fast'] as const;
+type Transition = typeof Transitions[number];
+type TransitionMap = Partial<{ [key in Transition]: boolean }>;
+
+function setTransition(classNames: TransitionMap, transition?: Transition) {
+  for (const t of Transitions) {
+    classNames[t] = t === transition;
+  }
+}
+
 @Component({
   selector: 'app-playground',
   templateUrl: './playground.component.html',
@@ -85,7 +97,9 @@ export class PlaygroundComponent implements OnInit, OnChanges {
   cards: Place[] = [];
 
   @Input()
-  desk: number[][] = [deck(0)];
+  deal: number;
+
+  game: FreecellGame;
 
   private dragger: Dragger;
 
@@ -96,20 +110,41 @@ export class PlaygroundComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.layout) {
-      this.placeholders = this.layout ? createFreecellPlaceholders(this.layout) : [];
-      this.cards = this.layout ? createFreecellCards(this.layout) : [];
+      if (this.layout) {
+        this.placeholders = createFreecellPlaceholders(this.layout);
+        this.cards = createFreecellCards(this.layout);
+        this.game = new FreecellGame(this.layout.basis);
+      } else {
+        this.placeholders = [];
+        this.cards = [];
+        this.game = null;
+      }
     }
+
+    if (this.game) {
+      this.onDeal();
+    }
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  onDeal() {
+    this.game.deal(this.deal);
 
     const W = this.layout.width;
     const H = this.layout.height;
-    for (let i = 0; i < this.desk.length; i++) {
-      const pile = this.desk[i];
-      for (let j = 0; j < pile.length; j++) {
-        const cardIndex = pile[j];
+    for (let i = 0; i < this.game.length; i++) {
+      const line = this.game.lineAt(i);
+      for (let j = 0; j < line.length; j++) {
+        const cardIndex = line[j];
         const card = this.cards[cardIndex];
-        card.style.left = toPercent(this.layout.getCardX(i, j, pile.length), W);
-        card.style.top = toPercent(this.layout.getCardY(i, j, pile.length), H);
+        card.style.left = toPercent(this.layout.getCardX(i, j, line.length), W);
+        card.style.top = toPercent(this.layout.getCardY(i, j, line.length), H);
         card.style.zIndex = j;
+
+        setTransition(card.classNames, 'transition_deal');
       }
     }
   }
@@ -135,6 +170,7 @@ export class PlaygroundComponent implements OnInit, OnChanges {
       this.dragger.onDrag = () => {
         card.style.transform = `translate(${this.dragger.deltaX}px, ${this.dragger.deltaY}px)`;
         card.classNames.dragged = true;
+        setTransition(card.classNames);
       };
       this.dragger.onDragEnd = () => {
         this.dragger = null;
@@ -142,6 +178,8 @@ export class PlaygroundComponent implements OnInit, OnChanges {
         card.style.zIndex = styleZIndex;
         delete card.style.transform;
         delete card.classNames.dragged;
+
+        setTransition(card.classNames, 'transition_fast');
       };
     }
   }
