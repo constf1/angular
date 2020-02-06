@@ -4,7 +4,6 @@ import { toPercent } from '../common/math-utils';
 import { suitFullNameOf, rankFullNameOf, deck, CARD_NUM } from '../common/deck';
 import { Dragger } from '../common/dragger';
 import { FreecellGame } from '../freecell-game';
-import { type } from 'os';
 
 interface Place {
   style: {
