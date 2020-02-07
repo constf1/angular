@@ -3,11 +3,13 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { PlaygroundComponent } from './playground/playground.component';
+import { KeyedElementDirective } from './common/keyed-element.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PlaygroundComponent
+    PlaygroundComponent,
+    KeyedElementDirective
   ],
   imports: [
     BrowserModule

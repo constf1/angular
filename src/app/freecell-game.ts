@@ -1,5 +1,5 @@
 import { FreecellBasis } from './freecell-basis';
-import { deck } from './common/deck';
+import { deck, CARD_NUM } from './common/deck';
 
 export class FreecellGame {
   private desk: number[][];
@@ -32,6 +32,17 @@ export class FreecellGame {
     return this.desk[line];
   }
 
+  mapCardToLine() {
+    const cards: number[] = [];
+    for (let i = this.desk.length; i-- > 0;) {
+      const line = this.desk[i];
+      for (let j = line.length; j-- > 0;) {
+        cards[line[j]] = i;
+      }
+    }
+    return cards;
+  }
+
   numberOfCardsAt(line: number) {
     return this.desk[line].length;
   }
@@ -61,4 +72,5 @@ export class FreecellGame {
     }
     return cards;
   }
+
 }
