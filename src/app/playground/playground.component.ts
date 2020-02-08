@@ -176,32 +176,25 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.dragger || index < this.spotCount) {
       return;
     } else {
-      const card = this.elements[index];
-      const styleZIndex = card.style.zIndex;
-
-      card.style.zIndex = CARD_NUM;
+      const cardIndex = index - this.spotCount;
+      const tableau = this.game.asTablaeu(cardIndex);
 
       this.dragger = new Dragger(event.screenX, event.screenY, this.renderer);
-
-      this.dragger.onDrag = () => {
-        card.style.transform = `translate(${this.dragger.deltaX}px, ${this.dragger.deltaY}px)`;
-        card.classNames.dragged = true;
-        setTransition(card.classNames);
-      };
+      this.onDragStart(tableau);
+      this.dragger.onDrag = () => this.onDrag(tableau);
       this.dragger.onDragEnd = (ev) => {
-        card.style.zIndex = styleZIndex;
-        delete card.style.transform;
-        delete card.classNames.dragged;
-
-        setTransition(card.classNames, 'transition_fast');
+        this.onDragEnd(tableau);
 
         const destination = this.findDestination(index, ev.clientX, ev.clientY);
         if (destination >= 0) {
-          const mapCardToLine = this.game.mapCardToLine();
-          const srcLine = mapCardToLine[index - this.spotCount];
-          const dstLine = destination < this.spotCount ? destination : mapCardToLine[destination - this.spotCount];
+          const srcLine = this.game.lineMap[index - this.spotCount];
+          const dstLine = destination < this.spotCount ? destination : this.game.lineMap[destination - this.spotCount];
           if (srcLine !== dstLine) {
             console.log('TODO: Find the best path from ' + srcLine + ' to ' + dstLine + '.');
+            const path = this.game.getBestPath(tableau, dstLine);
+            if (path) {
+              console.log('TODO: Autoplay the path:', path);
+            }
           }
         }
 
@@ -226,5 +219,31 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
       });
     }
     return destination;
+  }
+
+  onDragStart(tableau: number[]) {
+    for (let i = 0; i < tableau.length; i++) {
+      const card = this.elements[this.spotCount + tableau[i]];
+      card.style.zIndex = CARD_NUM + i;
+      card.classNames.dragged = true;
+      setTransition(card.classNames);
+    }
+  }
+
+  onDrag(tableau: number[]) {
+    for (const c of tableau) {
+      const card = this.elements[this.spotCount + c];
+      card.style.transform = `translate(${this.dragger.deltaX}px, ${this.dragger.deltaY}px)`;
+    }
+  }
+
+  onDragEnd(tableau: number[]) {
+    for (const c of tableau) {
+      const card = this.elements[this.spotCount + c];
+      card.style.zIndex = this.game.spotMap[c];
+      delete card.style.transform;
+      delete card.classNames.dragged;
+      setTransition(card.classNames, 'transition_fast');
+    }
   }
 }
