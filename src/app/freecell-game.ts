@@ -1,6 +1,6 @@
 // tslint:disable: variable-name
 
-import { FreecellBasis, isTableau, Filter, solve, Path } from './freecell-basis';
+import { FreecellBasis, isTableau, Filter, solve, Path, isMoveValid } from './freecell-basis';
 import { deck } from './common/deck';
 
 export class FreecellGame {
@@ -53,7 +53,11 @@ export class FreecellGame {
    * @param destination destination line
    */
   moveCard(source: number, destination: number) {
-    this._addCard(destination, this._desk[source].pop());
+    if (this.isMoveValid(source, destination)) {
+      this._addCard(destination, this._desk[source].pop());
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -76,7 +80,9 @@ export class FreecellGame {
   /*
    * Constant getters:
    */
-
+  isMoveValid(source: number, destination: number) {
+    return isMoveValid(this.basis, this._desk, source, destination);
+  }
 
   /**
    * Returns a line of cards
@@ -141,17 +147,33 @@ export class FreecellGame {
       return null;
     }
 
+    // Handle one card tableau.
+    if (tableau.length === 1) {
+      return isMoveValid(this.basis, this._desk, source, destination) ? [this.basis.toMove(source, destination)] : null;
+    }
+
+    const destinationFilter: Filter = { [destination]: true };
+    if (this.basis.isPile(destination) && this.lineAt(destination).length === 0) {
+      // any empty pile is good as destination.
+      for (let i = this.basis.PILE_START; i < this.basis.PILE_END; i++) {
+        if (this.lineAt(i).length === 0) {
+          destinationFilter[i] = true;
+        }
+      }
+    }
+
     const filter: Filter = tableau.reduce((obj, key) => { obj[key] = true; return obj; }, {});
     const desk = this._desk.reduce((arr, line) => { arr.push([...line]); return arr; }, [] as number[][]);
 
     let savedPath = null;
     const callback = (path: Path) => {
       const length = path.length;
-      if (length <= 0 || this.basis.toDestination(path[length - 1]) !== destination) {
+      const d = this.basis.toDestination(path[length - 1]);
+      if (length <= 0 || !destinationFilter[d]) {
         return false;
       }
       // Is destination equials the tableau?
-      const line = desk[destination];
+      const line = desk[d];
       const delta = line.length - tableau.length;
       if (delta < 0) {
         return false;
@@ -167,6 +189,28 @@ export class FreecellGame {
 
     solve({ basis: this.basis, desk, lastCard, callback, cardFilter: filter });
 
+    if (savedPath) {
+      const length = savedPath.length;
+      const d = this.basis.toDestination(savedPath[length - 1]);
+      if (d !== destination) {
+        // Swap destinations.
+        for (let i = 0; i < savedPath.length; i++) {
+          let src = this.basis.toSource(savedPath[i]);
+          let dst = this.basis.toDestination(savedPath[i]);
+          if (src === destination) {
+            src = d;
+          } else if (src === d) {
+            src = destination;
+          }
+          if (dst === destination) {
+            dst = d;
+          } else if (dst === d) {
+            dst = destination;
+          }
+          savedPath[i] = this.basis.toMove(src, dst);
+        }
+      }
+    }
     return savedPath;
   }
 

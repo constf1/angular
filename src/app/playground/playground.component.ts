@@ -3,8 +3,10 @@ import { FreecellLayout } from '../freecell-layout';
 import { toPercent } from '../common/math-utils';
 import { suitFullNameOf, rankFullNameOf, CARD_NUM, playNameOf } from '../common/deck';
 import { Dragger } from '../common/dragger';
+import { Autoplay } from '../common/autoplay';
 import { FreecellGame } from '../freecell-game';
 import { KeyedElementDirective } from '../common/keyed-element.directive';
+import { isMoveValid } from '../freecell-basis';
 
 interface Place {
   style: {
@@ -103,6 +105,7 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
   game: FreecellGame;
 
   private dragger: Dragger;
+  private autoplay = new Autoplay(1000);
 
   constructor(private renderer: Renderer2) { }
 
@@ -149,19 +152,8 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
   onDeal() {
     this.game.deal(this.deal);
 
-    const W = this.layout.width;
-    const H = this.layout.height;
     for (let i = 0; i < this.game.length; i++) {
-      const line = this.game.lineAt(i);
-      for (let j = 0; j < line.length; j++) {
-        const cardIndex = line[j];
-        const card = this.getCardElement(cardIndex);
-        card.style.left = toPercent(this.layout.getCardX(i, j, line.length), W);
-        card.style.top = toPercent(this.layout.getCardY(i, j, line.length), H);
-        card.style.zIndex = j;
-
-        setTransition(card.classNames, 'transition_deal');
-      }
+      this.updateLine(i, 'transition_deal');
     }
   }
 
@@ -190,16 +182,32 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
           const srcLine = this.game.lineMap[index - this.spotCount];
           const dstLine = destination < this.spotCount ? destination : this.game.lineMap[destination - this.spotCount];
           if (srcLine !== dstLine) {
-            console.log('TODO: Find the best path from ' + srcLine + ' to ' + dstLine + '.');
-            const path = this.game.getBestPath(tableau, dstLine);
-            if (path) {
-              console.log('TODO: Autoplay the path:', path);
-            }
+            this.playPath(this.game.getBestPath(tableau, dstLine));
           }
         }
 
         this.dragger = null;
       };
+    }
+  }
+
+  playPath(path?: number[]) {
+    if (path && path.length > 0) {
+      const basis = this.game.basis;
+      this.onCardMove(basis.toSource(path[0]), basis.toDestination(path[0]), 'transition_fast');
+      if (path.length > 1) {
+        path.reverse();
+        path.pop();
+        this.autoplay.play(() => {
+          if (path.length > 0) {
+            const move = path.pop();
+            return this.onCardMove(basis.toSource(move), basis.toDestination(move),
+              path.length > 0 ? 'transition_fast' : 'transition_norm')
+              && path.length > 0;
+          }
+          return false;
+        });
+      }
     }
   }
 
@@ -222,6 +230,8 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   onDragStart(tableau: number[]) {
+    this.autoplay.stop();
+
     for (let i = 0; i < tableau.length; i++) {
       const card = this.elements[this.spotCount + tableau[i]];
       card.style.zIndex = CARD_NUM + i;
@@ -244,6 +254,31 @@ export class PlaygroundComponent implements OnInit, OnChanges, AfterViewInit {
       delete card.style.transform;
       delete card.classNames.dragged;
       setTransition(card.classNames, 'transition_fast');
+    }
+  }
+
+  onCardMove(source: number, destination: number, transition: Transition) {
+    if (this.game.moveCard(source, destination)) {
+      this.updateLine(source, 'transition_fast');
+      this.updateLine(destination, transition);
+      return true;
+    }
+    return false;
+  }
+
+  updateLine(index: number, transition: Transition) {
+    const W = this.layout.width;
+    const H = this.layout.height;
+    const line = this.game.lineAt(index);
+
+    for (let i = 0; i < line.length; i++) {
+      const cardIndex = line[i];
+      const card = this.getCardElement(cardIndex);
+      card.style.left = toPercent(this.layout.getCardX(index, i, line.length), W);
+      card.style.top = toPercent(this.layout.getCardY(index, i, line.length), H);
+      card.style.zIndex = i;
+
+      setTransition(card.classNames, transition);
     }
   }
 }

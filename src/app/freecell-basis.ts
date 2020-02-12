@@ -1,4 +1,5 @@
 import { rankOf, suitOf, RANK_NUM, CARD_NUM, SUIT_NUM } from './common/deck';
+import { byteArrayToString } from './common/math-utils';
 
 export function isTableau(cardA: number, cardB: number) {
   return rankOf(cardA) === ((rankOf(cardB) + 1) % RANK_NUM) && (suitOf(cardA) % 2) !== (suitOf(cardB) % 2);
@@ -42,6 +43,19 @@ export function createFreecellBasis(pileNum: number, cellNum: number, baseNum: n
   function toSource(move: number) {
     return (move - (move % DESK_SIZE)) / DESK_SIZE;
   }
+
+  // const moves: string[][] = [];
+  // for (let i = 0; i < DESK_SIZE; i++) {
+  //   const line: string[] = [];
+  //   for (let j = 0; j < DESK_SIZE; j++) {
+  //     line.push(byteArrayToString([i, j]));
+  //   }
+  //   moves.push(line);
+  // }
+
+  // function toMove2(source: number, destination: number) {
+  //   return moves[source][destination];
+  // }
 
   return {
     // Constants:
@@ -125,18 +139,47 @@ export function getBase({ BASE_START, BASE_END }: FreecellBasis, desk: FreecellD
   const rank = rankOf(card);
 
   for (let i = BASE_START; i < BASE_END; i++) {
-    if (i - BASE_START === suit && desk[i].length === rank) {
+    if (suitOf(i - BASE_START) === suit && desk[i].length === rank) {
       return i;
     }
   }
   return -1;
 }
 
+export function isMoveValid(basis: FreecellBasis, desk: FreecellDesk, source: number, destination: number): boolean {
+  if (source === destination) {
+    return false;
+  }
+
+  const srcLength = desk[source].length;
+  const dstLength = desk[destination].length;
+  if (srcLength <= 0) {
+    return false;
+  }
+
+  if (basis.isCell(destination)) {
+    return dstLength === 0;
+  }
+
+  const card = desk[source][srcLength - 1];
+  if (basis.isPile(destination)) {
+    return dstLength === 0 || isTableau(desk[destination][dstLength - 1], card);
+  }
+
+  const suit = suitOf(card);
+  const rank = rankOf(card);
+  if (basis.isBase(destination)) {
+    return (suitOf(destination - basis.BASE_START) === suit && dstLength === rank);
+  }
+
+  return false;
+}
+
 export function getMoves(
   basis: FreecellBasis,
   desk: FreecellDesk,
   moves: number[],
-  filter?: Filter
+  cardFilter?: Filter
   ) {
   const emptyCell = getEmptyCell(basis, desk);
   const emptyPile = getEmptyPile(basis, desk);
@@ -146,7 +189,7 @@ export function getMoves(
     const src = desk[i];
     if (src.length > 0) {
       const card = src[src.length - 1];
-      if (!filter || filter[card]) {
+      if (!cardFilter || cardFilter[card]) {
         // To a tableau.
         for (let j = PILE_START; j < PILE_END; j++) {
           if (j !== i) {
@@ -223,7 +266,7 @@ export function solve(task: {
 
       if (Date.now() - startTime > 500) {
         // It's time to stop the search.
-        console.log('Oops! Search timeout!');
+        console.log('Oops! Search timeout!', path.length, input.length, output.length, done.size);
         return;
       }
 
