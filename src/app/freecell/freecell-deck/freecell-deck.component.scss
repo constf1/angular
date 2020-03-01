@@ -1,0 +1,90 @@
+@mixin bg_pos($index) {
+  $col: $index % 8;
+  $row: ($index - $col) / 8;
+  background-position: $col / 7 * 100% $row / 7 * 100%;
+}
+
+@mixin bg_rank($index) {
+  $i: $index * 4;
+  &.spades { @include bg_pos($i); }
+  &.diamonds { @include bg_pos($i + 1); }
+  &.clubs { @include bg_pos($i + 2); }
+  &.hearts { @include bg_pos($i + 3); }
+}
+
+.deck {
+  width:100%;
+  height:100%;
+  background-color:yellow;
+  position: relative;
+
+  background-image: url('/assets/freecell/blue_gray_paper_grid.jpg');
+  background-repeat: repeat;
+  background-size: auto;
+}
+
+.placeholder, .card {
+  cursor: pointer;
+  position: absolute;
+
+  background-image: url('/assets/freecell/cards.svg');
+  background-size: 800% 800%;
+  background-repeat: no-repeat;
+
+  border-radius: 8.333% / 6.25%;
+}
+
+.placeholder {
+  background-color: lightblue;
+
+  &.pile { @include bg_pos(57); }
+  &.base { @include bg_rank(13); }
+  &.cell {
+    background-color: lightseagreen;
+    @include bg_pos(56);
+  }
+}
+
+.card {
+  background-color: lightyellow;
+  &.Ace { @include bg_rank(0); }
+  &.Two { @include bg_rank(1); }
+  &.Three { @include bg_rank(2); }
+  &.Four { @include bg_rank(3); }
+  &.Five { @include bg_rank(4); }
+  &.Six { @include bg_rank(5); }
+  &.Seven { @include bg_rank(6); }
+  &.Eight { @include bg_rank(7); }
+  &.Nine { @include bg_rank(8); }
+  &.Ten { @include bg_rank(9); }
+  &.Jack { @include bg_rank(10); }
+  &.Queen { @include bg_rank(11); }
+  &.King { @include bg_rank(12); }
+
+  transition-property: transform;
+
+  &.transition_deal {
+    transition-duration: 1.5s;
+    transition-timing-function: cubic-bezier(.6,-0.5,.25,1.5);
+  }
+
+  &.transition_norm {
+    transition-duration: 0.5s;
+    transition-timing-function: linear;
+  }
+
+  &.transition_fast {
+    transition-duration: 0.25s;
+    transition-timing-function: linear;
+  }
+
+  // transition-property: left, top;
+  // transition-duration: 1s;
+  // transition-timing-function: cubic-bezier(.5,1,.5,1);
+
+  &.dragged {
+    transition-property: none;
+    // border: 1px solid grey;
+    cursor: grabbing;
+  }
+}

@@ -23,5 +23,4 @@ export class Autoplay {
       }
     }, this.timeout);
   }
-
 }

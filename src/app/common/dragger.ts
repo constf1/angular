@@ -1,12 +1,12 @@
 import { Renderer2 } from '@angular/core';
 
-export interface Draggable {
-  offset: (dx: number, dy: number) => void;
-  restore: () => void;
-}
-
 export class Dragger {
-  constructor(public screenX: number, public screenY: number, public renderer: Renderer2, public draggable?: Draggable) {
+  deltaX = 0;
+  deltaY = 0;
+  onDrag?: (event: MouseEvent) => void;
+  onDragEnd?: (event: MouseEvent) => void;
+
+  constructor(public screenX: number, public screenY: number, public renderer: Renderer2) {
     // Call a function whenever the cursor moves:
     const onMouseMoveListener = this.renderer.listen('document', 'mousemove', (event) => {
       event.preventDefault();
@@ -19,9 +19,6 @@ export class Dragger {
         this.deltaY /= window.devicePixelRatio;
       }
 
-      // if (this.draggable) {
-      //   this.draggable.offset(this.deltaX, this.deltaY);
-      // }
       if (this.onDrag) {
         this.onDrag(event);
       }
@@ -33,17 +30,9 @@ export class Dragger {
       onMouseMoveListener();
       onMouseUpListener();
 
-      // if (this.draggable) {
-      //   this.draggable.restore();
-      // }
       if (this.onDragEnd) {
         this.onDragEnd(event);
       }
     });
   }
-
-  deltaX = 0;
-  deltaY = 0;
-  onDrag?: (event: MouseEvent) => void;
-  onDragEnd?: (event: MouseEvent) => void;
 }

@@ -1,3 +1,4 @@
+
 /**
  * Standard 52-card deck
  */
@@ -141,4 +142,11 @@ export function deck(seed?: number): number[] {
     }
   }
   return cards;
+}
+
+export function isTableau(cardA: number, cardB: number) {
+  return (
+    rankOf(cardA) === (rankOf(cardB) + 1) % RANK_NUM &&
+    suitOf(cardA) % 2 !== suitOf(cardB) % 2
+  );
 }

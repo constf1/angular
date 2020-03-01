@@ -2,14 +2,18 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
-import { PlaygroundComponent } from './playground/playground.component';
-import { KeyedElementDirective } from './common/keyed-element.directive';
+
+import { RatioKeeperComponent } from './common/components/ratio-keeper/ratio-keeper.component';
+
+import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.component';
+import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    PlaygroundComponent,
-    KeyedElementDirective
+    FreecellMainComponent,
+    FreecellDeckComponent,
+    RatioKeeperComponent
   ],
   imports: [
     BrowserModule

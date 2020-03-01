@@ -1,9 +1,0 @@
-<div class="game">
-  <ng-content></ng-content>
-  <div *ngFor="let elem of elements; index as i; trackBy: trackByIndex"
-    [ngClass]="elem.classNames"
-    [ngStyle]="elem.style"
-    (mousedown)="onMouseDown($event, i)"
-    [appKeyedElement]="i"
-    ></div>
-</div>

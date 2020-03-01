@@ -1,3 +1,6 @@
+/**
+ * Miscellaneous math utilities.
+ */
 
 export function toPercent(numerator: number, denominator: number = 100, fractionDigits: number = 3): string {
   return (numerator * 100 / denominator).toFixed(fractionDigits) + '%';
@@ -8,7 +11,16 @@ export function toPercent(numerator: number, denominator: number = 100, fraction
 export function randomNumber(minValue: number, maxValue: number): number {
   return Math.random() * (maxValue - minValue) + minValue;
 }
-export function randomIneger(minValue: number, maxValue: number): number {
+export function randomIneger(minValue: number, maxValue: number, skipValue?: number): number {
+  if (skipValue !== undefined && maxValue - minValue >= 3) {
+    // We need at least two numbers to choose from.
+    while (true) {
+      const value = randomIneger(minValue, maxValue);
+      if (value !== skipValue) {
+        return value;
+      }
+    }
+  }
   return Math.floor(Math.random() * (maxValue - minValue)) + minValue;
 }
 
@@ -47,4 +59,3 @@ export function stringToByteArray(str: string): number[] {
   }
   return arr;
 }
-

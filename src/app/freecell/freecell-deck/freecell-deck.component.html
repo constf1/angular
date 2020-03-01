@@ -1,0 +1,9 @@
+<div class="deck">
+  <ng-content></ng-content>
+  <div *ngFor="let item of items; index as i; trackBy: trackByIndex"
+    [ngClass]="item.ngClass"
+    [ngStyle]="item.ngStyle"
+    (mousedown)="onMouseDown($event, i)"
+    #elements
+  ></div>
+</div>
