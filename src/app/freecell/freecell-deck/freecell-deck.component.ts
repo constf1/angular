@@ -125,10 +125,9 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   }
 
   onDragStart(tableau: Readonly<number[]>) {
-    const lineZIndex = this.getLineZIndex(-1);
-    for (let i = 0; i < tableau.length; i++) {
-      const card = this.cards[tableau[i]];
-      card.ngStyle.zIndex = lineZIndex + i;
+    for (const cardIndex of tableau) {
+      const card = this.cards[cardIndex];
+      card.ngStyle.zIndex = (card.ngStyle.zIndex % CARD_NUM) + CARD_NUM;
       card.ngClass.dragged = true;
     }
   }
@@ -151,7 +150,7 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
       const card = this.cards[index];
       const lineIndex = this.game.toLine(index);
 
-      card.ngStyle.zIndex = this.getLineZIndex(lineIndex) + this.game.toSpot(index);
+      card.ngStyle.zIndex = card.ngStyle.zIndex % CARD_NUM;
       card.ngStyle.transform = this.getCardTransform(lineIndex, index);
       delete card.ngClass.dragged;
       setTransition(card.ngClass, 'transition_fast');
@@ -159,12 +158,28 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   }
 
   onDeal() {
+    let zIndex = 0;
     for (let i = this.game.DESK_SIZE; i-- > 0; ) {
+      for (const cardIndex of this.game.getLine(i)) {
+        this.cards[cardIndex].ngStyle.zIndex = zIndex++;
+      }
       this.updateLine(i, 'transition_deal');
     }
   }
 
+  bringToFront(cardIndex: number) {
+    const cards = this.cards;
+    const oldZIndex = cards[cardIndex].ngStyle.zIndex;
+    for (let i = 0; i < CARD_NUM; i++) {
+      if (cards[i].ngStyle.zIndex > oldZIndex) {
+        cards[i].ngStyle.zIndex--;
+      }
+    }
+    cards[cardIndex].ngStyle.zIndex = CARD_NUM - 1;
+  }
+
   onCardMove(source: number, destination: number, transition: Transition = 'transition_norm') {
+    this.bringToFront(this.game.getCard(destination, -1));
     this.updateLine(source, transition);
     this.updateLine(destination, transition);
   }
@@ -208,7 +223,6 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
     const cards: Item[] = [];
     const layout = this.layout;
     if (layout) {
-      const basis = layout.basis;
       const W = layout.width;
       const H = layout.height;
 
@@ -216,12 +230,8 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
       const height = toPercent(layout.itemHeight, H);
 
       for (let i = 0; i < CARD_NUM; i++) {
-        const pos = layout.getCardPosition(basis.PILE_START, i, CARD_NUM);
-        // const left = toPercent(pos.x, W);
-        // const top = toPercent(pos.y, H);
-
         const item: Item = {
-          ngStyle: { width, height },
+          ngStyle: { width, height, zIndex: i },
           ngClass: {
             card: true,
             [suitFullNameOf(i)]: true,
@@ -240,27 +250,10 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
     return `translate(${toPercent(pos.x, this.layout.itemWidth)}, ${toPercent(pos.y, this.layout.itemHeight)})`;
   }
 
-  getLineZIndex(lineIndex: number) {
-    if (this.game.isPile(lineIndex)) {
-      return 1;
-    }
-    if (this.game.isCell(lineIndex)) {
-      return CARD_NUM;
-    }
-    if (this.game.isBase(lineIndex)) {
-      return 2 * CARD_NUM;
-    }
-    return 3 * CARD_NUM;
-  }
-
   updateLine(index: number, transition: Transition = 'transition_norm') {
-    const line = this.game.getLine(index);
-    const lineZIndex = this.getLineZIndex(index);
-    for (let i = line.length; i-- > 0;) {
-      const item = this.cards[line[i]];
-      item.ngStyle.transform = this.getCardTransform(index, line[i]);
-      item.ngStyle.zIndex = i + lineZIndex;
-
+    for (const cardIndex of this.game.getLine(index)) {
+      const item = this.cards[cardIndex];
+      item.ngStyle.transform = this.getCardTransform(index, cardIndex);
       setTransition(item.ngClass, transition);
     }
   }

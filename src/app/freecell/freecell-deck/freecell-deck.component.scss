@@ -70,7 +70,7 @@
 
   &.transition_norm {
     transition-duration: 0.5s;
-    transition-timing-function: linear;
+    transition-timing-function: ease-out;
   }
 
   &.transition_fast {
