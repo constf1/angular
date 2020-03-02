@@ -9,7 +9,8 @@ import {
   EventEmitter,
   Renderer2,
   OnChanges,
-  SimpleChanges } from '@angular/core';
+  SimpleChanges
+} from '@angular/core';
 
 import { Dragger } from '../../common/dragger';
 import { toPercent } from '../../common/math-utils';
@@ -65,7 +66,7 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
 
   private dragger: MyDragger | null = null;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private renderer: Renderer2) { }
 
   ngOnInit() {
   }
@@ -159,7 +160,7 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
 
   onDeal() {
     let zIndex = 0;
-    for (let i = this.game.DESK_SIZE; i-- > 0; ) {
+    for (let i = this.game.DESK_SIZE; i-- > 0;) {
       for (const cardIndex of this.game.getLine(i)) {
         this.cards[cardIndex].ngStyle.zIndex = zIndex++;
       }
@@ -223,11 +224,8 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
     const cards: Item[] = [];
     const layout = this.layout;
     if (layout) {
-      const W = layout.width;
-      const H = layout.height;
-
-      const width = toPercent(layout.itemWidth, W);
-      const height = toPercent(layout.itemHeight, H);
+      const width = toPercent(layout.itemWidth, layout.width);
+      const height = toPercent(layout.itemHeight, layout.height);
 
       for (let i = 0; i < CARD_NUM; i++) {
         const item: Item = {
@@ -261,7 +259,7 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   findDestination(source: number, clientX: number, clientY: number): number {
     if (this.elementList) {
       const children = this.elementList.toArray();
-      for (let i = children.length; i-- > 0; ) {
+      for (let i = children.length; i-- > 0;) {
         if (i !== source) {
           const rc = children[i].nativeElement.getBoundingClientRect();
           if (
