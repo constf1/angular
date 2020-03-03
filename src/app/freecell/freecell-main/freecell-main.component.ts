@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 
 import { Autoplay } from '../../common/autoplay';
+import { playNameOf, suitFullNameOf, rankFullNameOf } from '../../common/deck';
+import { randomIneger } from '../../common/math-utils';
 
 import { FreecellGame } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
 import { FreecellHistory } from '../freecell-history';
-
-import { randomIneger } from '../../common/math-utils';
 
 import { FreecellDeckComponent, LineChangeEvent } from '../freecell-deck/freecell-deck.component';
 import { FreecellHistoryItem } from '../freecell-history/freecell-history.component';
@@ -136,10 +136,14 @@ export class FreecellMainComponent implements OnInit {
   moveCard(source: number, destination: number, fast: boolean = false) {
     this.game.moveCard(source, destination);
     if (this.history.onMove(source, destination) === 0) {
+      const card = this.game.getCard(destination, -1);
       this.historyItems[this.history.size - 1] = {
-        card: this.game.getCard(destination, -1),
-        emptyCount: this.game.countEmpty(),
-        source, destination
+        name: playNameOf(card),
+        suit: suitFullNameOf(card),
+        rank: rankFullNameOf(card),
+        from: this.game.getSpotName(source),
+        goal: this.game.getSpotName(destination),
+        free: this.game.countEmpty(),
       };
       this.historyItems.length = this.history.size;
     }

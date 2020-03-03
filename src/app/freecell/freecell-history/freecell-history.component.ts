@@ -1,10 +1,12 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter } from '@angular/core';
 
 export interface FreecellHistoryItem {
-  card: number;
-  source: number;
-  destination: number;
-  emptyCount: number;
+  name: string;
+  suit: string;
+  rank: string;
+  from: string;
+  goal: string;
+  free: number;
 }
 
 @Component({

@@ -1,4 +1,12 @@
-<div>freecell-history-selection: {{selection}}
-  <a (click)="setSelection(-1)" >Start</a>
-  <a *ngFor="let item of items; index as i" (click)="setSelection(i)">{{i}}</a>
+<div class="list-group">
+  <a class="list-group-item list-group-item-action" [class.active]="selection === -1"
+    (click)="setSelection(-1)" >Start</a>
+  <a *ngFor="let item of items; index as i"
+    class="list-group-item list-group-item-action" [class.active]="selection === i"
+    (click)="setSelection(i)"
+  >
+    <span [class]="'risk-' + item.free">
+      <span [class]="item.suit">{{item.name}}</span>: {{item.from}} &rarr; {{item.goal}}; free {{item.free}};
+    </span>
+  </a>
 </div>

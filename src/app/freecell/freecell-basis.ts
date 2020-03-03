@@ -31,4 +31,17 @@ export class FreecellBasis {
   isCell(index: number) {
     return index >= this.CELL_START && index < this.CELL_END;
   }
+
+  getSpotName(index: number) {
+    if (this.isBase(index)) {
+      return 'base ' + (index - this.BASE_START);
+    }
+    if (this.isPile(index)) {
+      return 'pile ' + (index - this.PILE_START);
+    }
+    if (this.isCell(index)) {
+      return 'cell ' + (index - this.CELL_START);
+    }
+    return 'unknown ' + index;
+  }
 }
