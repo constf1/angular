@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter } from '@angular/core';
 
-interface FreecellHistoryItem {
+export interface FreecellHistoryItem {
   card: number;
   source: number;
   destination: number;
@@ -26,5 +26,12 @@ export class FreecellHistoryComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
+  }
+
+  setSelection(value: number) {
+    if (this.selection !== value) {
+      // this.selection = value;
+      this.selectionChange.emit(value);
+    }
   }
 }

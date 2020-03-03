@@ -1,1 +1,4 @@
-<p>freecell-history works!</p>
+<div>freecell-history-selection: {{selection}}
+  <a (click)="setSelection(-1)" >Start</a>
+  <a *ngFor="let item of items; index as i" (click)="setSelection(i)">{{i}}</a>
+</div>

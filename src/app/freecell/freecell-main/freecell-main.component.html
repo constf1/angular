@@ -7,7 +7,11 @@
       <button class="freecell horizontal bottom-right" [disabled]="!history.canRedo" (click)="onRedo()">REDO</button>
 
       <div class="history" [style.left.%]="showHistory ? 0 : -50">
-        <app-freecell-history *ngIf="showHistory" ></app-freecell-history>
+        <app-freecell-history *ngIf="showHistory"
+          [items]="historyItems"
+          [selection]="historySelection"
+          (selectionChange)="onHistorySelectionChange($event)"
+        ></app-freecell-history>
       </div>
       <button class="freecell vertical middle-left"
         [style.left.%]="showHistory ? 50 : 0"

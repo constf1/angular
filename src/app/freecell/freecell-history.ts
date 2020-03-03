@@ -94,25 +94,28 @@ export class FreecellHistory {
     return false;
   }
 
-  onMove(source: number, destination: number) {
+  onMove(source: number, destination: number): number {
     if (
       this.canUndo &&
       this.lastDestination === source &&
       this.lastSource === destination
     ) {
       this.undo();
+      return -1;
     } else if (
       this.canRedo &&
       this.nextSource === source &&
       this.nextDestination === destination
     ) {
       this.redo();
+      return 1;
     } else {
       this.path =
         (this.canRedo
           ? this.path.substring(0, this.mark + this.mark)
           : this.path) + this._encode(source, destination);
       this.mark++; // mark + mark === path.length
+      return 0;
     }
   }
 }

@@ -6,8 +6,10 @@ import { FreecellGame } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
 import { FreecellHistory } from '../freecell-history';
 
+import { randomIneger } from '../../common/math-utils';
+
 import { FreecellDeckComponent, LineChangeEvent } from '../freecell-deck/freecell-deck.component';
-import { randomIneger } from 'src/app/common/math-utils';
+import { FreecellHistoryItem } from '../freecell-history/freecell-history.component';
 
 @Component({
   selector: 'app-freecell-main',
@@ -30,6 +32,8 @@ export class FreecellMainComponent implements OnInit {
   autoplay = new Autoplay(200);
 
   showHistory = false;
+  historyItems: FreecellHistoryItem[] = [];
+  historySelection = -1;
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
@@ -48,10 +52,10 @@ export class FreecellMainComponent implements OnInit {
       this.height = this.mainRef.nativeElement.clientHeight;
     }
 
-    const left = this.layout.baseStartX;
-    const width = this.layout.baseEndX - this.layout.baseStartX;
-    const top = this.layout.baseEndY + 0.25 * this.layout.deltaHeight;
-    const height = this.layout.deltaHeight * 0.5;
+    // const left = this.layout.baseStartX;
+    // const width = this.layout.baseEndX - this.layout.baseStartX;
+    // const top = this.layout.baseEndY + 0.25 * this.layout.deltaHeight;
+    // const height = this.layout.deltaHeight * 0.5;
 
     this.game.deal();
   }
@@ -79,6 +83,7 @@ export class FreecellMainComponent implements OnInit {
   onDeal() {
     const deal = randomIneger(0, 10, this.history.deal);
     this.game.deal(deal);
+    this.historyItems.length = 0;
     this.history.onDeal(deal);
     this.freecellComponent.onDeal();
     this.onUpdate();
@@ -130,8 +135,25 @@ export class FreecellMainComponent implements OnInit {
 
   moveCard(source: number, destination: number, fast: boolean = false) {
     this.game.moveCard(source, destination);
-    this.history.onMove(source, destination);
+    if (this.history.onMove(source, destination) === 0) {
+      this.historyItems[this.history.size - 1] = {
+        card: this.game.getCard(destination, -1),
+        emptyCount: this.game.countEmpty(),
+        source, destination
+      };
+      this.historyItems.length = this.history.size;
+    }
+    this.historySelection = this.history.last;
     this.freecellComponent.onCardMove(source, destination, fast ? 'transition_fast' : 'transition_norm');
     this.onUpdate();
+  }
+
+  onHistorySelectionChange(value: number) {
+    while (this.history.last > value && this.history.canUndo) {
+      this.onUndo();
+    }
+    while (this.history.last < value && this.history.canRedo) {
+      this.onRedo();
+    }
   }
 }

@@ -65,6 +65,30 @@ export class FreecellDesk extends FreecellBasis {
     return tableau;
   }
 
+  countEmptyCells(): number {
+    let count = 0;
+    for (let i = this.CELL_START; i < this.CELL_END; i++) {
+      if (this.desk[i].length === 0) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  countEmptyPiles(): number {
+    let count = 0;
+    for (let i = this.PILE_START; i < this.PILE_END; i++) {
+      if (this.desk[i].length === 0) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  countEmpty(): number {
+    return this.countEmptyCells() + this.countEmptyPiles();
+  }
+
   getEmptyCell(): number {
     for (let i = this.CELL_START; i < this.CELL_END; i++) {
       if (this.desk[i].length === 0) {
