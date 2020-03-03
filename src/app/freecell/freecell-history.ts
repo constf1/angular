@@ -1,4 +1,4 @@
-import { byteToCode } from '../common/math-utils';
+import { codeToByte, byteArrayToString } from '../common/math-utils';
 
 export class FreecellHistory {
   private seed: number;
@@ -13,24 +13,28 @@ export class FreecellHistory {
     return this.seed;
   }
 
-  get currentSource() {
-    return this.path.charCodeAt(this.mark - 2);
+  get last() {
+    return this.mark - 1;
   }
 
-  get currentDestination() {
-    return this.path.charCodeAt(this.mark - 1);
+  get next() {
+    return this.mark;
+  }
+
+  get lastSource() {
+    return this.getSource(this.last);
+  }
+
+  get lastDestination() {
+    return this.getDestination(this.last);
   }
 
   get nextSource() {
-    return this.path.charCodeAt(this.mark);
+    return this.getSource(this.next);
   }
 
   get nextDestination() {
-    return this.path.charCodeAt(this.mark + 1);
-  }
-
-  get available() {
-    return (this.path.length - this.mark) / 2;
+    return this.getDestination(this.next);
   }
 
   get canUndo() {
@@ -38,17 +42,30 @@ export class FreecellHistory {
   }
 
   get canRedo() {
-    return this.mark < this.path.length;
+    return this.mark + this.mark < this.path.length;
+  }
+
+  protected _decode(index: number): number {
+    return codeToByte(this.path.charCodeAt(index));
+  }
+
+  protected _encode(...values: number[]): string {
+    return byteArrayToString(values);
+  }
+
+  getSource(index: number): number {
+    return this._decode(index + index);
+  }
+
+  getDestination(index: number): number {
+    return this._decode(index + index + 1);
   }
 
   toURI() {
     let uri = 'deal=' + this.deal;
     if (this.path) {
-      uri += '&path=';
-      for (let i = 0; i < this.path.length; i++) {
-        uri += String.fromCharCode(byteToCode(this.path.charCodeAt(i)));
-      }
-      if (this.mark < this.path.length) {
+      uri += '&path=' + this.path;
+      if (this.canRedo) {
         uri += '&mark=' + this.mark;
       }
     }
@@ -63,7 +80,7 @@ export class FreecellHistory {
 
   undo() {
     if (this.canUndo) {
-      this.mark -= 2;
+      this.mark--;
       return true;
     }
     return false;
@@ -71,7 +88,7 @@ export class FreecellHistory {
 
   redo() {
     if (this.canRedo) {
-      this.mark += 2;
+      this.mark++;
       return true;
     }
     return false;
@@ -80,22 +97,22 @@ export class FreecellHistory {
   onMove(source: number, destination: number) {
     if (
       this.canUndo &&
-      this.path.charCodeAt(this.mark - 1) === source &&
-      this.path.charCodeAt(this.mark - 2) === destination
+      this.lastDestination === source &&
+      this.lastSource === destination
     ) {
       this.undo();
     } else if (
       this.canRedo &&
-      this.path.charCodeAt(this.mark) === source &&
-      this.path.charCodeAt(this.mark + 1) === destination
+      this.nextSource === source &&
+      this.nextDestination === destination
     ) {
       this.redo();
     } else {
       this.path =
-        (this.mark < this.path.length
-          ? this.path.substring(0, this.mark)
-          : this.path) + String.fromCharCode(source, destination);
-      this.mark = this.path.length;
+        (this.canRedo
+          ? this.path.substring(0, this.mark + this.mark)
+          : this.path) + this._encode(source, destination);
+      this.mark++; // mark + mark === path.length
     }
   }
 }

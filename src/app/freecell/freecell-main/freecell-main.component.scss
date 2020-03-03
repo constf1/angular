@@ -8,11 +8,19 @@ div.main {
 
 $border-r: 0.6em;
 
-button.freecell {
+button.freecell, div.history {
   position: absolute;
+  background-color: #808080aa;
+
+  transition-property: left;
+
+  transition-duration: 0.5s;
+  transition-timing-function: ease-in-out;
+}
+
+button.freecell {
   cursor: pointer;
   color: lightyellow;
-  background-color: #808080aa;
   border: 2px solid darkorange;
 
   /* border-color: #FF4040; */
@@ -23,8 +31,17 @@ button.freecell {
   font-weight: 700;
   font-size: 10px;
 
-  width: 25%;
-  height: 5%;
+  &.horizontal {
+    width: 25%;
+    height: 5%;
+  }
+
+  &.vertical {
+    width: 2.5%;
+    height: 30%;
+    padding-left: 0;
+    padding-right: 0;
+  }
 
   &:disabled {
     color: darkgrey;
@@ -37,7 +54,7 @@ button.freecell {
     background-color: #929292e0;
   }
 
-  &::enabled:hover {
+  &:enabled:hover {
     color: #ffffb0;
     background-color: #888888dd;
   }
@@ -70,4 +87,20 @@ button.freecell {
     border-bottom: none;
     border-right: none;
   }
+  &.middle-left {
+    top: 35%;
+    left: 0;
+    border-top-right-radius: $border-r;
+    border-bottom-right-radius: $border-r;
+    border-left: none;
+  }
+}
+
+div.history {
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+
+  z-index: 1000;
 }

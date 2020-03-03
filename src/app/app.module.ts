@@ -7,13 +7,15 @@ import { RatioKeeperComponent } from './common/components/ratio-keeper/ratio-kee
 
 import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.component';
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
+import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     FreecellMainComponent,
     FreecellDeckComponent,
-    RatioKeeperComponent
+    RatioKeeperComponent,
+    FreecellHistoryComponent
   ],
   imports: [
     BrowserModule

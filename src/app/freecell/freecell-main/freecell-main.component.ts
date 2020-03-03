@@ -29,6 +29,8 @@ export class FreecellMainComponent implements OnInit {
 
   autoplay = new Autoplay(200);
 
+  showHistory = false;
+
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     if (this.mainRef && this.mainRef.nativeElement) {
@@ -64,7 +66,7 @@ export class FreecellMainComponent implements OnInit {
 
   onUndo() {
     if (this.history.canUndo) {
-      this.moveCard(this.history.currentDestination, this.history.currentSource);
+      this.moveCard(this.history.lastDestination, this.history.lastSource);
     }
   }
 
