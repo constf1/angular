@@ -8,7 +8,16 @@
     </div>
   </div>
 
-  <div class="list-group history-list">
+  <app-simple-virtual-list [itemCount]="items.length" [selection]="selection" (selectionChange)="setSelection($event)">
+    <ng-template appSimpleVirtualListItem let-i>
+      <span>
+        <span [ngClass]="items[i].whichClass">{{items[i].which}}</span> &rarr; <span [ngClass]="items[i].whereClass">{{items[i].where}}</span>
+      </span>
+      <span class="badge badge-pill" [ngClass]="items[i].outcomeClass">{{items[i].outcome}}</span>
+    </ng-template>
+  </app-simple-virtual-list>
+
+  <!-- <div class="list-group history-list">
     <a *ngFor="let item of items; index as i"
       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
       [class.active]="selection === i"
@@ -19,5 +28,5 @@
       </span>
       <span class="badge badge-pill" [ngClass]="item.outcomeClass">{{item.outcome}}</span>
     </a>
-  </div>
+  </div> -->
 </div>

@@ -1,1 +1,17 @@
-<p>simple-virtual-list works!</p>
+<ng-template #defaultItem let-itemIndex>{{itemIndex}}</ng-template>
+
+<div class="scroll-view" #view tabindex="0" [style.height.px]="lineHeight * rowCount" (keydown)="onKeyDown($event)"
+  (scroll)="onScroll($event)" (focus)="hasFocus = true" (blur)="hasFocus = false">
+
+  <div *ngIf="itemCount > 0" class="scroll-spacer" [style.height.px]="lineHeight" [style.transform]="'scaleY(' + itemCount + ')'"></div>
+
+  <div *ngIf="bufferSize > 0" class="scroll-buffer" [style.height.px]="lineHeight * bufferSize" [style.top.px]="lineHeight * firstItem">
+    <div class="scroll-item" *ngFor="let offset of bufferSize | xrange" [style.height.px]="lineHeight">
+      <a class="dropdown-item" [class.focus]="bufferIsFocus(offset)" [class.active]="bufferIsSelection(offset)"
+        (click)="bufferOnClick(offset)">
+        <ng-template [ngTemplateOutlet]="itemTemplate?.templateRef || defaultItem"
+          [ngTemplateOutletContext]="{ $implicit: toIndex(offset) }"></ng-template>
+      </a>
+    </div>
+  </div>
+</div>
