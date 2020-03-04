@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter } from '@angular/core';
 
 export interface FreecellHistoryItem {
-  name: string;
-  suit: string;
-  rank: string;
-  from: string;
-  goal: string;
-  free: number;
+  which?: string;
+  whichClass?: string;
+  where?: string;
+  whereClass?: string;
+  outcome?: string;
+  outcomeClass?: string;
 }
 
 @Component({
@@ -31,7 +31,7 @@ export class FreecellHistoryComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   setSelection(value: number) {
-    if (this.selection !== value) {
+    if (this.selection !== value && value <= this.items.length && value >= -1) {
       // this.selection = value;
       this.selectionChange.emit(value);
     }

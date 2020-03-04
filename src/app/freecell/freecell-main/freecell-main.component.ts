@@ -11,6 +11,8 @@ import { FreecellHistory } from '../freecell-history';
 import { FreecellDeckComponent, LineChangeEvent } from '../freecell-deck/freecell-deck.component';
 import { FreecellHistoryItem } from '../freecell-history/freecell-history.component';
 
+const INFO_LEVELS = ['dark', 'danger', 'warning', 'warning', 'info' ] as const;
+
 @Component({
   selector: 'app-freecell-main',
   templateUrl: './freecell-main.component.html',
@@ -133,19 +135,36 @@ export class FreecellMainComponent implements OnInit {
     });
   }
 
+  onUpdateHistory(source: number, destination: number) {
+    const item: FreecellHistoryItem = {};
+    const card = this.game.getCard(destination, -1);
+    item.which = playNameOf(card);
+    item.whichClass = suitFullNameOf(card) + ' ' + rankFullNameOf(card);
+
+    if (this.game.getLine(destination).length > 1) {
+      const prev = this.game.getCard(destination, -2);
+      item.where = playNameOf(prev);
+      item.whereClass = suitFullNameOf(prev) + ' ' + rankFullNameOf(prev);
+    } else if (this.game.isBase(destination)) {
+      item.where = 'base';
+    } else if (this.game.isCell(destination)) {
+      item.where = 'cell';
+    } else if (this.game.isPile(destination)) {
+      item.where = 'pile';
+    }
+
+    const count = this.game.countEmpty();
+    item.outcome = '' + count;
+    item.outcomeClass = 'badge-' + (INFO_LEVELS[count] || 'success');
+
+    this.historyItems[this.history.size - 1] = item;
+    this.historyItems.length = this.history.size;
+  }
+
   moveCard(source: number, destination: number, fast: boolean = false) {
     this.game.moveCard(source, destination);
     if (this.history.onMove(source, destination) === 0) {
-      const card = this.game.getCard(destination, -1);
-      this.historyItems[this.history.size - 1] = {
-        name: playNameOf(card),
-        suit: suitFullNameOf(card),
-        rank: rankFullNameOf(card),
-        from: this.game.getSpotName(source),
-        goal: this.game.getSpotName(destination),
-        free: this.game.countEmpty(),
-      };
-      this.historyItems.length = this.history.size;
+      this.onUpdateHistory(source, destination);
     }
     this.historySelection = this.history.last;
     this.freecellComponent.onCardMove(source, destination, fast ? 'transition_fast' : 'transition_norm');
