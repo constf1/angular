@@ -1,10 +1,18 @@
 <div>
   <div class="btn-toolbar" role="toolbar">
     <div class="btn-group btn-group-sm" role="group">
-      <button type="button" class="btn btn-secondary" (click)="setSelection(-1)">HOME</button>
-      <button type="button" class="btn btn-secondary" (click)="setSelection(selection-1)">PREV</button>
-      <button type="button" class="btn btn-secondary" (click)="setSelection(selection+1)">NEXT</button>
-      <button type="button" class="btn btn-secondary" (click)="setSelection(items.length-1)">LAST</button>
+      <button type="button" class="btn btn-secondary"
+        [disabled]="0 > selection"
+        (click)="setSelection(-1)">HOME</button>
+      <button type="button" class="btn btn-secondary"
+        [disabled]="0 > selection"
+        (click)="setSelection(selection-1)">PREV</button>
+      <button type="button" class="btn btn-secondary"
+        [disabled]="selection + 1 >= items.length"
+        (click)="setSelection(selection+1)">NEXT</button>
+      <button type="button" class="btn btn-secondary"
+        [disabled]="selection + 1 >= items.length"
+        (click)="setSelection(items.length-1)">LAST</button>
     </div>
   </div>
 
