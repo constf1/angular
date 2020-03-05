@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter, ViewChild } from '@angular/core';
+import { SimpleVirtualListComponent } from 'src/app/common/components/simple-virtual-list/simple-virtual-list.component';
 
 export interface FreecellHistoryItem {
   which?: string;
@@ -19,12 +20,21 @@ export class FreecellHistoryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() selection: number;
   @Output() selectionChange = new EventEmitter<number>();
 
+  @ViewChild(SimpleVirtualListComponent, { static: true }) list: SimpleVirtualListComponent;
+
   constructor() { }
 
   ngOnInit() {
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    if (changes.selection) {
+      setTimeout(() => {
+        const item = Math.max(Math.min(this.selection, this.items.length - 1), 0);
+        // console.log('Selection Change:', item);
+        this.list.scrollToItem(item);
+      }, 0);
+    }
   }
 
   ngOnDestroy() {

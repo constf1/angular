@@ -11,7 +11,7 @@ import {
   Output,
   EventEmitter,
   ViewChild,
-  ElementRef} from '@angular/core';
+  ElementRef } from '@angular/core';
 
 @Directive({
   selector: '[appSimpleVirtualListItem]'
@@ -50,14 +50,14 @@ export class SimpleVirtualListComponent implements OnInit, OnChanges {
   }
 
   get firstItem() {
-    return this._firstItem;
+    return this.first;
   }
 
   set firstItem(value: number) {
     const firstItemMax = this.itemCount - this.bufferSize;
     const newValue = Math.min(firstItemMax, Math.max(0, value));
-    if (newValue !== this._firstItem) {
-      this._firstItem = newValue;
+    if (newValue !== this.first) {
+      this.first = newValue;
       // this.pointerEvents = 'none';
       // setTimeout(()=>{
       //   this.pointerEvents = 'auto';
@@ -85,10 +85,10 @@ export class SimpleVirtualListComponent implements OnInit, OnChanges {
   focusedItem = -1;
   hasFocus = false;
 
-  private _firstItem = 0;
+  private first = 0;
 
   toIndex(offset: number) {
-    return this._firstItem + offset;
+    return this.first + offset;
   }
 
   bufferIsSelection(offset: number): boolean {
@@ -177,7 +177,7 @@ export class SimpleVirtualListComponent implements OnInit, OnChanges {
       case 'Enter':
         event.preventDefault();
         if (this.focusedItem >= 0 && this.focusedItem <= itemMax) {
-          this.bufferOnClick(this.focusedItem - this._firstItem);
+          this.bufferOnClick(this.focusedItem - this.first);
         }
     }
   }
@@ -198,8 +198,14 @@ export class SimpleVirtualListComponent implements OnInit, OnChanges {
     // Adjust firstItem and scrollTop position.
     const scrollTopMax = Math.max(0, count - this.rowCount) * this.lineHeight;
     if (this.scrollTop > scrollTopMax) {
-      this.firstItem = this._firstItem;
+      this.firstItem = this.first;
       this.scrollTop = scrollTopMax;
     }
+
+    // this.scrollToItem(this.selection);
+    // setTimeout(() => {
+    //   const item = Math.max(Math.min(this.selection, this.itemCount - 1), 0);
+    //   this.scrollToItem(item);
+    // }, 0);
   }
 }

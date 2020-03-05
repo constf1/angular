@@ -8,12 +8,15 @@
     </div>
   </div>
 
-  <app-simple-virtual-list [itemCount]="items.length" [selection]="selection" (selectionChange)="setSelection($event)">
+  <app-simple-virtual-list [itemCount]="items.length" [selection]="selection" (selectionChange)="setSelection($event)" [rowMax]='10'>
     <ng-template appSimpleVirtualListItem let-i>
-      <span>
-        <span [ngClass]="items[i].whichClass">{{items[i].which}}</span> &rarr; <span [ngClass]="items[i].whereClass">{{items[i].where}}</span>
+      <span class="d-flex justify-content-between align-items-center">
+        <span>
+          {{i + 1}}.
+          <span [ngClass]="items[i].whichClass">{{items[i].which}}</span> &rarr; <span [ngClass]="items[i].whereClass">{{items[i].where}}</span>
+        </span>
+        <span class="badge badge-pill" [ngClass]="items[i].outcomeClass">{{items[i].outcome}}</span>
       </span>
-      <span class="badge badge-pill" [ngClass]="items[i].outcomeClass">{{items[i].outcome}}</span>
     </ng-template>
   </app-simple-virtual-list>
 
