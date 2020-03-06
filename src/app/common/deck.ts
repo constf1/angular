@@ -120,11 +120,10 @@ export function rankFullNameOf(index: number) {
 // A set of optionally shuffled playing cards.
 export function deck(seed?: number): number[] {
   const cards: number[] = [];
-  if (seed === undefined) {
-    for (let i = 0; i < CARD_NUM; i++) {
-      cards[i] = i;
-    }
-  } else {
+  for (let i = 0; i < CARD_NUM; i++) {
+    cards[i] = i;
+  }
+  if (seed !== undefined) {
     // use LCG algorithm to pick up cards from the deck
     // http://en.wikipedia.org/wiki/Linear_congruential_generator
     const m = 0x80000000;
@@ -134,11 +133,17 @@ export function deck(seed?: number): number[] {
     for (let i = 0; i < CARD_NUM; i++) {
       seed = (a * seed + c) % m;
 
-      let card = seed % CARD_NUM;
-      while (cards.indexOf(card) >= 0) {
-        card = (card + 1) % CARD_NUM;
+      // swap cards
+      const j = seed % CARD_NUM;
+      if (i !== j) {
+        const card = cards[i];
+        cards[i] = cards[j];
+        cards[j] = card;
       }
-      cards.push(card);
+      // while (cards.indexOf(card) >= 0) {
+      //   card = (card + 1) % CARD_NUM;
+      // }
+      // cards.push(card);
     }
   }
   return cards;
