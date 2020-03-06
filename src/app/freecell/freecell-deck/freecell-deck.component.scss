@@ -18,7 +18,7 @@
   background-color:yellow;
   position: relative;
 
-  background-image: url('/assets/freecell/blue_gray_paper_grid.jpg');
+  background-image: url('../../../assets/freecell/blue_gray_paper_grid.jpg');
   background-repeat: repeat;
   background-size: auto;
 }
@@ -27,7 +27,7 @@
   cursor: pointer;
   position: absolute;
 
-  background-image: url('/assets/freecell/cards.svg');
+  background-image: url('../../../assets/freecell/cards.svg');
   background-size: 800% 800%;
   background-repeat: no-repeat;
 
