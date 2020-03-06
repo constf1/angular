@@ -1,0 +1,713 @@
+<svg width="480" height="640" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .club,.spade{fill:#000;stroke:#ff8c00}.diamond,.heart{fill:#dc143c;stroke:#a02020}.rank,.suit{transform:translate(8px,10px) scale(.15);stroke-width:2px}.suit{transform:translate(8px,22px) scale(.35)}.bottom{transform:rotate(180deg) translate(-60px,-80px)}.center-ace{transform:translate(30px,40px) scale(1.5);stroke-width:.5px}.center-jack{transform:translate(30px,40px) scale(.5);stroke-width:1px}.center-three,.center-two{stroke-width:2px}.center-two{transform:translate(30px,20px) scale(.4)}.center-three{transform:translate(30px,40px) scale(.4)}.center-six-left{transform:translate(21.5px,40px) scale(.4);stroke-width:2px}.center-six-right{transform:translate(38.5px,40px) scale(.4);stroke-width:2px}.center-seven,.center-ten{transform:translate(30px,30px) scale(.4);stroke-width:2px}.center-ten{transform:translate(30px,26.5px) scale(.4)}.four-left,.four-right{transform:translate(21.5px,20px) scale(.4);stroke-width:2px}.four-right{transform:translate(38.5px,20px) scale(.4)}.eight-left,.eight-right{transform:translate(21.5px,33px) scale(.4);stroke-width:2px}.eight-right{transform:translate(38.5px,33px) scale(.4)}
+  </style>
+  <defs>
+    <g id="ranks">
+      <path d="M19.81 62.802l2.2-.4q1 0 1 1.1 0 3.5-1.4 5.9-1.4 2.4-3.5 3.4-3.4 1.7-5.8 1.7-4.6 0-6.9-3.45-2.3-3.45-2.3-10.4t3.8-18.05h-5.8q-1.1 0-1.1-1.1t1.7-3.55q1.7-2.45 3.6-2.45h4.5q7.1-15.8 16.7-27.3 2.5-3 6.15-5.6 3.65-2.6 5.65-2.6 2 0 3 1.8 2.6 4.2 6.1 30.7 1.2 11.4 4.15 23.55t5.45 14.15q.6.4.6 1 0 1.5-4.25 2.8-4.25 1.3-6.5 1.3t-3.45-.55q-1.2-.55-1.5-1.15-1.8-3.9-3.6-18.6l-.6-4.7q-.4-4.7-.8-7.1l-.7-.5-20.9-.1q-1.2 5.1-1.2 8.9 0 3.8.25 5.55t1.65 3.75q1.4 2 3.8 2zm-2.5-27.3h.1q13.9 0 15.95.05 2.05.05 2.25-.15.2-.2.3-.5-1.7-12.3-2.7-16.75-1-4.45-2-4.45t-2.5 2q-7.9 9.9-11.4 19.8z" transform="translate(-30 -40)" id="rankA"/>
+      <path d="M27.874 73.112l-15.9-.9q-5.7 0-9.3 1.6-.7.3-1.2.3-1.3 0-1.3-3.35t1.9-8q1.9-4.65 4.6-8.65 5.7-8.7 9.9-13.2l1.9-2q5.5-5.9 8.85-11.6 3.35-5.7 3.35-12.4 0-6.3-4.9-8-1.1-.4-3.1-.45a9.387 9.387 0 00-.234-.003 8.683 8.683 0 00-3.566.753q-1.8.8-2.7 2-1.7 2.5-1.8 4.6-.2 3.6 1.6 4.8l.5.4q2.1.9 2.1 2.7v.1q0 2.7-1.6 4.25-1.6 1.55-3.2 1.75l-1.7.2q-3 0-5.05-1.1t-2.85-2.8q-1.5-3-1.5-6 0-8.5 6.45-13.3 6.45-4.8 14.75-4.8t14 4.3q5.7 4.3 5.7 12 0 10.4-8.9 18.3l-2 1.7q-13.4 11.4-17.6 18.6-1.5 2.5-1.5 4.2 0 1.1 1.95 1.35t7.55.25q14.1 0 18.3-4.6.5-.3 1-.3 1.2 0 1.2 3.4t-1.4 7.25q-1.4 3.85-4.1 5.45-1.9 1.2-10.2 1.2z" transform="translate(-22 -39)" id="rank2"/>
+      <path d="M10.704 35.848h-.2q-.7 0-.7-.5v-.2q.3-6.4 3.6-6.4h2q3.6 0 6.25-1.2t4.05-2.85q1.4-1.65 2.2-3.95 1.2-3.3 1.2-6.35t-.9-4.85q-.9-1.8-2.3-2.5-2.2-1.1-5-1.1t-5.1 2.1q-2.3 2.1-2.3 5.6 0 1.5.6 3t.6 1.8q0 1.5-1.7 2.25t-3.95.75q-2.25 0-3.95-1.5-1.7-1.5-2.05-2.95-.35-1.45-.35-2.95 0-4.9 3.4-8.2 6.1-5.8 17.2-5.8 2.3 0 5.75.85t5.75 2.2q2.3 1.35 4.2 4.35 1.9 3 1.9 6.85 0 3.85-1.25 6.8-1.25 2.95-3.05 4.65-3.8 3.5-6.7 4.2l-1.2.4q-.6.4-.6.75t.65.45q.65.1 1.6.35.95.25 3.45 1.5t4.4 3.15q1.9 1.9 3.45 5.55 1.55 3.65 1.55 9.2 0 5.55-2.4 10.2-2.4 4.65-5.9 6.75-7.1 4.4-12.6 4.6l-2.4.1q-9.5 0-14.7-3.95-5.2-3.95-5.2-10.45 0-5 2.75-8.9 2.75-3.9 7.35-3.9 2.5 0 4.55 1.1t2.05 3.2q0 1.1-.9 1.5-1.5.9-2.3 2.55-.8 1.65-.9 2.85l-.1 1.2q0 3.6 2 5.85 2 2.25 5.2 2.25 10.4 0 10.4-17.1 0-7.1-4.4-10.3-4.4-3.2-11.5-3.2h-1.2l-2.3.2z" transform="translate(-22 -39)" id="rank3"/>
+      <path d="M28.808 54.01l-8.6-.1-18 .2q-2.2 0-2.2-2l.2-1.1q6.4-15.8 21.5-35.9 4.8-6.5 8.9-11l1.3-1.3q2.6-2.7 7.7-2.7 2.7 0 2.7 1.6-1.6 14.1-1.6 28.7v12.7q1.3-.1 2.8-.2l2.3-.2h.9a.614.614 0 01.8.5q0 1.7-1.7 5.5t-3.5 4.6l-1.4.3q.2 11.3 1 15.2 0 2.6-3.95 3.8-3.95 1.2-7.5 1.2t-3.55-1.6q0-.2.6-4t1.3-14.2zm-14.7-10.4l8.3.2q4.4 0 6.9-.1.3-8.2.3-14.4l-.1-9.8q0-1.3-.7-1.3l-1.2.6q-3.1 3.4-6.55 8.9-3.45 5.5-5.35 9.4l-1.9 3.8q-.4.9-.4 1.8t.7.9z" transform="translate(-26 -39)" id="rank4"/>
+      <path d="M34.118 12.109l-9.9-.7q-9.3 0-9.7 2.5-1.4 6.6-1.6 11.7 0 1 .7 1 .2 0 .6-.2 3.6-1.9 8.3-1.9 4.7 0 8.45 1.4 3.75 1.4 5.85 3.8 2.1 2.4 3.55 4.85 1.45 2.45 2.05 5.45.8 4.8.8 8 0 10.6-5.75 17.65-5.75 7.05-16.35 7.05h-.3q-9.3 0-15.05-3.6t-5.75-10.9q0-3.5 1.05-6.1 1.05-2.6 2.55-3.8 3.1-2.5 5.6-2.7l1-.1q2.3 0 4.4 1.05 2.1 1.05 2.1 3.15 0 .8-1.1 1.65-1.1.85-1.9 2.5-.8 1.65-.9 2.75l-.2 1.2q0 2.7.9 4.55.9 1.85 2.3 2.45 2.3 1.1 3.9 1.1 3.5 0 5.85-2.35 2.35-2.35 3.25-5.95 1.3-5.6 1.3-8.7 0-17.1-9.6-17.1-5.9 0-9.5 5.4-.5 1.7-4.3 1.7t-3.8-1.6v-.4q2.2-12.9 3.6-34.8.3-.9 1.4-1.1 4.1-.2 9.2-.2l11.5.2q9.2 0 11.1-.8.4-.2.9-.2 1 0 1 1 0 2.8-2.35 6.95t-5.15 4.15z" transform="translate(-22 -39)" id="rank5"/>
+      <path d="M22.506 73.205q-5.8 0-10.05-1.8-4.25-1.8-6.6-4.55-2.35-2.75-3.65-6.95-2.2-6.8-2.2-15.15 0-8.35.55-13.75t2.3-11.3q1.75-5.9 4.5-10.1 2.75-4.2 7.55-6.9t11.1-2.7q4 0 9.4 1.8 3.2 1.1 5.3 4 2.1 2.9 2.1 7.2 0 2.8-1.2 4.7-2.3 3.7-6.2 3.7-2.2 0-4.05-1.4-1.85-1.4-1.85-2.75t.9-2.65q.9-1.3.9-3 0-5.6-6.5-5.6-.5 0-1.25.1t-2.75 1.45q-2 1.35-3.5 3.7t-2.75 7.55q-1.25 5.2-1.25 12.4.1.8.6.8.1 0 .5-.2 1.2-1.4 4.7-2.75t7.3-1.35q3.8 0 7 1.3t4.95 3.5q1.75 2.2 2.95 4.45 1.2 2.25 1.7 4.75.7 4.3.7 6 0 10.7-5.55 18.1-5.55 7.4-15.65 7.4zm7.35-30.85q-.75-3.15-2.75-5.2-2-2.05-4.95-2.05t-4.95 2.05q-2 2.05-2.8 5.15-1.1 4.9-1.1 8.4t.6 6.75q.6 3.25 2.7 6.15 2.1 2.9 5.1 2.9 3 0 4.85-1.75 1.85-1.75 2.75-4.45 1.7-5.1 1.7-8.1t-.2-4.85q-.2-1.85-.95-5z" transform="translate(-22 -39)" id="rank6"/>
+      <path d="M11.06.1l15.2.5q5.2 0 8.5-.4l1.1-.2q1.7 0 1.7 3.8t-1.3 6.7Q18.46 39 18.46 63.2q0 4.7.75 6 .75 1.3.75 1.4 0 1.8-5.5 1.8-9.8 0-9.8-3.7 0-13.8 10.95-34.6t10.95-22.4q0-.8-.8-1-3.4-.2-6.05-.2t-5.95.65q-3.3.65-5.2 1.65-3.8 1.9-4.8 3.4l-.5.7q-.7 1.2-1.5 1.2-1.2 0-1.2-1.8 0-15 3.4-15.7 2-.5 7.1-.5z" transform="translate(-18 -38)" id="rank7"/>
+      <path d="M12.92 33.908l1.4-.7q.6-.2.6-.6l-.5-.6q-10.6-4.4-10.6-14.8 0-8.2 6.05-12.7t14.45-4.5q3.6 0 7.2.95t5.9 2.35q2.3 1.4 4.05 4.25t1.75 7.05q0 4.2-2.6 8.3-2.6 4.1-6.6 6.7-.8.4-.8.65t.6.75q1.6.6 4.15 2.55 2.55 1.95 4.2 4 1.65 2.05 3.05 5.55t1.4 6.2q0 2.7-.2 4.5-.2 1.8-1.5 5.5t-3.6 6.45q-2.3 2.75-7.1 4.95t-11.4 2.2q-9.9 0-16.35-4.95-6.45-4.95-6.45-13.95 0-4.3 1.45-8.05 1.45-3.75 3.55-6.05 4.1-4.4 7.9-6zm21.1 19q-.5-8.5-7.5-13.2-3.2-2.2-3.95-2.2t-1.6.45q-.85.45-2.1 1.6-1.25 1.15-2.35 2.75-2.8 3.8-2.8 10.5 0 3.2 1 6.6 2.1 6.5 8.9 6.5 5.4 0 7.9-4.2t2.5-8.8zm-7-27.2q2.5-1.7 3.6-5.1 1.1-3.4 1.1-5.7 0-2.3-.75-4.25-.75-1.95-1.85-2.75-2.1-1.8-4.85-1.9a13.578 13.578 0 00-.493-.009 9.111 9.111 0 00-4.207.909q-1.95 1-2.75 2.6-1.3 2.6-1.3 5.1 0 4.4 4.3 7.95t6.2 3.55q.5 0 1-.4z" transform="translate(-25 -39)" id="rank8"/>
+      <path d="M18.44 67.314h.1q12.1 0 12.1-27.1-.1-.8-.6-.8-.1 0-.5.2-1.2 1.4-4.7 2.75t-7.1 1.35q-8.1 0-12.8-5.45-4.7-5.45-4.7-12.95 0-13.6 7.7-20.4 5.8-4.9 12.35-4.9t10.85 1.7q4.3 1.7 6.75 4.35 2.45 2.65 3.85 6.85 2.2 6.7 2.2 17.7 0 42.7-25.5 42.7-4.3 0-9-1.4-9.3-2.8-9.3-11.9 0-9.1 8.2-9.1 2.1 0 3.75 1.45t1.65 2.95q0 1.5-1.05 3.2-1.05 1.7-1.05 2.7 0 6.1 6.8 6.1zm-4.8-38.75q.7 2.95 2.8 5.35 2.1 2.4 5.35 2.4 3.25 0 5.35-2.6 3.5-4.2 3.5-11.5 0-3.4-.9-7.4-2-8-8-8-2.9 0-4.9 2.05-2 2.05-2.7 5.15-1.2 4.8-1.2 8.2 0 3.4.7 6.35z" transform="translate(-22 -39)" id="rank9"/>
+      <path d="M68.9 67.85q-2.5 2.75-6.4 4.25-3.9 1.5-9.45 1.5-5.55 0-10.05-2.15-4.5-2.15-6.95-5.4-2.45-3.25-3.95-8.15t-1.9-9.3q-.4-4.4-.4-10.35 0-5.95.5-10.95.5-5 2-10.25t4.05-8.75q2.55-3.5 6.95-5.75T53.35.3Q59 .3 63.1 2t6.6 4.85q2.5 3.15 4.1 6.55 1.6 3.4 2.3 8 1.2 7.8 1.2 13.95 0 6.15-.35 10.15t-1.2 8.45q-.85 4.45-2.6 7.8-1.75 3.35-4.25 6.1zM20.8 29.8l.5 32.9q0 4.8-.1 6.1-.1 2.4-4 3.55t-6.9 1.15q-3 0-3-1.5a87.278 87.278 0 01.5-5.4q1.8-14.4 1.8-31.5l-.4-15.3q-.6-5.2-5.5-5.2l-2 .2Q0 14.8 0 13.7q0-2.5 8.35-8.1T20.1 0q1.6 0 1.6 2.05t-.45 10.65q-.45 8.6-.45 17.1zm43.3 7.15Q64.1 7.1 53.55 7.1T43 36.95Q43 66.8 53.55 66.8T64.1 36.95z" transform="translate(-39 -39)" id="rankT"/>
+      <path d="M9.702 52.948l.2-20.2q0-23.7-2.3-26.8-1.1-1.4-1.1-1.95t1.35-1.3q1.35-.75 5.25-1.65 3.9-.9 6.9-.9 3 0 3 1.4l-.2 1.3q-1.2 10.8-1.2 21.1t.6 23q.6 12.7.6 18.7 0 8.1-6.25 13.95t-14.85 6.35q-1.7-.2-1.7-1.2 0-.7.45-1.1.45-.4 1.05-1 .6-.6 2.2-3.1t2.8-5.65q1.2-3.15 2.2-8.75 1-5.6 1-12.2z" transform="translate(-16 -39)" id="rankJ"/>
+      <path d="M9.029 17.307l.4-.6q1-4.6 3.25-7.95 2.25-3.35 4.5-5t5.05-2.55q3.7-1.2 6.5-1.2 6.7 0 11.55 3.1 4.85 3.1 7.35 8.4 4.6 10.1 4.6 22.9 0 21.5-10.2 31.7 4.7 5.2 9.2 5.2 1.3 0 1.3.9 0 1.6-3.7 3.45t-7.9 1.85l-3.2-.3q-1.3-.2-2.1-.95t-1-2.05l-.7-2.8q-4.7 1.9-9.6 1.9-12.5 0-18.4-8.55-5.9-8.55-5.9-21.65 0-7.6 1.3-13.95t2.7-8.95l1.3-2.6q.4-.9 1.3-.9t1.35.15q.45.15.7.3.25.15.35.15zm17.5 39.3l-.8-.7q-.3-.4-.3-.8 0-1.1 2-1.1 4.1 0 8.4 4.3 3.8-7.8 3.8-20.3 0-20.2-6.7-26.8-2.9-2.8-6.2-2.8-3.3 0-5.7 2.6-4.2 4.6-4.2 11.65 0 7.05 3.6 8.45.9.3.9 1.3 0 3-2 5.05t-4.9 2.45q-.9 0-.9.7-.1 1.1-.1 3.15t.2 4.5q.2 2.45.95 5.8.75 3.35 2 5.8 1.25 2.45 3.6 4.2t5.45 1.75q3.1 0 5.7-1.8-2.3-5.2-4.8-7.4z" transform="translate(-26 -39)" id="rankQ"/>
+      <path d="M31.1 56.049v-4q0-10.5-3-15.2-2.6-4.1-4.7-4.6-1.6-.5-1.7-.5l-1.1.5q-2.4 2.8-3.8 5.4-1.4 2.6-1.5 3.8l-.2 1.3q0 14.1 1.2 24.1.2 1.2.2 1.4 0 2.2-4.65 3.8-4.65 1.6-7.6 1.6-2.95 0-2.95-.9 0-.6.3-1.5 1-2.2 1.45-14.55.45-12.35.45-22.5t-.4-16.45q-.6-9.5-2-11.4-1.1-1.4-1.1-1.8 0-1.4 5.15-2.7 5.15-1.3 8.3-1.3 3.15 0 3.15 1.4l-.1 1.3q-1.3 10.8-1.3 23.1 0 1 .45 1t1.05-.9q.6-.9 1.75-2.5t4.2-5.8q3.05-4.2 5.65-7.5 2.6-3.3 5.25-6.15 2.65-2.85 4.35-3.55 1.7-.7 6.9-.7t5.2 1.3q0 .5-1.1 1.1-1.1.6-3 1.9-1.9 1.3-7.95 7.1-6.05 5.8-12.15 13.6-.2.2-.2.55 0 .35.55.45.55.1 1.55.3 1 .2 3.65 1.55t4.75 3.4q2.1 2.05 4.05 6.3 1.95 4.25 2.25 8 .3 3.75.6 6.75t1.55 8.6q1.25 5.6 2.95 6.7.5.4.5 1 0 1.6-4.4 2.95t-7.85 1.35q-3.45 0-3.95-2.8-.5-3-.7-14.3z" transform="translate(-24 -39)" id="rankK"/>
+    </g>
+    <g id="suits">
+      <path d="M22.119 0q3.516 6.104 9.985 14.917A212.191 212.191 0 0044.531 30.42 161.303 161.303 0 0033.74 43.774q-7.47 9.937-11.523 17.164-1.807-3.467-6.323-9.839-4.517-6.372-8.13-11.036Q4.15 35.4 0 30.42a331.124 331.124 0 0011.987-15.112A134.449 134.449 0 0022.119 0z" transform="matrix(.5 0 0 .5 -11.1 -15.25)" id="suitD"/>
+      <path d="M50.102 58.011l.391 1.709H9.38l.39-1.709a47.785 47.785 0 009.497-2.637q2.906-1.318 5.225-4.248a22.815 22.815 0 003.613-6.568 21.788 21.788 0 001.294-7.348l-.098-2.295a20.881 20.881 0 01-7.128 8.74q-4.346 2.881-8.692 2.881-3.76 0-6.909-1.855-3.149-1.856-4.858-4.932a13.836 13.836 0 01-1.709-6.836q0-5.615 3.564-9.473 3.565-3.857 8.106-3.906 3.027 0 7.91 2.49a48.144 48.144 0 01-2.686-5.127 12.787 12.787 0 01-.537-3.662q0-5.908 3.955-9.57T29.79.003q5.664 0 9.57 3.906 3.906 3.906 3.906 9.131 0 4.199-3.369 8.984 4.102-1.953 4.883-2.099 1.074-.391 2.979-.391 5.126 0 8.447 3.809a12.988 12.988 0 013.564 9.375 13.606 13.606 0 01-3.808 9.692 12.504 12.504 0 01-9.473 4.028 14.589 14.589 0 01-5.615-1.196q-2.881-1.196-5.2-3.198a28.936 28.936 0 01-5.298-7.129 38.353 38.353 0 001.44 9.888 17.949 17.949 0 003.858 6.665 16.329 16.329 0 005.761 4.223 44.247 44.247 0 008.667 2.32z" transform="matrix(.5 0 0 .5 -15 -15.25)" id="suitC"/>
+      <path d="M10.7 32.423l-4.394-6.006q-3.662-4.883-4.981-8.033Q.007 15.235.007 12.012q0-5.224 3.393-8.569Q6.794.098 11.726.098q4.248 0 7.739 2.784 3.491 2.783 5.347 8.642a16.854 16.854 0 015.127-8.667A11.9 11.9 0 0137.702.001a11.545 11.545 0 018.228 3.32 10.76 10.76 0 013.491 8.105 21.044 21.044 0 01-2.148 8.838q-2.149 4.639-7.569 11.328a153.892 153.892 0 00-9.985 13.941 45.872 45.872 0 00-4.907 11.499 43.495 43.495 0 00-3.296-8.643A134.149 134.149 0 0010.7 32.423z" transform="matrix(.5 0 0 .5 -12.4 -15.25)" id="suitH"/>
+      <path d="M42.678 58.301l.391 1.806H4.397l.293-1.806a20.59 20.59 0 0010.254-2.368q4.199-2.369 6.323-6.568 2.124-4.199 2.124-11.279v-.684q-4.394 9.327-12.695 9.327-4.346 0-7.52-3.125Q.003 40.479.003 35.986a13.682 13.682 0 012.172-7.666Q4.348 25 9.182 20.996a61.076 61.076 0 0010.01-10.351A28.006 28.006 0 0023.684 0a36.261 36.261 0 003.565 8.813 52.216 52.216 0 009.716 10.914q6.885 6.152 8.594 9.375 1.709 3.222 1.807 6.689a10.515 10.515 0 01-3.174 7.813q-3.174 3.125-7.422 3.125a14.285 14.285 0 01-12.5-9.327 29.748 29.748 0 002.075 11.817q1.929 4.052 5.909 6.347 3.979 2.295 10.424 2.735z" transform="matrix(.5 0 0 .5 -11.8 -15.25)" id="suitS"/>
+    </g>
+    <g id="cards">
+      <g id="background">
+        <radialGradient id="bgCardGradient">
+          <stop offset="0%" stop-color="#ffe"/>
+          <stop offset="99%" stop-color="#f0f0d0"/>
+        </radialGradient>
+        <radialGradient id="bgCellGradient">
+          <stop offset="0%" stop-color="#ddfefe"/>
+          <stop offset="99%" stop-color="#00b0b0"/>
+        </radialGradient>
+        <radialGradient id="bgBaseGradient">
+          <stop offset="0%" stop-color="#feddfe"/>
+          <stop offset="99%" stop-color="#dd80dd"/>
+        </radialGradient>
+        <radialGradient id="bgPileGradient">
+          <stop offset="0%" stop-color="#f0f0e0"/>
+          <stop offset="99%" stop-color="#bba"/>
+        </radialGradient>
+        <g id="bgCard" stroke-width=".75" stroke="#ba7">
+          <rect x="0" y="0" width="60" height="80" rx="5" fill="#985" fill-opacity="0.75" stroke="none" />
+          <rect x="1" y="1" width="58" height="78" rx="5" fill="url(#bgCardGradient)"/>
+          <path d="M30 10h18a3 3 180 100-6 2 2 180 100 4 1 1 180 100-2m2 34V12a3 3 180 016 0 2 2 180 11-4 0 1 1 180 012 0" id="bgLine" fill="none"/>
+          <use href="#bgLine" transform="rotate(180 30 40)"/>
+        </g>
+        <rect x="1" y="1" width="58" height="78" rx="5" fill="url(#bgCellGradient)" stroke="#408080" id="bgCell"/>
+        <rect x="1" y="1" width="58" height="78" rx="5" fill="url(#bgBaseGradient)" stroke="#804080" id="bgBase"/>
+        <g id="bgPile">
+          <rect x="1" y="1" width="58" height="78" rx="5" fill="url(#bgPileGradient)"/>
+          <path d="M1 74V6a5 5 90 015-5h48a5 5 90 015 5v68" stroke="#606020" fill="none"/>
+        </g>
+      </g>
+      <g id="cardAC">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-ace"/>
+        <g id="cardACTop">
+          <use href="#rankA" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#cardACTop" class="bottom"/>
+      </g>
+      <g id="cardAD">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-ace"/>
+        <g id="cardADTop">
+          <use href="#rankA" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#cardADTop" class="bottom"/>
+      </g>
+      <g id="cardAH">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-ace"/>
+        <g id="cardAHTop">
+          <use href="#rankA" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#cardAHTop" class="bottom"/>
+      </g>
+      <g id="cardAS">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-ace"/>
+        <g id="cardASTop">
+          <use href="#rankA" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#cardASTop" class="bottom"/>
+      </g>
+      <g id="card2C">
+        <use href="#bgCard"/>
+        <g id="card2CTop">
+          <use href="#suitC" class="center-two"/>
+          <use href="#rank2" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card2CTop" class="bottom"/>
+      </g>
+      <g id="card2D">
+        <use href="#bgCard"/>
+        <g id="card2DTop">
+          <use href="#suitD" class="center-two"/>
+          <use href="#rank2" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card2DTop" class="bottom"/>
+      </g>
+      <g id="card2S">
+        <use href="#bgCard"/>
+        <g id="card2STop">
+          <use href="#suitS" class="center-two"/>
+          <use href="#rank2" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card2STop" class="bottom"/>
+      </g>
+      <g id="card2H">
+        <use href="#bgCard"/>
+        <g id="card2HTop">
+          <use href="#suitH" class="center-two"/>
+          <use href="#rank2" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card2HTop" class="bottom"/>
+      </g>
+      <g id="card3C">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-three"/>
+        <g id="card3CTop">
+          <use href="#suitC" class="center-two"/>
+          <use href="#rank3" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card3CTop" class="bottom"/>
+      </g>
+      <g id="card3D">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-three"/>
+        <g id="card3DTop">
+          <use href="#suitD" class="center-two"/>
+          <use href="#rank3" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card3DTop" class="bottom"/>
+      </g>
+      <g id="card3S">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-three"/>
+        <g id="card3STop">
+          <use href="#suitS" class="center-two"/>
+          <use href="#rank3" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card3STop" class="bottom"/>
+      </g>
+      <g id="card3H">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-three"/>
+        <g id="card3HTop">
+          <use href="#suitH" class="center-two"/>
+          <use href="#rank3" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card3HTop" class="bottom"/>
+      </g>
+      <g id="card4C">
+        <use href="#bgCard"/>
+        <g id="card4CTop">
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#rank4" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card4CTop" class="bottom"/>
+      </g>
+      <g id="card4D">
+        <use href="#bgCard"/>
+        <g id="card4DTop">
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#rank4" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card4DTop" class="bottom"/>
+      </g>
+      <g id="card4S">
+        <use href="#bgCard"/>
+        <g id="card4STop">
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#rank4" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card4STop" class="bottom"/>
+      </g>
+      <g id="card4H">
+        <use href="#bgCard"/>
+        <g id="card4HTop">
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#rank4" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card4HTop" class="bottom"/>
+      </g>
+      <g id="card5C">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-three"/>
+        <g id="card5CTop">
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#rank5" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card5CTop" class="bottom"/>
+      </g>
+      <g id="card5D">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-three"/>
+        <g id="card5DTop">
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#rank5" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card5DTop" class="bottom"/>
+      </g>
+      <g id="card5S">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-three"/>
+        <g id="card5STop">
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#rank5" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card5STop" class="bottom"/>
+      </g>
+      <g id="card5H">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-three"/>
+        <g id="card5HTop">
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#rank5" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card5HTop" class="bottom"/>
+      </g>
+      <g id="card6C">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-six-left"/>
+        <use href="#suitC" class="center-six-right"/>
+        <g id="card6CTop">
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#rank6" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card6CTop" class="bottom"/>
+      </g>
+      <g id="card6D">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-six-left"/>
+        <use href="#suitD" class="center-six-right"/>
+        <g id="card6DTop">
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#rank6" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card6DTop" class="bottom"/>
+      </g>
+      <g id="card6S">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-six-left"/>
+        <use href="#suitS" class="center-six-right"/>
+        <g id="card6STop">
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#rank6" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card6STop" class="bottom"/>
+      </g>
+      <g id="card6H">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-six-left"/>
+        <use href="#suitH" class="center-six-right"/>
+        <g id="card6HTop">
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#rank6" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card6HTop" class="bottom"/>
+      </g>
+      <g id="card7C">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-six-left"/>
+        <use href="#suitC" class="center-six-right"/>
+        <use href="#suitC" class="center-seven"/>
+        <g id="card7CTop">
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#rank7" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card7CTop" class="bottom"/>
+      </g>
+      <g id="card7D">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-six-left"/>
+        <use href="#suitD" class="center-six-right"/>
+        <use href="#suitD" class="center-seven"/>
+        <g id="card7DTop">
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#rank7" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card7DTop" class="bottom"/>
+      </g>
+      <g id="card7S">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-six-left"/>
+        <use href="#suitS" class="center-six-right"/>
+        <use href="#suitS" class="center-seven"/>
+        <g id="card7STop">
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#rank7" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card7STop" class="bottom"/>
+      </g>
+      <g id="card7H">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-six-left"/>
+        <use href="#suitH" class="center-six-right"/>
+        <use href="#suitH" class="center-seven"/>
+        <g id="card7HTop">
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#rank7" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card7HTop" class="bottom"/>
+      </g>
+      <g id="card8C">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-six-left"/>
+        <use href="#suitC" class="center-six-right"/>
+        <g id="card8CTop">
+          <use href="#suitC" class="center-seven"/>
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#rank8" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card8CTop" class="bottom"/>
+      </g>
+      <g id="card8D">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-six-left"/>
+        <use href="#suitD" class="center-six-right"/>
+        <g id="card8DTop">
+          <use href="#suitD" class="center-seven"/>
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#rank8" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card8DTop" class="bottom"/>
+      </g>
+      <g id="card8S">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-six-left"/>
+        <use href="#suitS" class="center-six-right"/>
+        <g id="card8STop">
+          <use href="#suitS" class="center-seven"/>
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#rank8" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card8STop" class="bottom"/>
+      </g>
+      <g id="card8H">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-six-left"/>
+        <use href="#suitH" class="center-six-right"/>
+        <g id="card8HTop">
+          <use href="#suitH" class="center-seven"/>
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#rank8" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card8HTop" class="bottom"/>
+      </g>
+      <g id="card9C">
+        <use href="#bgCard"/>
+        <use href="#suitC" class="center-three"/>
+        <g id="card9CTop">
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#suitC" class="eight-left"/>
+          <use href="#suitC" class="eight-right"/>
+          <use href="#rank9" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#card9CTop" class="bottom"/>
+      </g>
+      <g id="card9D">
+        <use href="#bgCard"/>
+        <use href="#suitD" class="center-three"/>
+        <g id="card9DTop">
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#suitD" class="eight-left"/>
+          <use href="#suitD" class="eight-right"/>
+          <use href="#rank9" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#card9DTop" class="bottom"/>
+      </g>
+      <g id="card9S">
+        <use href="#bgCard"/>
+        <use href="#suitS" class="center-three"/>
+        <g id="card9STop">
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#suitS" class="eight-left"/>
+          <use href="#suitS" class="eight-right"/>
+          <use href="#rank9" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#card9STop" class="bottom"/>
+      </g>
+      <g id="card9H">
+        <use href="#bgCard"/>
+        <use href="#suitH" class="center-three"/>
+        <g id="card9HTop">
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#suitH" class="eight-left"/>
+          <use href="#suitH" class="eight-right"/>
+          <use href="#rank9" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#card9HTop" class="bottom"/>
+      </g>
+      <g id="cardTC">
+        <use href="#bgCard"/>
+        <g id="cardTCTop">
+          <use href="#suitC" class="center-ten"/>
+          <use href="#suitC" class="four-left"/>
+          <use href="#suitC" class="four-right"/>
+          <use href="#suitC" class="eight-left"/>
+          <use href="#suitC" class="eight-right"/>
+          <use href="#rankT" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#cardTCTop" class="bottom"/>
+      </g>
+      <g id="cardTD">
+        <use href="#bgCard"/>
+        <g id="cardTDTop">
+          <use href="#suitD" class="center-ten"/>
+          <use href="#suitD" class="four-left"/>
+          <use href="#suitD" class="four-right"/>
+          <use href="#suitD" class="eight-left"/>
+          <use href="#suitD" class="eight-right"/>
+          <use href="#rankT" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#cardTDTop" class="bottom"/>
+      </g>
+      <g id="cardTS">
+        <use href="#bgCard"/>
+        <g id="cardTSTop">
+          <use href="#suitS" class="center-ten"/>
+          <use href="#suitS" class="four-left"/>
+          <use href="#suitS" class="four-right"/>
+          <use href="#suitS" class="eight-left"/>
+          <use href="#suitS" class="eight-right"/>
+          <use href="#rankT" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#cardTSTop" class="bottom"/>
+      </g>
+      <g id="cardTH">
+        <use href="#bgCard"/>
+        <g id="cardTHTop">
+          <use href="#suitH" class="center-ten"/>
+          <use href="#suitH" class="four-left"/>
+          <use href="#suitH" class="four-right"/>
+          <use href="#suitH" class="eight-left"/>
+          <use href="#suitH" class="eight-right"/>
+          <use href="#rankT" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#cardTHTop" class="bottom"/>
+      </g>
+      <g id="cardJC">
+        <use href="#bgCard"/>
+        <use href="#rankJ" class="center-jack"/>
+        <g id="cardJCTop">
+          <use href="#rankJ" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#cardJCTop" class="bottom"/>
+      </g>
+      <g id="cardJD">
+        <use href="#bgCard"/>
+        <use href="#rankJ" class="center-jack"/>
+        <g id="cardJDTop">
+          <use href="#rankJ" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#cardJDTop" class="bottom"/>
+      </g>
+      <g id="cardJS">
+        <use href="#bgCard"/>
+        <use href="#rankJ" class="center-jack"/>
+        <g id="cardJSTop">
+          <use href="#rankJ" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#cardJSTop" class="bottom"/>
+      </g>
+      <g id="cardJH">
+        <use href="#bgCard"/>
+        <use href="#rankJ" class="center-jack"/>
+        <g id="cardJHTop">
+          <use href="#rankJ" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#cardJHTop" class="bottom"/>
+      </g>
+      <g id="cardQC">
+        <use href="#bgCard"/>
+        <use href="#rankQ" class="center-jack"/>
+        <g id="cardQCTop">
+          <use href="#rankQ" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#cardQCTop" class="bottom"/>
+      </g>
+      <g id="cardQD">
+        <use href="#bgCard"/>
+        <use href="#rankQ" class="center-jack"/>
+        <g id="cardQDTop">
+          <use href="#rankQ" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#cardQDTop" class="bottom"/>
+      </g>
+      <g id="cardQS">
+        <use href="#bgCard"/>
+        <use href="#rankQ" class="center-jack"/>
+        <g id="cardQSTop">
+          <use href="#rankQ" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#cardQSTop" class="bottom"/>
+      </g>
+      <g id="cardQH">
+        <use href="#bgCard"/>
+        <use href="#rankQ" class="center-jack"/>
+        <g id="cardQHTop">
+          <use href="#rankQ" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#cardQHTop" class="bottom"/>
+      </g>
+      <g id="cardKC">
+        <use href="#bgCard"/>
+        <use href="#rankK" class="center-jack"/>
+        <g id="cardKCTop">
+          <use href="#rankK" class="rank"/>
+          <use href="#suitC" class="suit"/>
+        </g>
+        <use href="#cardKCTop" class="bottom"/>
+      </g>
+      <g id="cardKD">
+        <use href="#bgCard"/>
+        <use href="#rankK" class="center-jack"/>
+        <g id="cardKDTop">
+          <use href="#rankK" class="rank"/>
+          <use href="#suitD" class="suit"/>
+        </g>
+        <use href="#cardKDTop" class="bottom"/>
+      </g>
+      <g id="cardKS">
+        <use href="#bgCard"/>
+        <use href="#rankK" class="center-jack"/>
+        <g id="cardKSTop">
+          <use href="#rankK" class="rank"/>
+          <use href="#suitS" class="suit"/>
+        </g>
+        <use href="#cardKSTop" class="bottom"/>
+      </g>
+      <g id="cardKH">
+        <use href="#bgCard"/>
+        <use href="#rankK" class="center-jack"/>
+        <g id="cardKHTop">
+          <use href="#rankK" class="rank"/>
+          <use href="#suitH" class="suit"/>
+        </g>
+        <use href="#cardKHTop" class="bottom"/>
+      </g>
+    </g>
+  </defs>
+  <use class="card ace spade" href="#cardAS"/>
+  <use class="card ace diamond" href="#cardAD" transform="translate(60)"/>
+  <use class="card ace club" href="#cardAC" transform="translate(120)"/>
+  <use class="card ace heart" href="#cardAH" transform="translate(180)"/>
+
+  <use class="card two spade" href="#card2S" transform="translate(240)"/>
+  <use class="card two diamond" href="#card2D" transform="translate(300)"/>
+  <use class="card two club" href="#card2C" transform="translate(360)"/>
+  <use class="card two heart" href="#card2H" transform="translate(420)"/>
+
+  <g transform="translate(0 80)">
+    <use class="card three spade" href="#card3S" />
+    <use class="card three diamond" href="#card3D" transform="translate(60)"/>
+    <use class="card three club" href="#card3C" transform="translate(120)"/>
+    <use class="card three heart" href="#card3H" transform="translate(180)"/>
+
+    <use class="card four spade" href="#card4S" transform="translate(240)"/>
+    <use class="card four diamond" href="#card4D" transform="translate(300)"/>
+    <use class="card four club" href="#card4C" transform="translate(360)"/>
+    <use class="card four heart" href="#card4H" transform="translate(420)"/>
+  </g>
+
+  <g transform="translate(0 160)">
+    <use class="card five spade" href="#card5S" />
+    <use class="card five diamond" href="#card5D" transform="translate(60)"/>
+    <use class="card five club" href="#card5C"  transform="translate(120)"/>
+    <use class="card five heart" href="#card5H" transform="translate(180)"/>
+
+    <use class="card six spade" href="#card6S" transform="translate(240)"/>
+    <use class="card six diamond" href="#card6D" transform="translate(300)"/>
+    <use class="card six club" href="#card6C" transform="translate(360)"/>
+    <use class="card six heart" href="#card6H" transform="translate(420)"/>
+  </g>
+
+  <g transform="translate(0 240)">
+    <use class="card seven spade" href="#card7S" />
+    <use class="card seven diamond" href="#card7D" transform="translate(60)"/>
+    <use class="card seven club" href="#card7C" transform="translate(120)"/>
+    <use class="card seven heart" href="#card7H" transform="translate(180)"/>
+
+    <use class="card eight spade" href="#card8S" transform="translate(240)"/>
+    <use class="card eight diamond" href="#card8D" transform="translate(300)"/>
+    <use class="card eight club" href="#card8C" transform="translate(360)"/>
+    <use class="card eight heart" href="#card8H" transform="translate(420)"/>
+  </g>
+  <g transform="translate(0 320)">
+    <use class="card nine spade" href="#card9S" />
+    <use class="card nine diamond" href="#card9D" transform="translate(60)"/>
+    <use class="card nine club" href="#card9C" transform="translate(120)"/>
+    <use class="card nine heart" href="#card9H" transform="translate(180)"/>
+
+    <use class="card ten spade" href="#cardTS" transform="translate(240)"/>
+    <use class="card ten diamond" href="#cardTD" transform="translate(300)"/>
+    <use class="card ten club" href="#cardTC" transform="translate(360)"/>
+    <use class="card ten heart" href="#cardTH" transform="translate(420)"/>
+  </g>
+  <g transform="translate(0 400)">
+    <use class="card jack spade" href="#cardJS" />
+    <use class="card jack diamond" href="#cardJD" transform="translate(60)"/>
+    <use class="card jack club" href="#cardJC" transform="translate(120)"/>
+    <use class="card jack heart" href="#cardJH" transform="translate(180)"/>
+
+    <use class="card queen spade" href="#cardQS" transform="translate(240)"/>
+    <use class="card queen diamond" href="#cardQD" transform="translate(300)"/>
+    <use class="card queen club" href="#cardQC" transform="translate(360)"/>
+    <use class="card queen heart" href="#cardQH" transform="translate(420)"/>
+  </g>
+  <g transform="translate(0 480)">
+    <use class="card king spade" href="#cardKS" />
+    <use class="card king diamond" href="#cardKD" transform="translate(60)"/>
+    <use class="card king club" href="#cardKC" transform="translate(120)"/>
+    <use class="card king heart" href="#cardKH" transform="translate(180)"/>
+
+    <g transform="translate(240)">
+      <use href="#bgBase"/>
+      <use href="#suitS" class="spade center-ace"/>
+    </g>
+    <g transform="translate(300)" >
+      <use href="#bgBase"/>
+      <use href="#suitD" class="diamond center-ace"/>
+    </g>
+    <g transform="translate(360)">
+      <use href="#bgBase"/>
+      <use href="#suitC" class="club center-ace"/>
+    </g>
+    <g transform="translate(420)">
+      <use href="#bgBase"/>
+      <use href="#suitH" class="heart center-ace"/>
+    </g>
+  </g>
+
+  <use class="spot cell" href="#bgCell" transform="translate(0 560)"/>
+  <use class="spot pile" href="#bgPile" transform="translate(60 560)"/>
+</svg>
