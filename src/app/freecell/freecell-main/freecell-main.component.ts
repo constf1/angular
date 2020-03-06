@@ -20,7 +20,7 @@ const INFO_LEVELS = ['dark', 'danger', 'warning', 'warning', 'info' ] as const;
 })
 export class FreecellMainComponent implements OnInit {
   @ViewChild('mainRef', {static: true}) mainRef: ElementRef<HTMLElement>;
-  @ViewChild(FreecellDeckComponent, {static: false}) freecellComponent: FreecellDeckComponent;
+  @ViewChild(FreecellDeckComponent) freecellComponent: FreecellDeckComponent;
 
   name = 'History: ';
   width: number;

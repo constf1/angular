@@ -38,7 +38,7 @@ export class SimpleVirtualListComponent implements OnInit, OnChanges {
 
   @Output() selectionChange = new EventEmitter<number>();
 
-  @ContentChild(SimpleVirtualListItemDirective, { static: false }) itemTemplate: SimpleVirtualListItemDirective;
+  @ContentChild(SimpleVirtualListItemDirective) itemTemplate: SimpleVirtualListItemDirective;
 
   @ViewChild('view', { static: true }) view: ElementRef<HTMLElement>;
 
