@@ -1,24 +1,47 @@
 import { codeToByte, byteArrayToString } from '../common/math-utils';
+import { commonPrefix } from '../common/string-utils';
 
+export function toNumber(path: string, index: number): number {
+  return codeToByte(path.charCodeAt(index));
+}
+
+export function toString(...values: number[]): string {
+  return byteArrayToString(values);
+}
+
+// tslint:disable: variable-name
 export class FreecellHistory {
-  private seed: number;
-  private path = '';
-  private mark = 0;
+  private _deal = -1;
+  private _mark = 0;
+
+  constructor(private _path = '') {
+    this._mark = _path.length;
+  }
 
   get size() {
-    return this.path.length / 2;
+    return this._path.length / 2;
   }
 
   get deal() {
-    return this.seed;
+    return this._deal;
+  }
+
+  set deal(deal: number) {
+    this._deal = deal;
+    this._path = '';
+    this._mark = 0;
   }
 
   get last() {
-    return this.mark - 1;
+    return this._mark - 1;
   }
 
-  get next() {
-    return this.mark;
+  get mark() {
+    return this._mark;
+  }
+
+  get path() {
+    return this._path;
   }
 
   get lastSource() {
@@ -30,57 +53,43 @@ export class FreecellHistory {
   }
 
   get nextSource() {
-    return this.getSource(this.next);
+    return this.getSource(this.mark);
   }
 
   get nextDestination() {
-    return this.getDestination(this.next);
+    return this.getDestination(this.mark);
   }
 
   get canUndo() {
-    return this.mark > 0;
+    return this._mark > 0;
   }
 
   get canRedo() {
-    return this.mark + this.mark < this.path.length;
-  }
-
-  protected _decode(index: number): number {
-    return codeToByte(this.path.charCodeAt(index));
-  }
-
-  protected _encode(...values: number[]): string {
-    return byteArrayToString(values);
+    return this._mark + this._mark < this._path.length;
   }
 
   getSource(index: number): number {
-    return this._decode(index + index);
+    return toNumber(this._path, index + index);
   }
 
   getDestination(index: number): number {
-    return this._decode(index + index + 1);
+    return toNumber(this._path, index + index + 1);
   }
 
   toURI() {
     let uri = 'deal=' + this.deal;
-    if (this.path) {
-      uri += '&path=' + this.path;
+    if (this._path) {
+      uri += '&path=' + this._path;
       if (this.canRedo) {
-        uri += '&mark=' + this.mark;
+        uri += '&mark=' + this._mark;
       }
     }
     return uri;
   }
 
-  onDeal(deal: number) {
-    this.seed = deal;
-    this.path = '';
-    this.mark = 0;
-  }
-
   undo() {
     if (this.canUndo) {
-      this.mark--;
+      this._mark--;
       return true;
     }
     return false;
@@ -88,7 +97,7 @@ export class FreecellHistory {
 
   redo() {
     if (this.canRedo) {
-      this.mark++;
+      this._mark++;
       return true;
     }
     return false;
@@ -110,12 +119,16 @@ export class FreecellHistory {
       this.redo();
       return 1;
     } else {
-      this.path =
+      this._path =
         (this.canRedo
-          ? this.path.substring(0, this.mark + this.mark)
-          : this.path) + this._encode(source, destination);
-      this.mark++; // mark + mark === path.length
+          ? this._path.substring(0, this._mark + this._mark)
+          : this._path) + toString(source, destination);
+      this._mark++; // mark + mark === path.length
       return 0;
     }
+  }
+
+  countEqualMoves(path: string) {
+    return Math.floor(commonPrefix(this._path, path).length / 2);
   }
 }

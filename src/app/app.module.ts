@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 
@@ -16,6 +17,15 @@ import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.co
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
 
+/**
+ * Routes:
+ */
+const appRoutes: Routes = [
+  { path: 'freecell-dom/:id', component: FreecellMainComponent },
+  { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
+  { path: '**', component: FreecellMainComponent }
+];
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -28,6 +38,9 @@ import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-h
     SimpleVirtualListItemDirective
   ],
   imports: [
+    RouterModule.forRoot(appRoutes, {
+      // enableTracing: true, // <-- debugging purposes only
+    }),
     BrowserModule,
     CommonModule
   ],

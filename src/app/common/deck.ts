@@ -123,7 +123,7 @@ export function deck(seed?: number): number[] {
   for (let i = 0; i < CARD_NUM; i++) {
     cards[i] = i;
   }
-  if (seed !== undefined) {
+  if (seed >= 0) {
     // use LCG algorithm to pick up cards from the deck
     // http://en.wikipedia.org/wiki/Linear_congruential_generator
     const m = 0x80000000;
@@ -140,10 +140,6 @@ export function deck(seed?: number): number[] {
         cards[i] = cards[j];
         cards[j] = card;
       }
-      // while (cards.indexOf(card) >= 0) {
-      //   card = (card + 1) % CARD_NUM;
-      // }
-      // cards.push(card);
     }
   }
   return cards;
