@@ -57,7 +57,10 @@ export class FreecellDesk extends FreecellBasis {
     let j = line.length;
     if (j > 0) {
       tableau.push(line[j - 1]);
-      while (--j > 0 && isTableau(line[j - 1], line[j])) {
+      while (
+        --j > 0 &&
+        isTableau(line[j - 1], line[j]) &&
+        rankOf(line[j - 1]) > 0) {
         tableau.push(line[j - 1]);
       }
     }
@@ -124,6 +127,7 @@ export class FreecellDesk extends FreecellBasis {
    * @param seed seed number
    */
   deal(seed?: number) {
+    // console.log('Deal:', seed);
     const cards = deck(seed);
 
     this.clear();
