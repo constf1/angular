@@ -1,4 +1,4 @@
-<svg width="480" height="640" xmlns="http://www.w3.org/2000/svg">
+<svg width="540" height="720" xmlns="http://www.w3.org/2000/svg">
   <style>
     .club,.spade{fill:#000;stroke:#ff8c00}.diamond,.heart{fill:#dc143c;stroke:#a02020}.rank,.suit{transform:translate(8px,10px) scale(.15);stroke-width:2px}.suit{transform:translate(8px,22px) scale(.35)}.bottom{transform:rotate(180deg) translate(-60px,-80px)}.center-ace{transform:translate(30px,40px) scale(1.5);stroke-width:.5px}.center-jack{transform:translate(30px,40px) scale(.5);stroke-width:1px}.center-three,.center-two{stroke-width:2px}.center-two{transform:translate(30px,20px) scale(.4)}.center-three{transform:translate(30px,40px) scale(.4)}.center-six-left{transform:translate(21.5px,40px) scale(.4);stroke-width:2px}.center-six-right{transform:translate(38.5px,40px) scale(.4);stroke-width:2px}.center-seven,.center-ten{transform:translate(30px,30px) scale(.4);stroke-width:2px}.center-ten{transform:translate(30px,26.5px) scale(.4)}.four-left,.four-right{transform:translate(21.5px,20px) scale(.4);stroke-width:2px}.four-right{transform:translate(38.5px,20px) scale(.4)}.eight-left,.eight-right{transform:translate(21.5px,33px) scale(.4);stroke-width:2px}.eight-right{transform:translate(38.5px,33px) scale(.4)}
   </style>
@@ -617,97 +617,99 @@
       </g>
     </g>
   </defs>
-  <use class="card ace spade" href="#cardAS"/>
-  <use class="card ace diamond" href="#cardAD" transform="translate(60)"/>
-  <use class="card ace club" href="#cardAC" transform="translate(120)"/>
-  <use class="card ace heart" href="#cardAH" transform="translate(180)"/>
+  <g transform="translate(3.75 5)">
+    <use class="card ace spade" href="#cardAS"/>
+    <use class="card ace diamond" href="#cardAD" transform="translate(67.5)"/>
+    <use class="card ace club" href="#cardAC" transform="translate(135)"/>
+    <use class="card ace heart" href="#cardAH" transform="translate(202.5)"/>
 
-  <use class="card two spade" href="#card2S" transform="translate(240)"/>
-  <use class="card two diamond" href="#card2D" transform="translate(300)"/>
-  <use class="card two club" href="#card2C" transform="translate(360)"/>
-  <use class="card two heart" href="#card2H" transform="translate(420)"/>
+    <use class="card two spade" href="#card2S" transform="translate(270)"/>
+    <use class="card two diamond" href="#card2D" transform="translate(337.5)"/>
+    <use class="card two club" href="#card2C" transform="translate(405)"/>
+    <use class="card two heart" href="#card2H" transform="translate(472.5)"/>
+  </g>
 
-  <g transform="translate(0 80)">
+  <g transform="translate(3.75 95)">
     <use class="card three spade" href="#card3S" />
-    <use class="card three diamond" href="#card3D" transform="translate(60)"/>
-    <use class="card three club" href="#card3C" transform="translate(120)"/>
-    <use class="card three heart" href="#card3H" transform="translate(180)"/>
+    <use class="card three diamond" href="#card3D" transform="translate(67.5)"/>
+    <use class="card three club" href="#card3C" transform="translate(135)"/>
+    <use class="card three heart" href="#card3H" transform="translate(202.5)"/>
 
-    <use class="card four spade" href="#card4S" transform="translate(240)"/>
-    <use class="card four diamond" href="#card4D" transform="translate(300)"/>
-    <use class="card four club" href="#card4C" transform="translate(360)"/>
-    <use class="card four heart" href="#card4H" transform="translate(420)"/>
+    <use class="card four spade" href="#card4S" transform="translate(270)"/>
+    <use class="card four diamond" href="#card4D" transform="translate(337.5)"/>
+    <use class="card four club" href="#card4C" transform="translate(405)"/>
+    <use class="card four heart" href="#card4H" transform="translate(472.5)"/>
   </g>
 
-  <g transform="translate(0 160)">
+  <g transform="translate(3.75 185)">
     <use class="card five spade" href="#card5S" />
-    <use class="card five diamond" href="#card5D" transform="translate(60)"/>
-    <use class="card five club" href="#card5C"  transform="translate(120)"/>
-    <use class="card five heart" href="#card5H" transform="translate(180)"/>
+    <use class="card five diamond" href="#card5D" transform="translate(67.5)"/>
+    <use class="card five club" href="#card5C"  transform="translate(135)"/>
+    <use class="card five heart" href="#card5H" transform="translate(202.5)"/>
 
-    <use class="card six spade" href="#card6S" transform="translate(240)"/>
-    <use class="card six diamond" href="#card6D" transform="translate(300)"/>
-    <use class="card six club" href="#card6C" transform="translate(360)"/>
-    <use class="card six heart" href="#card6H" transform="translate(420)"/>
+    <use class="card six spade" href="#card6S" transform="translate(270)"/>
+    <use class="card six diamond" href="#card6D" transform="translate(337.5)"/>
+    <use class="card six club" href="#card6C" transform="translate(405)"/>
+    <use class="card six heart" href="#card6H" transform="translate(472.5)"/>
   </g>
 
-  <g transform="translate(0 240)">
+  <g transform="translate(3.75 275)">
     <use class="card seven spade" href="#card7S" />
-    <use class="card seven diamond" href="#card7D" transform="translate(60)"/>
-    <use class="card seven club" href="#card7C" transform="translate(120)"/>
-    <use class="card seven heart" href="#card7H" transform="translate(180)"/>
+    <use class="card seven diamond" href="#card7D" transform="translate(67.5)"/>
+    <use class="card seven club" href="#card7C" transform="translate(135)"/>
+    <use class="card seven heart" href="#card7H" transform="translate(202.5)"/>
 
-    <use class="card eight spade" href="#card8S" transform="translate(240)"/>
-    <use class="card eight diamond" href="#card8D" transform="translate(300)"/>
-    <use class="card eight club" href="#card8C" transform="translate(360)"/>
-    <use class="card eight heart" href="#card8H" transform="translate(420)"/>
+    <use class="card eight spade" href="#card8S" transform="translate(270)"/>
+    <use class="card eight diamond" href="#card8D" transform="translate(337.5)"/>
+    <use class="card eight club" href="#card8C" transform="translate(405)"/>
+    <use class="card eight heart" href="#card8H" transform="translate(472.5)"/>
   </g>
-  <g transform="translate(0 320)">
+  <g transform="translate(3.75 365)">
     <use class="card nine spade" href="#card9S" />
-    <use class="card nine diamond" href="#card9D" transform="translate(60)"/>
-    <use class="card nine club" href="#card9C" transform="translate(120)"/>
-    <use class="card nine heart" href="#card9H" transform="translate(180)"/>
+    <use class="card nine diamond" href="#card9D" transform="translate(67.5)"/>
+    <use class="card nine club" href="#card9C" transform="translate(135)"/>
+    <use class="card nine heart" href="#card9H" transform="translate(202.5)"/>
 
-    <use class="card ten spade" href="#cardTS" transform="translate(240)"/>
-    <use class="card ten diamond" href="#cardTD" transform="translate(300)"/>
-    <use class="card ten club" href="#cardTC" transform="translate(360)"/>
-    <use class="card ten heart" href="#cardTH" transform="translate(420)"/>
+    <use class="card ten spade" href="#cardTS" transform="translate(270)"/>
+    <use class="card ten diamond" href="#cardTD" transform="translate(337.5)"/>
+    <use class="card ten club" href="#cardTC" transform="translate(405)"/>
+    <use class="card ten heart" href="#cardTH" transform="translate(472.5)"/>
   </g>
-  <g transform="translate(0 400)">
+  <g transform="translate(3.75 455)">
     <use class="card jack spade" href="#cardJS" />
-    <use class="card jack diamond" href="#cardJD" transform="translate(60)"/>
-    <use class="card jack club" href="#cardJC" transform="translate(120)"/>
-    <use class="card jack heart" href="#cardJH" transform="translate(180)"/>
+    <use class="card jack diamond" href="#cardJD" transform="translate(67.5)"/>
+    <use class="card jack club" href="#cardJC" transform="translate(135)"/>
+    <use class="card jack heart" href="#cardJH" transform="translate(202.5)"/>
 
-    <use class="card queen spade" href="#cardQS" transform="translate(240)"/>
-    <use class="card queen diamond" href="#cardQD" transform="translate(300)"/>
-    <use class="card queen club" href="#cardQC" transform="translate(360)"/>
-    <use class="card queen heart" href="#cardQH" transform="translate(420)"/>
+    <use class="card queen spade" href="#cardQS" transform="translate(270)"/>
+    <use class="card queen diamond" href="#cardQD" transform="translate(337.5)"/>
+    <use class="card queen club" href="#cardQC" transform="translate(405)"/>
+    <use class="card queen heart" href="#cardQH" transform="translate(472.5)"/>
   </g>
-  <g transform="translate(0 480)">
+  <g transform="translate(3.75 545)">
     <use class="card king spade" href="#cardKS" />
-    <use class="card king diamond" href="#cardKD" transform="translate(60)"/>
-    <use class="card king club" href="#cardKC" transform="translate(120)"/>
-    <use class="card king heart" href="#cardKH" transform="translate(180)"/>
+    <use class="card king diamond" href="#cardKD" transform="translate(67.5)"/>
+    <use class="card king club" href="#cardKC" transform="translate(135)"/>
+    <use class="card king heart" href="#cardKH" transform="translate(202.5)"/>
 
-    <g transform="translate(240)">
+    <g transform="translate(270)">
       <use href="#bgBase"/>
       <use href="#suitS" class="spade center-ace"/>
     </g>
-    <g transform="translate(300)" >
+    <g transform="translate(337.5)" >
       <use href="#bgBase"/>
       <use href="#suitD" class="diamond center-ace"/>
     </g>
-    <g transform="translate(360)">
+    <g transform="translate(405)">
       <use href="#bgBase"/>
       <use href="#suitC" class="club center-ace"/>
     </g>
-    <g transform="translate(420)">
+    <g transform="translate(472.5)">
       <use href="#bgBase"/>
       <use href="#suitH" class="heart center-ace"/>
     </g>
   </g>
 
-  <use class="spot cell" href="#bgCell" transform="translate(0 560)"/>
-  <use class="spot pile" href="#bgPile" transform="translate(60 560)"/>
+  <use class="spot cell" href="#bgCell" transform="translate(3.75 635)"/>
+  <use class="spot pile" href="#bgPile" transform="translate(71.25 635)"/>
 </svg>
