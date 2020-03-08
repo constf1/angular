@@ -65,7 +65,7 @@ export class FreecellLayout {
     this.pileStartX = dx;
     this.pileStartY = this.cellEndY + dy;
     this.pileEndX = this.pileStartX + basis.PILE_NUM * (cx + dx) - dx;
-    this.pileEndY = this.pileStartY + 5 * cy;
+    this.pileEndY = this.pileStartY + 6 * cy;
   }
 
   getCellX(index: number): number {
