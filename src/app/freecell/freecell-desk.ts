@@ -1,4 +1,4 @@
-import { deck, isTableau, suitOf, rankOf } from '../common/deck';
+import { deck, isTableau, suitOf, rankOf, RANK_NUM } from '../common/deck';
 import { copy } from '../common/array-utils';
 import { FreecellBasis } from './freecell-basis';
 
@@ -86,6 +86,15 @@ export class FreecellDesk extends FreecellBasis {
       }
     }
     return count;
+  }
+
+  isSolved() {
+    for (let i = this.BASE_START; i < this.BASE_END; i++) {
+      if (this.desk[i].length < RANK_NUM) {
+        return false;
+      }
+    }
+    return true;
   }
 
   countEmpty(): number {

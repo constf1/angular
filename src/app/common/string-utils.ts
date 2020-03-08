@@ -11,3 +11,10 @@ export function commonPrefix(a: string, b: string) {
   }
   return a.substring(0, length);
 }
+
+export function padLeft(str: string, width: number, prefix: string = ' ') {
+  while (str.length < width && prefix) {
+    str = prefix + str;
+  }
+  return str;
+}

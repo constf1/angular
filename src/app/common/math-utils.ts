@@ -1,3 +1,5 @@
+import { padLeft } from './string-utils';
+
 /**
  * Miscellaneous math utilities.
  */
@@ -5,6 +7,11 @@
 export function toPercent(numerator: number, denominator: number = 100, fractionDigits: number = 3): string {
   return (numerator * 100 / denominator).toFixed(fractionDigits) + '%';
 }
+
+export function toString(value: number, minWidth: number, prefix: string = '0', radix?: number): string {
+  return padLeft(value.toString(radix), minWidth, prefix);
+}
+
 /**
  * Returns a random number between minValue (inclusive) and maxValue (exclusive)
  */

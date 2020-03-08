@@ -12,6 +12,7 @@ import { FreecellDeckComponent, LineChangeEvent } from '../freecell-deck/freecel
 import { FreecellHistoryItem } from '../freecell-history/freecell-history.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { FreecellDbService } from '../freecell-db.service';
 
 const INFO_LEVELS = ['dark', 'danger', 'warning', 'warning', 'info' ] as const;
 
@@ -41,7 +42,7 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
 
   subscription: Subscription;
 
-  constructor(public router: Router, public route: ActivatedRoute) {
+  constructor(private router: Router, private route: ActivatedRoute, private db: FreecellDbService) {
     // route.params.subscribe(
     //   value => console.log('Route Next:', value),
     //   error => console.error('Route Error:', error),
@@ -96,6 +97,10 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
 
   update(deal: number, path: string, mark: number) {
     if (this.history.deal !== deal) {
+      if (this.history.deal >= 0 && !this.game.isSolved()) {
+        console.log(`Saving game #${this.history.deal} to DB...`);
+        this.db.setGame({ deal: this.history.deal, path: this.history.path });
+      }
       this.deal(deal);
     }
 
@@ -237,6 +242,13 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
     this.game.moveCard(source, destination);
     if (this.history.onMove(source, destination) === 0) {
       this.updateHistoryComponent(source, destination);
+      if (this.game.isSolved()) {
+        this.db.setGame({ deal: this.history.deal, path: this.history.path })
+          .then(value => console.log('DB Set Success:', value))
+          // .then(() => this.db.getGame(this.history.deal))
+          // .then(value => console.log('DB Get Success:', value))
+          ;
+      }
     }
     this.historySelection = this.history.last;
     if (this.freecellComponent) {
