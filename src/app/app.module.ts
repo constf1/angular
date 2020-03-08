@@ -16,6 +16,7 @@ import {
 import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.component';
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /**
  * Routes:
@@ -42,7 +43,8 @@ const appRoutes: Routes = [
       // enableTracing: true, // <-- debugging purposes only
     }),
     BrowserModule,
-    CommonModule
+    CommonModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
