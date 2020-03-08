@@ -18,9 +18,8 @@
         [style.zIndex]="showHistory ? 1000 : 0"
         (click)="showHistory=!showHistory"
       >
-      {{showHistory ? '\u297D' : '\u297C'}}
+      {{showHistory ? '\u003C' : '\u003E'}}
       </button>
     </app-freecell-deck>
   </app-ratio-keeper>
-  {{name + history.toURI()}}
 </div>
