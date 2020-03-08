@@ -1,6 +1,6 @@
 <div class="freecell_deck">
   <ng-content></ng-content>
-  <div *ngFor="let item of items; index as i; trackBy: trackByIndex"
+  <div matRipple *ngFor="let item of items; index as i; trackBy: trackByIndex"
     [ngClass]="item.ngClass"
     [ngStyle]="item.ngStyle"
     (mousedown)="onMouseDown($event, i)"

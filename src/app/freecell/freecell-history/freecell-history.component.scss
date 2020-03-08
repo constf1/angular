@@ -1,48 +1,43 @@
-div.history-list {
-  height: 100%;
-  overflow-y: auto;
+span.history-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
-.diamonds,
-.hearts {
+.history-item-diamonds,
+.history-item-hearts {
   color: red;
 }
 
-.spades,
-.clubs {
+.history-item-spades,
+.history-item-clubs {
   color: black;
 }
 
-.risk-12,
-.risk-11,
-.risk-10,
-.risk-9,
-.risk-8,
-.risk-7,
-.risk-6 {
+.danger-very-low {
   background-color: #BBEE90;
 }
 
-.risk-5 {
+.danger-low {
   background-color: #BBDD85;
 }
 
-.risk-4 {
+.danger-moderate {
   background-color: #BBCC80;
 }
 
-.risk-3 {
+.danger-high {
   background-color: #FFEE30;
 }
 
-.risk-2 {
+.danger-very-high {
   background-color: #FFCC00;
 }
 
-.risk-1 {
+.danger-extreme {
   background-color: #FF9920;
 }
 
-.risk-0 {
+.danger-critical {
   background-color: #FF5540;
 }

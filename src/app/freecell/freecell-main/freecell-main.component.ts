@@ -1,20 +1,17 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { Autoplay } from '../../common/autoplay';
-import { playNameOf, suitFullNameOf, rankFullNameOf } from '../../common/deck';
-import { randomIneger, codeToByte } from '../../common/math-utils';
+import { randomIneger } from '../../common/math-utils';
 
 import { FreecellGame } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
 import { FreecellHistory, toNumber } from '../freecell-history';
+import { FreecellDbService } from '../freecell-db.service';
 
 import { FreecellDeckComponent, LineChangeEvent } from '../freecell-deck/freecell-deck.component';
 import { FreecellHistoryItem } from '../freecell-history/freecell-history.component';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { FreecellDbService } from '../freecell-db.service';
-
-const INFO_LEVELS = ['dark', 'danger', 'warning', 'warning', 'info' ] as const;
 
 @Component({
   selector: 'app-freecell-main',
@@ -43,10 +40,6 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
   subscription: Subscription;
 
   constructor(private router: Router, private route: ActivatedRoute, private db: FreecellDbService) {
-    // route.params.subscribe(
-    //   value => console.log('Route Next:', value),
-    //   error => console.error('Route Error:', error),
-    //   () => console.log('Route Complete.'));
     this.game.deal();
   }
 
@@ -145,6 +138,7 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
   deal(deal: number) {
     this.game.deal(deal);
     this.historyItems.length = 0;
+    this.historySelection = -1;
     this.history.deal = deal;
     this.findNextMove();
     if (this.freecellComponent) {
@@ -213,26 +207,37 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
   }
 
   updateHistoryComponent(source: number, destination: number) {
-    const item: FreecellHistoryItem = {};
     const card = this.game.getCard(destination, -1);
-    item.which = playNameOf(card);
-    item.whichClass = suitFullNameOf(card) + ' ' + rankFullNameOf(card);
+    const count = this.game.countEmpty();
+
+    const item: FreecellHistoryItem = {
+      giver: 'none',
+      taker: 'none',
+      which: card,
+      outcome: count
+    };
 
     if (this.game.getLine(destination).length > 1) {
       const prev = this.game.getCard(destination, -2);
-      item.where = playNameOf(prev);
-      item.whereClass = suitFullNameOf(prev) + ' ' + rankFullNameOf(prev);
+      item.taker = prev;
     } else if (this.game.isBase(destination)) {
-      item.where = 'base';
+      item.taker = 'base';
     } else if (this.game.isCell(destination)) {
-      item.where = 'cell';
+      item.taker = 'cell';
     } else if (this.game.isPile(destination)) {
-      item.where = 'pile';
+      item.taker = 'pile';
     }
 
-    const count = this.game.countEmpty();
-    item.outcome = '' + count;
-    item.outcomeClass = 'badge-' + (INFO_LEVELS[count] || 'success');
+    if (this.game.getLine(source).length > 0) {
+      const prev = this.game.getCard(source, -1);
+      item.giver = prev;
+    } else if (this.game.isBase(source)) {
+      item.giver = 'base';
+    } else if (this.game.isCell(source)) {
+      item.giver = 'cell';
+    } else if (this.game.isPile(source)) {
+      item.giver = 'pile';
+    }
 
     this.historyItems[this.history.size - 1] = item;
     this.historyItems.length = this.history.size;
@@ -262,9 +267,13 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
   }
 
   navigate(deal?: number, path?: string, mark?: number) {
-    // Don't put mark into the url if it equals the history size.
+    // Don't put mark into the url if it equals to the history size.
     if (mark === this.history.size) {
       mark = undefined;
+    }
+    // Don't put empty path into the url.
+    if (!path) {
+      path = undefined;
     }
     this.router.navigate(['.'], {
       relativeTo: this.route,

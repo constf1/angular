@@ -1,43 +1,53 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, OnDestroy, Output, EventEmitter, ViewChild } from '@angular/core';
-import { SimpleVirtualListComponent } from 'src/app/common/components/simple-virtual-list/simple-virtual-list.component';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { CARD_NUM, suitFullNameOf, playNameOf } from '../../common/deck';
 
 export interface FreecellHistoryItem {
-  which?: string;
-  whichClass?: string;
-  where?: string;
-  whereClass?: string;
-  outcome?: string;
-  outcomeClass?: string;
+  which: number;
+  giver: string | number;
+  taker: string | number;
+  outcome: number;
 }
+
+// const INFO_LEVELS = [
+//   'mood_bad',
+//   'sentiment_very_dissatisfied',
+//   'sentiment_dissatisfied',
+//   'sentiment_satisfied',
+//   'mood',
+//   'sentiment_very_satisfied',
+// ] as const;
+
+export const OUTCOMES = [
+  'danger-critical',
+  'danger-extreme',
+  'danger-very-high',
+  'danger-high',
+  'danger-moderate',
+  'danger-low',
+  'danger-very-low'
+] as const;
 
 @Component({
   selector: 'app-freecell-history',
   templateUrl: './freecell-history.component.html',
   styleUrls: ['./freecell-history.component.scss']
 })
-export class FreecellHistoryComponent implements OnInit, OnChanges, OnDestroy {
+export class FreecellHistoryComponent implements OnInit {
   @Input() items: FreecellHistoryItem[] = [];
-  @Input() selection: number;
+  @Input() selection = -1;
   @Output() selectionChange = new EventEmitter<number>();
 
-  @ViewChild(SimpleVirtualListComponent, { static: true }) list: SimpleVirtualListComponent;
+  readonly cards: { [key: number]: { className: string, cardName: string } } = {};
 
   constructor() { }
 
   ngOnInit() {
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes.selection) {
-      setTimeout(() => {
-        const item = Math.max(Math.min(this.selection, this.items.length - 1), 0);
-        // console.log('Selection Change:', item);
-        this.list.scrollToItem(item);
-      }, 0);
+    for (let i = 0; i < CARD_NUM; i++) {
+      this.cards[i] = {
+        className: 'history-item-' + suitFullNameOf(i),
+        cardName: playNameOf(i)
+      };
     }
-  }
-
-  ngOnDestroy() {
   }
 
   setSelection(value: number) {
@@ -45,5 +55,17 @@ export class FreecellHistoryComponent implements OnInit, OnChanges, OnDestroy {
       // this.selection = value;
       this.selectionChange.emit(value);
     }
+  }
+
+  getOutcomeClass(index: number): string {
+    return OUTCOMES[index] || 'danger-very-low';
+  }
+
+  getClass(index: string | number): string {
+    return typeof index === 'number' ? this.cards[index]?.className : '';
+  }
+
+  getName(index: string | number): string {
+    return typeof index === 'string' ? index : this.cards[index]?.cardName;
   }
 }
