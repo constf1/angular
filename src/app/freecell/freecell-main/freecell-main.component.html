@@ -1,10 +1,14 @@
 <div class="main" #mainRef>
   <app-ratio-keeper [width]="width" [height]="height" [ratio]="7/5">
     <app-freecell-deck [layout]="layout" [game]="game" (lineChange)="onLineChange($event)">
-      <button class="freecell horizontal top-left" (click)="onDeal()">DEAL</button>
+      <button mat-stroked-button (click)="onDeal()">DEAL</button>
+      <button mat-stroked-button [disabled]="!history.canUndo" (click)="onUndo()">UNDO</button>
+      <button mat-stroked-button [disabled]="!history.canRedo" (click)="onRedo()">REDO</button>
+      <button mat-stroked-button [disabled]="!nextMove" (click)="onAuto()">AUTO</button>
+      <!-- <button class="freecell horizontal top-left" (click)="onDeal()">DEAL</button>
       <button class="freecell horizontal top-right" [disabled]="!nextMove" (click)="onAuto()">AUTO</button>
       <button class="freecell horizontal bottom-left" [disabled]="!history.canUndo" (click)="onUndo()">UNDO</button>
-      <button class="freecell horizontal bottom-right" [disabled]="!history.canRedo" (click)="onRedo()">REDO</button>
+      <button class="freecell horizontal bottom-right" [disabled]="!history.canRedo" (click)="onRedo()">REDO</button> -->
 
       <div class="history" [style.left.%]="showHistory ? 0 : -50">
         <app-freecell-history *ngIf="showHistory"

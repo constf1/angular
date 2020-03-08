@@ -3,20 +3,20 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 
+import { MaterialModule } from './material.module';
+
 import { AppComponent } from './app.component';
 
 import { XrangePipe } from './common/pipes/xrange.pipe';
-
 import { RatioKeeperComponent } from './common/components/ratio-keeper/ratio-keeper.component';
+
 import {
   SimpleVirtualListComponent,
   SimpleVirtualListItemDirective
 } from './common/components/simple-virtual-list/simple-virtual-list.component';
-
 import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.component';
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /**
  * Routes:
@@ -44,7 +44,7 @@ const appRoutes: Routes = [
     }),
     BrowserModule,
     CommonModule,
-    BrowserAnimationsModule
+    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent]
