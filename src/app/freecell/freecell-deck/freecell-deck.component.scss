@@ -7,13 +7,13 @@
 
 @mixin bg_rank($index) {
   $i: $index * 4;
-  &.spades { @include bg_pos($i); }
-  &.diamonds { @include bg_pos($i + 1); }
-  &.clubs { @include bg_pos($i + 2); }
-  &.hearts { @include bg_pos($i + 3); }
+  &.freecell_spades { @include bg_pos($i); }
+  &.freecell_diamonds { @include bg_pos($i + 1); }
+  &.freecell_clubs { @include bg_pos($i + 2); }
+  &.freecell_hearts { @include bg_pos($i + 3); }
 }
 
-.deck {
+.freecell_deck {
   width:100%;
   height:100%;
   background-color:yellow;
@@ -24,7 +24,7 @@
   background-size: auto;
 }
 
-.placeholder, .card {
+.freecell_spot, .freecell_card {
   cursor: pointer;
   position: absolute;
 
@@ -35,32 +35,32 @@
   border-radius: 8.333% / 6.25%;
 }
 
-.placeholder {
+.freecell_spot {
   background-color: lightblue;
 
-  &.pile { @include bg_pos(57); }
-  &.base { @include bg_rank(13); }
-  &.cell {
+  &.freecell_pile { @include bg_pos(57); }
+  &.freecell_base { @include bg_rank(13); }
+  &.freecell_cell {
     background-color: lightseagreen;
     @include bg_pos(56);
   }
 }
 
-.card {
+.freecell_card {
   background-color: #d3caa1;
-  &.Ace { @include bg_rank(0); }
-  &.Two { @include bg_rank(1); }
-  &.Three { @include bg_rank(2); }
-  &.Four { @include bg_rank(3); }
-  &.Five { @include bg_rank(4); }
-  &.Six { @include bg_rank(5); }
-  &.Seven { @include bg_rank(6); }
-  &.Eight { @include bg_rank(7); }
-  &.Nine { @include bg_rank(8); }
-  &.Ten { @include bg_rank(9); }
-  &.Jack { @include bg_rank(10); }
-  &.Queen { @include bg_rank(11); }
-  &.King { @include bg_rank(12); }
+  &.freecell_Ace { @include bg_rank(0); }
+  &.freecell_Two { @include bg_rank(1); }
+  &.freecell_Three { @include bg_rank(2); }
+  &.freecell_Four { @include bg_rank(3); }
+  &.freecell_Five { @include bg_rank(4); }
+  &.freecell_Six { @include bg_rank(5); }
+  &.freecell_Seven { @include bg_rank(6); }
+  &.freecell_Eight { @include bg_rank(7); }
+  &.freecell_Nine { @include bg_rank(8); }
+  &.freecell_Ten { @include bg_rank(9); }
+  &.freecell_Jack { @include bg_rank(10); }
+  &.freecell_Queen { @include bg_rank(11); }
+  &.freecell_King { @include bg_rank(12); }
 
   transition-property: transform;
 

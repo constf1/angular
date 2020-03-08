@@ -202,16 +202,16 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
 
         const item: Item = {
           ngStyle: { transform, width, height },
-          ngClass: { placeholder: true }
+          ngClass: { freecell_spot: true }
         };
 
         if (basis.isBase(i)) {
-          item.ngClass.base = true;
-          item.ngClass[suitFullNameOf(i - basis.BASE_START)] = true;
+          item.ngClass.freecell_base = true;
+          item.ngClass['freecell_' + suitFullNameOf(i - basis.BASE_START)] = true;
         } else if (basis.isCell(i)) {
-          item.ngClass.cell = true;
+          item.ngClass.freecell_cell = true;
         } else if (basis.isPile(i)) {
-          item.ngClass.pile = true;
+          item.ngClass.freecell_pile = true;
         }
 
         placeholders.push(item);
@@ -231,9 +231,9 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
         const item: Item = {
           ngStyle: { width, height, zIndex: i },
           ngClass: {
-            card: true,
-            [suitFullNameOf(i)]: true,
-            [rankFullNameOf(i)]: true
+            ['freecell_card']: true,
+            ['freecell_' + suitFullNameOf(i)]: true,
+            ['freecell_' + rankFullNameOf(i)]: true
           }
         };
         cards.push(item);
