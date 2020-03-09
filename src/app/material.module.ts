@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   declarations: [],
@@ -20,7 +21,8 @@ import { MatSliderModule } from '@angular/material/slider';
     MatMenuModule,
     MatRippleModule,
     MatSelectModule,
-    MatSliderModule
+    MatSliderModule,
+    MatToolbarModule
   ],
   exports: [
     BrowserAnimationsModule,
@@ -31,7 +33,8 @@ import { MatSliderModule } from '@angular/material/slider';
     MatMenuModule,
     MatRippleModule,
     MatSelectModule,
-    MatSliderModule
+    MatSliderModule,
+    MatToolbarModule
   ]
 })
 export class MaterialModule { }
