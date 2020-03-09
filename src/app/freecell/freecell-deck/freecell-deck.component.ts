@@ -26,7 +26,7 @@ interface Item {
 
 export interface LineChangeEvent {
   source: number;
-  tableau?: number[];
+  tableau: number[];
   destination?: number;
 }
 
@@ -64,7 +64,11 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   spots: Item[] = [];
   cards: Item[] = [];
 
-  private dragger: MyDragger | null = null;
+  // tslint:disable-next-line: variable-name
+  private _spotSelection = -1;
+
+  // tslint:disable-next-line: variable-name
+  private _dragger: MyDragger | null = null;
 
   constructor(private renderer: Renderer2) { }
 
@@ -87,41 +91,58 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
     return index;
   }
 
+  setSpotSelection(index: number) {
+    if (this._spotSelection >= 0) {
+      this.spots[this._spotSelection].ngClass.freecell_selection = false;
+    }
+    this._spotSelection = index;
+    if (this._spotSelection >= 0) {
+      this.spots[this._spotSelection].ngClass.freecell_selection = true;
+    }
+  }
+
   onMouseDown(event: MouseEvent, index: number) {
     // console.log('Mousedown:', index);
     if (event.button !== 0) {
       return;
     }
     event.preventDefault();
-    if (!this.dragger && index >= this.spots.length) {
-      const cardIndex = index - this.spots.length;
-      const tableau = this.game.asTablaeu(cardIndex);
+    if (!this._dragger) {
+      if (index < this.spots.length) {
+        this.setSpotSelection(this._spotSelection === index ? -1 : index);
+      } else {
+        const cardIndex = index - this.spots.length;
+        const tableau = this.game.asTablaeu(cardIndex);
 
-      this.dragger = new MyDragger(event.screenX, event.screenY, this.renderer);
-      this.onDragStart(tableau);
-      this.dragger.onDrag = () => this.onDrag(tableau);
-      this.dragger.onDragEnd = ev => {
-        this.onDragEnd(tableau);
+        this._dragger = new MyDragger(event.screenX, event.screenY, this.renderer);
+        this.onDragStart(tableau);
+        this._dragger.onDrag = () => this.onDrag(tableau);
+        this._dragger.onDragEnd = ev => {
+          this.onDragEnd(tableau);
 
-        if (this.dragger.dragged) {
-          const destination = this.findDestination(index, ev.clientX, ev.clientY);
-          if (destination >= 0) {
-            const srcLine = this.game.toLine(cardIndex);
-            const dstLine =
-              destination < this.spots.length
-                ? destination
-                : this.game.toLine(destination - this.spots.length);
-            if (srcLine !== dstLine) {
-              this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
+          if (this._dragger.dragged) {
+            const destination = this.findDestination(index, ev.clientX, ev.clientY);
+            if (destination >= 0) {
+              const srcLine = this.game.toLine(cardIndex);
+              const dstLine =
+                destination < this.spots.length
+                  ? destination
+                  : this.game.toLine(destination - this.spots.length);
+              if (srcLine !== dstLine) {
+                // this.setSpotSelection(-1);
+                this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
+              }
             }
+          } else {
+            const srcLine = this.game.toLine(cardIndex);
+            const dstLine = this._spotSelection >= 0 ? this._spotSelection : undefined;
+            // this.setSpotSelection(-1);
+            this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
           }
-        } else {
-          const srcLine = this.game.toLine(cardIndex);
-          this.lineChange.emit({ source: srcLine });
-        }
 
-        this.dragger = null;
-      };
+          this._dragger = null;
+        };
+      }
     }
   }
 
@@ -139,10 +160,10 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
       card.ngStyle.transform =
         this.getCardTransform(this.game.toLine(index), index)
         + ' '
-        + `translate(${this.dragger.deltaX}px, ${this.dragger.deltaY}px)`;
+        + `translate(${this._dragger.deltaX}px, ${this._dragger.deltaY}px)`;
     }
-    if (Math.abs(this.dragger.deltaX) > 4 || Math.abs(this.dragger.deltaY) > 4) {
-      this.dragger.dragged = true;
+    if (Math.abs(this._dragger.deltaX) > 4 || Math.abs(this._dragger.deltaY) > 4) {
+      this._dragger.dragged = true;
     }
   }
 
@@ -159,6 +180,7 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   }
 
   onDeal() {
+    this.setSpotSelection(-1);
     let zIndex = 0;
     for (let i = this.game.DESK_SIZE; i-- > 0;) {
       for (const cardIndex of this.game.getLine(i)) {
@@ -180,6 +202,7 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   }
 
   onCardMove(source: number, destination: number, transition: Transition = 'transition_norm') {
+    this.setSpotSelection(-1);
     this.bringToFront(this.game.getCard(destination, -1));
     this.updateLine(source, transition);
     this.updateLine(destination, transition);

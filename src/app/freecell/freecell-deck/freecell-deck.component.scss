@@ -38,6 +38,18 @@
 .freecell_spot {
   background-color: lightblue;
 
+  &.freecell_selection {
+    outline-style: dotted;
+    outline-color:darkgrey;
+    outline-width: medium;
+    &.freecell_base {
+      outline-color:#bb11a1;
+    }
+    &.freecell_cell {
+      outline-color:#3e8181;
+    }
+  }
+
   &.freecell_pile { @include bg_pos(57); }
   &.freecell_base { @include bg_rank(13); }
   &.freecell_cell {

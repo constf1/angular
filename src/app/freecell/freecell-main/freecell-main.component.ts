@@ -176,7 +176,7 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
 
     let path = '';
     if (event.destination === undefined) {
-      path = this.game.solveFor(event.source);
+      path = this.game.solveFor(event.tableau, event.source);
     } else {
       path = this.game.getBestPath(event.tableau, event.destination);
     }

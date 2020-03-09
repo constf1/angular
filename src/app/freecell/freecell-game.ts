@@ -105,10 +105,19 @@ export class FreecellGame extends FreecellDesk {
     return '';
   }
 
-  solveFor(source: number): string {
+  solveFor(tableau: number[], source: number): string {
     // Validity checks:
     if (this.getLine(source).length <= 0) {
       return '';
+    }
+    if (tableau.length <= 0) {
+      return '';
+    }
+
+    const lastCard = tableau[tableau.length - 1];
+    if (this.getCard(source, -1) !== lastCard) {
+      return '';
+      // tableau = this.getTableauAt(source);
     }
 
     const solver = new FreecellSolver(this.PILE_NUM, this.CELL_NUM, this.BASE_NUM, this.toArray());
@@ -137,7 +146,7 @@ export class FreecellGame extends FreecellDesk {
     }
 
     // Handle a tableau.
-    const tableau = this.getTableauAt(source);
+    // const tableau = this.getTableauAt(source);
     if (tableau.length > 1) {
       solver.cardFilter = tableau.reduce((obj, key) => { obj[key] = true; return obj; }, {});
       solver.onMove = (card: number, src: number, dst: number) => {
