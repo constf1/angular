@@ -1,15 +1,19 @@
 <div class="main" #mainRef>
   <app-ratio-keeper [width]="width" [height]="height" [ratio]="7/5">
     <app-freecell-deck [layout]="layout" [game]="game" (lineChange)="onLineChange($event)">
-      <button mat-stroked-button (click)="onDeal()">DEAL</button>
-      <button mat-stroked-button [disabled]="!history.canUndo" (click)="onUndo()">UNDO</button>
+      <button mat-stroked-button (click)="onDeal()">
+        <mat-icon color="primary">autorenew</mat-icon>DEAL</button>
+      <button mat-stroked-button [disabled]="!history.canUndo" (click)="onUndo()">
+        <mat-icon [color]="history.canUndo ? 'accent' : 'grey'">undo</mat-icon>UNDO</button>
       <app-freecell-history
         [items]="historyItems"
         [selection]="historySelection"
         (selectionChange)="onHistorySelectionChange($event)"
       ></app-freecell-history>
-      <button mat-stroked-button [disabled]="!history.canRedo" (click)="onRedo()">REDO</button>
-      <button mat-stroked-button [disabled]="!nextMove" (click)="onAuto()">AUTO</button>
+      <button mat-stroked-button [disabled]="!history.canRedo" (click)="onRedo()">
+        <mat-icon [color]="history.canRedo ? 'accent' : 'grey'">redo</mat-icon>REDO</button>
+      <button mat-stroked-button [disabled]="!nextMove" (click)="onAuto()">
+        <mat-icon [color]="nextMove ? 'warn' : 'grey'">emoji_objects</mat-icon>AUTO</button>
     </app-freecell-deck>
   </app-ratio-keeper>
 </div>

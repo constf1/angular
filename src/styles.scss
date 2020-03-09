@@ -7,4 +7,10 @@ html, body {
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+// Angular Material prebuild themes:
+// [./node_modules/@angular/material/prebuilt-themes]
+// deeppurple-amber.css
+// indigo-pink.css
+// pink-bluegrey.css
+// purple-green.css
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
