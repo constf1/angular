@@ -17,13 +17,16 @@ import {
 import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.component';
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
+import { FreecellSidenavComponent } from './freecell/freecell-sidenav/freecell-sidenav.component';
 
 /**
  * Routes:
  */
 const appRoutes: Routes = [
+  { path: 'freecell-layout', component: FreecellSidenavComponent },
   { path: 'freecell-dom/:id', component: FreecellMainComponent },
-  { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
+  { path: '', redirectTo: '/freecell-layout', pathMatch: 'full' },
+  // { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
   { path: '**', component: FreecellMainComponent }
 ];
 
@@ -36,7 +39,8 @@ const appRoutes: Routes = [
     FreecellHistoryComponent,
     XrangePipe,
     SimpleVirtualListComponent,
-    SimpleVirtualListItemDirective
+    SimpleVirtualListItemDirective,
+    FreecellSidenavComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes, {

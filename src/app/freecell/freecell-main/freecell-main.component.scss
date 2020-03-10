@@ -23,7 +23,8 @@
 div.main {
   position: relative;
   width: 100%;
-  height: calc(100% - 64px); // Subtract the header size
+  // height: calc(100% - 64px); // Subtract the header size
+  height: 100%;
   background-color: red;
   overflow: hidden;
 }

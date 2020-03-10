@@ -1,0 +1,45 @@
+<ng-template #loading>
+  Loading stuff...
+</ng-template>
+
+<div class="example-container" *ngIf="matchXSmall$ | async as xsmall" >
+  <mat-sidenav-container class="example-sidenav-container">
+    <mat-sidenav #sidenav [mode]="xsmall.matches ? 'over' : 'side'">
+      <mat-toolbar color="primary" class="example-toolbar">
+        <button mat-icon-button (click)="sidenav.close()"><mat-icon>close</mat-icon></button>
+        <span>Menu</span>
+        <!-- <span class="flex-space-filler-1"></span> -->
+      </mat-toolbar>
+      <mat-action-list>
+        <button mat-list-item (click)="sidenavCommand.emit('deal')"><mat-icon>autorenew</mat-icon>DEAL</button>
+        <button mat-list-item (click)="sidenavCommand.emit('undo')"><mat-icon>undo</mat-icon>UNDO</button>
+        <button mat-list-item (click)="sidenavCommand.emit('redo')"><mat-icon>redo</mat-icon>REDO</button>
+        <button mat-list-item (click)="sidenavCommand.emit('auto')"><mat-icon>emoji_objects</mat-icon>AUTO</button>
+      </mat-action-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <mat-toolbar color="primary" class="example-toolbar">
+        <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+        <span>Freecell #1234567890</span>
+        <span class="flex-space-filler-1"></span>
+
+        <div *ngIf="xsmall.matches">
+          <button mat-icon-button [matMenuTriggerFor]="gameMenu"><mat-icon>more_vert</mat-icon></button>
+          <mat-menu #gameMenu="matMenu">
+            <app-freecell-history></app-freecell-history>
+          </mat-menu>
+        </div>
+        <app-freecell-history class="mat-typography" style="padding: 0 1rem;" *ngIf="!xsmall.matches"></app-freecell-history>
+      </mat-toolbar>
+
+      <div class="freecell-content" style="background-color:brown; margin: 1px auto;"
+       [style.width.px]="xsmall.matches ? 364 : 480"
+       [style.height.px]="xsmall.matches ? 273 : 360"
+      >
+        <app-freecell-main></app-freecell-main>
+      </div>
+      <!-- <p *ngFor="let content of fillerContent">{{content}}</p> -->
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

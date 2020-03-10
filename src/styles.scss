@@ -14,3 +14,10 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // pink-bluegrey.css
 // purple-green.css
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+
+.flex-space-filler-1 {
+  /* This fills the remaining space, by using flexbox.
+     Every toolbar row uses a flexbox row layout. */
+  flex: 1 1 auto;
+}
