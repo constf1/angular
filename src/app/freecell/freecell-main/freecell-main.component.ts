@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -19,12 +19,7 @@ import { FreecellHistoryItem } from '../freecell-history/freecell-history.compon
   styleUrls: ['./freecell-main.component.scss']
 })
 export class FreecellMainComponent implements OnInit, OnDestroy {
-  @ViewChild('mainRef', {static: true}) mainRef: ElementRef<HTMLElement>;
   @ViewChild(FreecellDeckComponent) freecellComponent: FreecellDeckComponent;
-
-  name = 'History: ';
-  width: number;
-  height: number;
 
   game = new FreecellGame(8, 4, 4);
   layout = new FreecellLayout(this.game);
@@ -43,21 +38,8 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
     this.game.deal();
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    if (this.mainRef && this.mainRef.nativeElement) {
-      this.width = this.mainRef.nativeElement.clientWidth;
-      this.height = this.mainRef.nativeElement.clientHeight;
-    }
-  }
-
   ngOnInit() {
     // console.log('OnInit:', this);
-    if (this.mainRef && this.mainRef.nativeElement) {
-      this.width = this.mainRef.nativeElement.clientWidth;
-      this.height = this.mainRef.nativeElement.clientHeight;
-    }
-
     this.subscription = this.route.queryParams.subscribe(params => {
       // console.log('Params:', params);
       const path = params.path || '';
@@ -74,11 +56,6 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
 
       this.update(deal, path, mark);
     });
-
-    // const left = this.layout.baseStartX;
-    // const width = this.layout.baseEndX - this.layout.baseStartX;
-    // const top = this.layout.baseEndY + 0.25 * this.layout.deltaHeight;
-    // const height = this.layout.deltaHeight * 0.5;
   }
 
   ngOnDestroy() {
@@ -126,14 +103,6 @@ export class FreecellMainComponent implements OnInit, OnDestroy {
       }
     }
   }
-
-  // ngAfterViewInit() {
-    // console.log('AfterViewInit:', this);
-    // if (this.mainRef) {
-      // this.width = this.mainRef.nativeElement.clientWidth;
-      // this.height = this.mainRef.nativeElement.clientHeight;
-    // }
-  // }
 
   deal(deal: number) {
     this.game.deal(deal);
