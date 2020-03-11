@@ -2,9 +2,9 @@
   Loading stuff...
 </ng-template>
 
-<div class="example-container" *ngIf="matchXSmall$ | async as xsmall" >
-  <mat-sidenav-container class="example-sidenav-container">
-    <mat-sidenav #sidenav [mode]="xsmall.matches ? 'over' : 'side'">
+<div class="example-container" *ngIf="breakpoints$ | async as bs" >
+  <mat-sidenav-container class="freecell-sidenav-container">
+    <mat-sidenav #sidenav [mode]="getSideNavMode(bs)">
       <mat-toolbar color="primary" class="example-toolbar">
         <button mat-icon-button (click)="sidenav.close()"><mat-icon>close</mat-icon></button>
         <span>Menu</span>
@@ -32,10 +32,11 @@
     <mat-sidenav-content>
       <mat-toolbar color="primary" class="example-toolbar">
         <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
+        <span> {{getStateName(bs)}} </span>
         <span>Freecell #{{game.history.deal}}</span>
         <span class="flex-space-filler-1"></span>
 
-        <ng-container *ngIf="xsmall.matches">
+        <ng-container *ngIf="bs.breakpoints[BP_XS]">
           <button mat-icon-button [matMenuTriggerFor]="gameMenu"><mat-icon>more_vert</mat-icon></button>
           <mat-menu #gameMenu="matMenu">
             <app-freecell-history
@@ -45,19 +46,24 @@
             ></app-freecell-history>
           </mat-menu>
         </ng-container>
-        <app-freecell-history class="mat-typography" style="padding: 0 1rem;" *ngIf="!xsmall.matches"
+        <app-freecell-history class="mat-typography" style="padding: 0 1rem;" *ngIf="!bs.breakpoints[BP_XS]"
           [items]="game.historyItems"
           [selection]="game.historySelection"
           (selectionChange)="game.onHistorySelectionChange($event)"
         ></app-freecell-history>
       </mat-toolbar>
 
-      <div class="freecell-content" style="background-color:brown; margin: 1px auto;"
-        [style.width.px]="xsmall.matches ? 360 : 480"
-        [style.height.px]="xsmall.matches ? 270 : 360"
-      >
-        <app-freecell-main #game></app-freecell-main>
+      <div class="freecell-content">
+        <div style="position: absolute; top:0; left:0; bottom:0; right:0">
+          <app-freecell-main #game></app-freecell-main>
+        </div>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>
+
+<!--
+  [style.width.px]="getContentWidth(bs)"
+        [style.height.px]="getContentHeight(bs)"
+[class.freecell-sidenav-opened]="sidenav.opened && sidenav.mode === 'side'"
+ -->

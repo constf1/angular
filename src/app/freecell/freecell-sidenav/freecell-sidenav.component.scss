@@ -14,11 +14,7 @@
   z-index: 2;
 }
 
-h1.example-app-name {
-  margin-left: 8px;
-}
-
-.example-sidenav-container {
+.freecell-sidenav-container {
   /* When the sidenav is not fixed, stretch the sidenav container to fill the available space. This
      causes `<mat-sidenav-content>` to act as our scrolling element for desktop layouts. */
   flex: 1;
@@ -28,4 +24,26 @@ h1.example-app-name {
   /* When the sidenav is fixed, don't constrain the height of the sidenav container. This allows the
      `<body>` to be our scrolling element for mobile layouts. */
   flex: 1 0 auto;
+}
+
+@mixin aspect_ratio_with_margin($ratio, $mx) {
+  margin: 1px $mx;
+  width: 100% - 2 * $mx;
+  padding-top: $ratio * 100% - 2 * $ratio * $mx;
+}
+
+.freecell-content {
+  position: relative;
+  margin: 1px 1px;
+  width:calc(100% - 2px);
+  padding-top: calc(75% - 1.5px); // 2px * 0.75
+
+  // 1.6
+  @media (min-aspect-ratio: 8/5) { @include aspect_ratio_with_margin(0.75, 4.8%); }
+
+  // 2.0
+  @media (min-aspect-ratio: 2/1) { @include aspect_ratio_with_margin(0.75, 8.8%); }
+
+  // 2.15
+  @media (min-aspect-ratio: 43/20) { @include aspect_ratio_with_margin(0.75, 12%); }
 }
