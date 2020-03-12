@@ -2,7 +2,7 @@
   Loading stuff...
 </ng-template>
 
-<div class="example-container" *ngIf="breakpoints$ | async as bs" >
+<div class="freecell-container" *ngIf="breakpoints$ | async as bs" >
   <mat-sidenav-container class="freecell-sidenav-container">
     <mat-sidenav #sidenav [mode]="getSideNavMode(bs)">
       <mat-toolbar color="primary" class="example-toolbar">

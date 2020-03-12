@@ -1,4 +1,4 @@
-.example-container {
+.freecell-container {
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -27,7 +27,8 @@
 }
 
 @mixin aspect_ratio_with_margin($ratio, $mx) {
-  margin: 1px $mx;
+  margin-left: $mx;
+  margin-right: $mx;
   width: 100% - 2 * $mx;
   padding-top: $ratio * 100% - 2 * $ratio * $mx;
 }
@@ -36,14 +37,14 @@
   position: relative;
   margin: 1px 1px;
   width:calc(100% - 2px);
-  padding-top: calc(75% - 1.5px); // 2px * 0.75
+  padding-top: calc(50% - 1px); // 2px * 0.5
 
   // 1.6
-  @media (min-aspect-ratio: 8/5) { @include aspect_ratio_with_margin(0.75, 4.8%); }
+  // @media (min-aspect-ratio: 8/5) { @include aspect_ratio_with_margin(0.5, 0.5%); }
 
   // 2.0
-  @media (min-aspect-ratio: 2/1) { @include aspect_ratio_with_margin(0.75, 8.8%); }
+  @media (min-aspect-ratio: 2/1) { @include aspect_ratio_with_margin(0.5, 2.7%); }
 
   // 2.15
-  @media (min-aspect-ratio: 43/20) { @include aspect_ratio_with_margin(0.75, 12%); }
+  @media (min-aspect-ratio: 43/20) { @include aspect_ratio_with_margin(0.5, 5.1%); }
 }
