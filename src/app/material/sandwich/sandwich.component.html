@@ -1,0 +1,23 @@
+<ng-template #moveButton let-index>
+  <button mat-icon-button
+    [class.s-header-move-down]="order[1] > order[index]"
+    [class.s-header-move-up]="order[index] > order[1]"
+    (click)="changeOrder(index)"
+  >
+    <mat-icon>{{order[1] > order[index] ? 'vertical_align_bottom' : 'vertical_align_top'}}</mat-icon>
+  </button>
+</ng-template>
+
+<div class="s-container">
+  <div class="s-header" [style.order]="order[0]">
+    <ng-content select=".sandwich-header"></ng-content>
+    <ng-container *ngTemplateOutlet="moveButton; context: { $implicit: 0 }"></ng-container>
+  </div>
+  <div class="s-content" [style.order]="order[1]">
+    <ng-content select=".sandwich-content"></ng-content>
+  </div>
+  <div class="s-footer" [style.order]="order[2]">
+    <ng-content select=".sandwich-footer"></ng-content>
+    <ng-container *ngTemplateOutlet="moveButton; context: { $implicit: 2 }"></ng-container>
+  </div>
+</div>

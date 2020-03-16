@@ -12,9 +12,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { SandwichComponent } from './sandwich/sandwich.component';
 
 @NgModule({
-  declarations: [],
+  declarations: [SandwichComponent],
   imports: [
     BrowserAnimationsModule,
     LayoutModule,
@@ -43,7 +44,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatSelectModule,
     MatSidenavModule,
     MatSliderModule,
-    MatToolbarModule
+    MatToolbarModule,
+
+    SandwichComponent
   ]
 })
 export class MaterialModule { }
