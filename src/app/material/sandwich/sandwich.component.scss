@@ -1,4 +1,4 @@
-div.s-container {
+div.sandwich-container {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -12,27 +12,27 @@ div.s-container {
   align-items: stretch; /* default */
 }
 
-div.s-header, div.s-footer {
+div.sandwich-header, div.sandwich-footer {
   position: relative;
   flex-grow: 0;
   flex-shrink: 0;
 }
 
-div.s-content {
+div.sandwich-content {
   flex-grow: 1;
   flex-shrink: 0;
 }
 
-.s-header-move-down, .s-header-move-up {
+.sandwich-button-move-down, .sandwich-button-move-up {
   position: absolute;
   right: 0;
   color: white;
 }
 
-.s-header-move-down {
+.sandwich-button-move-down {
   bottom: 0;
 }
 
-.s-header-move-up {
+.sandwich-button-move-up {
   top: 0;
 }

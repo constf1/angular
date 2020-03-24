@@ -1,0 +1,26 @@
+<ng-template #buttons>
+  <button mat-stroked-button [disabled]="!canUndo" (click)="undo()">
+    <mat-icon>undo</mat-icon>
+    <label>UNDO</label>
+  </button>
+  <button mat-stroked-button [disabled]="!canRedo" (click)="redo()">
+    <mat-icon>redo</mat-icon>
+    <label>REDO</label>
+  </button>
+  <button mat-stroked-button [disabled]="!canAuto" (click)="auto()" color="accent">
+    <mat-icon>emoji_objects</mat-icon>
+    <label>AUTO</label>
+  </button>
+</ng-template>
+
+<ng-container *ngIf="noLabel; else buttons">
+  <button mat-icon-button [disabled]="!canUndo" (click)="undo()">
+    <mat-icon>undo</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!canRedo" (click)="redo()">
+    <mat-icon>redo</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!canAuto" (click)="auto()" color="accent">
+    <mat-icon>emoji_objects</mat-icon>
+  </button>
+</ng-container>

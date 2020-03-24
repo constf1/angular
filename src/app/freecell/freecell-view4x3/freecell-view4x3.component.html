@@ -30,19 +30,22 @@
 </div> -->
 
 <app-sandwich>
-  <mat-toolbar class="sandwich-header" color="primary">
-    <span>Header</span>
+  <mat-toolbar appSandwichHeader color="primary">
+    <span>Freecell</span>
+    <app-freecell-deal-menu></app-freecell-deal-menu>
+    <span class="flex-space-filler-1"></span>
+    <app-freecell-action-buttons [noLabel]="noLabel"></app-freecell-action-buttons>
     <span class="flex-space-filler-1"></span>
   </mat-toolbar>
-  <div class="sandwich-content">
+  <div appSandwichContent>
     <div class="freecell-content-outer">
       <div class="freecell-content-inner">
         <app-freecell-main #game></app-freecell-main>
       </div>
     </div>
   </div>
-  <mat-toolbar class="sandwich-footer" color="primary">
-    <span>Footer</span>
+  <mat-toolbar appSandwichFooter color="primary">
+    <app-freecell-history class="mat-typography"></app-freecell-history>
     <span class="flex-space-filler-1"></span>
   </mat-toolbar>
 </app-sandwich>

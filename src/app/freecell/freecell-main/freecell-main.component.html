@@ -27,9 +27,11 @@
     <mat-icon class="toolbar-icon" color="warn">favorite</mat-icon>
   </mat-toolbar-row>
 </mat-toolbar> -->
+<app-freecell-router></app-freecell-router>
 <div class="main" #mainRef>
   <!-- <app-ratio-keeper [width]="width" [height]="height" [ratio]="7/5"> -->
-    <app-freecell-deck [layout]="layout" [game]="game" (lineChange)="onLineChange($event)">
+    <app-freecell-deck *ngIf="layout" [layout]="layout" (lineChange)="onLineChange($event)">
+      <ng-content></ng-content>
     </app-freecell-deck>
   <!-- </app-ratio-keeper> -->
 </div>

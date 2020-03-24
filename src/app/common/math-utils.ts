@@ -18,11 +18,11 @@ export function toString(value: number, minWidth: number, prefix: string = '0', 
 export function randomNumber(minValue: number, maxValue: number): number {
   return Math.random() * (maxValue - minValue) + minValue;
 }
-export function randomIneger(minValue: number, maxValue: number, skipValue?: number): number {
+export function randomInteger(minValue: number, maxValue: number, skipValue?: number): number {
   if (skipValue !== undefined && maxValue - minValue >= 3) {
     // We need at least two numbers to choose from.
     while (true) {
-      const value = randomIneger(minValue, maxValue);
+      const value = randomInteger(minValue, maxValue);
       if (value !== skipValue) {
         return value;
       }

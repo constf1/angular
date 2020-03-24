@@ -210,11 +210,12 @@ export class FreecellDesk extends FreecellBasis {
       for (let j = i; j-- > 0;) {
         if (i !== j) {
           if ((this.isMoveValid(i, j) && callback(i, j)) || (this.isMoveValid(j, i) && callback(j, i))) {
-            return;
+            return true;
           }
         }
       }
     }
+    return false;
   }
 }
 
