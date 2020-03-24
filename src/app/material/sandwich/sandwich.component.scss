@@ -26,7 +26,11 @@ div.sandwich-content {
 .sandwich-button-move-down, .sandwich-button-move-up {
   position: absolute;
   right: 0;
-  color: white;
+  color: #bccfe0;
+
+  &:hover {
+    color: white;
+  }
 }
 
 .sandwich-button-move-down {

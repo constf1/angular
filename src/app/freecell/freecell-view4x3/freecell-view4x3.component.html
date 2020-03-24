@@ -1,34 +1,3 @@
-<!-- <ng-template #moveButton let-index>
-  <button mat-icon-button
-    [class.freecell-view4-x3-header-move-down]="order[1] > order[index]"
-    [class.freecell-view4-x3-header-move-up]="order[index] > order[1]"
-    (click)="changeOrder(index)"
-  >
-    <mat-icon>{{order[1] > order[index] ? 'vertical_align_bottom' : 'vertical_align_top'}}</mat-icon>
-  </button>
-</ng-template>
-
-<div class="freecell-view4-x3-container">
-  <div class="freecell-view4-x3-header" [style.order]="order[0]">
-    <mat-toolbar color="primary">
-      <span>Header</span>
-      <span class="flex-space-filler-1"></span>
-    </mat-toolbar>
-    <ng-container *ngTemplateOutlet="moveButton; context: { $implicit: 0 }"></ng-container>
-  </div>
-  <div class="freecell-view4-x3-content" [style.order]="order[1]">
-    <div class="freecell-content-outer">
-      <div class="freecell-content-inner">
-        <app-freecell-main #game></app-freecell-main>
-      </div>
-    </div>
-  </div>
-  <div class="freecell-view4-x3-footer" [style.order]="order[2]">
-    <mat-toolbar color="primary">Footer</mat-toolbar>
-    <ng-container *ngTemplateOutlet="moveButton; context: { $implicit: 2 }"></ng-container>
-  </div>
-</div> -->
-
 <app-sandwich>
   <mat-toolbar appSandwichHeader color="primary">
     <span>Freecell</span>
@@ -40,7 +9,7 @@
   <div appSandwichContent>
     <div class="freecell-content-outer">
       <div class="freecell-content-inner">
-        <app-freecell-main #game></app-freecell-main>
+        <app-freecell-main></app-freecell-main>
       </div>
     </div>
   </div>
