@@ -2,8 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
-import { MaterialModule } from './material.module';
+import { MaterialModule } from './material/material.module';
 
 import { AppComponent } from './app.component';
 
@@ -14,16 +15,25 @@ import {
   SimpleVirtualListComponent,
   SimpleVirtualListItemDirective
 } from './common/components/simple-virtual-list/simple-virtual-list.component';
+
 import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.component';
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
+import { FreecellRouterComponent } from './freecell/freecell-router/freecell-router.component';
+import { FreecellActionButtonsComponent } from './freecell/freecell-action-buttons/freecell-action-buttons.component';
+import { FreecellView4x3Component } from './freecell/freecell-view4x3/freecell-view4x3.component';
+import { FreecellDealMenuComponent } from './freecell/freecell-deal-menu/freecell-deal-menu.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
+import { FreecellSidenavComponent } from './freecell/freecell-sidenav/freecell-sidenav.component';
 
 /**
  * Routes:
  */
 const appRoutes: Routes = [
-  { path: 'freecell-dom/:id', component: FreecellMainComponent },
-  { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
+  { path: 'freecell-view-4x3', component: FreecellView4x3Component },
+  { path: 'freecell-sidenav', component: FreecellSidenavComponent },
+  { path: 'freecell-dom', component: FreecellMainComponent },
+  { path: '', redirectTo: '/freecell-sidenav', pathMatch: 'full' },
+  // { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
   { path: '**', component: FreecellMainComponent }
 ];
 
@@ -36,7 +46,12 @@ const appRoutes: Routes = [
     FreecellHistoryComponent,
     XrangePipe,
     SimpleVirtualListComponent,
-    SimpleVirtualListItemDirective
+    SimpleVirtualListItemDirective,
+    FreecellRouterComponent,
+    FreecellSidenavComponent,
+    FreecellActionButtonsComponent,
+    FreecellView4x3Component,
+    FreecellDealMenuComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes, {
@@ -44,6 +59,7 @@ const appRoutes: Routes = [
     }),
     BrowserModule,
     CommonModule,
+    FormsModule,
     MaterialModule
   ],
   providers: [],

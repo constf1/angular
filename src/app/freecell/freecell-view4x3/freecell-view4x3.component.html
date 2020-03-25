@@ -1,0 +1,16 @@
+<app-sandwich>
+  <mat-toolbar appSandwichHeader color="primary">
+    <span>Freecell</span>
+    <app-freecell-deal-menu></app-freecell-deal-menu>
+    <span class="flex-space-filler-1"></span>
+    <app-freecell-action-buttons [noLabel]="noLabel"></app-freecell-action-buttons>
+    <span class="flex-space-filler-1"></span>
+  </mat-toolbar>
+  <app-freecell-main appSandwichContent [aspectRatio]="0.625"></app-freecell-main>
+  <mat-toolbar appSandwichFooter color="primary">
+    <div class="mat-typography padding-top-half-rem">
+      <app-freecell-history></app-freecell-history>
+    </div>
+    <span class="flex-space-filler-1"></span>
+  </mat-toolbar>
+</app-sandwich>

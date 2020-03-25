@@ -1,0 +1,74 @@
+<ng-template #loading>
+  Loading stuff...
+</ng-template>
+
+<div class="freecell-container" *ngIf="breakpoints$ | async as bs" >
+  <!-- Sidenav Container -->
+  <mat-sidenav-container class="freecell-sidenav-container">
+    <!-- Sidenav Drawer -->
+    <mat-sidenav #sidenav [mode]="(!sidenavModeSide || bs.breakpoints[BP_XS]) ? 'over' : 'side'"
+      (closedStart)="sidenavClosed=true"
+      (openedStart)="sidenavClosed=false"
+      (openedChange)="sidenavOpened=$event"
+    >
+      <mat-toolbar color="primary" class="freecell-toolbar">
+        <button mat-icon-button (click)="sidenav.close()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <span class="flex-space-filler-1"></span>
+        <span>Freecell</span>
+        <span class="flex-space-filler-1"></span>
+        <mat-slide-toggle *ngIf="!bs.breakpoints[BP_XS]" color="primary"
+          [checked]="sidenavModeSide"
+          (change)="sidenavModeSide=$event.checked"
+        ></mat-slide-toggle>
+      </mat-toolbar>
+      <mat-action-list>
+        <app-freecell-deal-menu [listItem]="true"></app-freecell-deal-menu>
+        <button mat-list-item
+          [disabled]="!actionService.canUndo"
+          (click)="actionService.undo()"
+        >
+          <mat-icon color="primary">undo</mat-icon>
+          UNDO
+        </button>
+        <button mat-list-item
+          [disabled]="!actionService.canRedo"
+          (click)="actionService.redo()"
+        >
+          <mat-icon color="primary">redo</mat-icon>
+          REDO
+        </button>
+        <button mat-list-item
+          [disabled]="!actionService.nextMove"
+          (click)="actionService.playNext()"
+        >
+          <mat-icon color="accent">emoji_objects</mat-icon>
+          AUTO
+        </button>
+      </mat-action-list>
+      <div style="padding: 1em;">
+        <app-freecell-history></app-freecell-history>
+      </div>
+      <!-- <app-freecell-action-list (command)="onAction(game, $event)" [canUndo]="canUndo" [canRedo]="canRedo" [canAuto]="!!game.nextMove"></app-freecell-action-list> -->
+    </mat-sidenav>
+
+    <!-- <mat-sidenav opened="false" mode="side" position="end">End content</mat-sidenav> -->
+
+    <!-- Sidenav Content -->
+    <mat-sidenav-content>
+      <app-freecell-main [aspectRatio]="0.56">
+        <button
+          *ngIf="sidenavClosed"
+          class="sidenav-open-button"
+          [class.sidenav-open-button-active]="!sidenavOpened"
+          mat-icon-button color="primary"
+          (click)="sidenav.open()"
+        >
+          <mat-icon>double_arrow</mat-icon>
+        </button>
+      </app-freecell-main>
+
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

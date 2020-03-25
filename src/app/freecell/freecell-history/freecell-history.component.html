@@ -3,10 +3,12 @@
   <mat-select [value]="selection" (valueChange)="setSelection($event)">
     <mat-option [value]="-1">Start</mat-option>
     <mat-option *ngFor="let item of items; index as i" [value]="i" >
-      <span class="history-item">
-        <span>{{i + 1}}. <span [class]="getClass(item.which)">{{getName(item.which)}}</span> &rarr; <span [class]="getClass(item.taker)">{{getName(item.taker)}}</span>; </span>
-        <span [class]="getOutcomeClass(item.outcome)">free {{item.outcome}}</span>
-      </span>
+      <div class="history-item">
+        {{i + 1}}.&nbsp;
+        <span [class]="item.cardClass">{{item.cardName}}</span>&nbsp;&rarr;&nbsp;
+        <span [class]="item.takerClass">{{item.takerName}}</span>&nbsp;
+        <span [class]="item.outcomeClass">{{item.outcomeName}}</span>
+      </div>
     </mat-option>
   </mat-select>
 </mat-form-field>

@@ -1,11 +1,40 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { CARD_NUM, suitFullNameOf, playNameOf } from '../../common/deck';
+// tslint:disable: variable-name
+import { Component, OnInit } from '@angular/core';
 
-export interface FreecellHistoryItem {
-  which: number;
-  giver: string | number;
-  taker: string | number;
+import { CARD_NUM, suitFullNameOf, playNameOf } from '../../common/deck';
+import { UnsubscribableComponent } from '../../common/unsubscribable-component';
+
+import { FreecellGameService } from '../services/freecell-game.service';
+import { playForward, FreecellPlayCallback } from '../freecell-play';
+import { FreecellBasis } from '../freecell-basis';
+
+interface HistoryItem {
+  card: number;
+  giver: number;
+  taker: number;
   outcome: number;
+
+  cardName: string;
+  cardClass: string;
+
+  takerName: string;
+  takerClass: string;
+
+  outcomeName: string;
+  outcomeClass: string;
+}
+
+function getSpotName(basis: FreecellBasis, index: number) {
+  if (basis.isBase(index)) {
+    return 'base';
+  }
+  if (basis.isPile(index)) {
+    return 'pile';
+  }
+  if (basis.isCell(index)) {
+    return 'cell';
+  }
+  return 'unknown index:' + index;
 }
 
 // const INFO_LEVELS = [
@@ -32,14 +61,49 @@ export const OUTCOMES = [
   templateUrl: './freecell-history.component.html',
   styleUrls: ['./freecell-history.component.scss']
 })
-export class FreecellHistoryComponent implements OnInit {
-  @Input() items: FreecellHistoryItem[] = [];
-  @Input() selection = -1;
-  @Output() selectionChange = new EventEmitter<number>();
+export class FreecellHistoryComponent extends UnsubscribableComponent implements OnInit {
+  items: HistoryItem[] = [];
+  selection = -1;
 
   readonly cards: { [key: number]: { className: string, cardName: string } } = {};
 
-  constructor() { }
+  onMoveCallback: FreecellPlayCallback = (view, giver, taker, index) => {
+    const item: Partial<HistoryItem> = this.items[index] || {};
+    if (giver !== item.giver || taker !== item.taker) {
+      item.card = view.getCard(taker, -1);
+      item.giver = giver;
+      item.taker = taker;
+      item.outcome = view.countEmpty();
+
+      // item.giverName = view.getLine(giver).length > 0
+      //   ? this.cards[view.getCard(giver, -1)].cardName
+      //   : getSpotName(view, giver);
+      item.cardName = this.cards[item.card].cardName;
+      item.cardClass = this.cards[item.card].className;
+
+      if (item.outcome === view.PILE_NUM + view.CELL_NUM) {
+        item.outcomeName = 'solved!';
+      } else {
+        item.outcomeName = 'free ' + item.outcome;
+      }
+      item.outcomeClass = OUTCOMES[Math.min(item.outcome, OUTCOMES.length - 1)];
+
+      if (view.getLine(taker).length > 1) {
+        const card = view.getCard(taker, -2);
+        item.takerName = this.cards[card].cardName;
+        item.takerClass = this.cards[card].className;
+      } else {
+        item.takerName = getSpotName(view, taker);
+        item.takerClass = '';
+      }
+
+      this.items[index] = item as HistoryItem;
+    }
+  }
+
+  constructor(private _gameService: FreecellGameService) {
+    super();
+  }
 
   ngOnInit() {
     for (let i = 0; i < CARD_NUM; i++) {
@@ -48,24 +112,22 @@ export class FreecellHistoryComponent implements OnInit {
         cardName: playNameOf(i)
       };
     }
+
+    this._addSubscription(this._gameService.state.subscribe(state => {
+      if (!state.path || !state.previous) {
+        this.items.length = 0;
+      }
+      if (state.game && state.path) {
+        playForward(state, this.onMoveCallback);
+        this.items.splice(state.path.length / 2);
+      }
+      this.selection = state.mark - 1;
+    }));
   }
 
   setSelection(value: number) {
     if (this.selection !== value && value <= this.items.length && value >= -1) {
-      // this.selection = value;
-      this.selectionChange.emit(value);
+      this._gameService.mark = value + 1;
     }
-  }
-
-  getOutcomeClass(index: number): string {
-    return OUTCOMES[index] || 'danger-very-low';
-  }
-
-  getClass(index: string | number): string {
-    return typeof index === 'number' ? this.cards[index]?.className : '';
-  }
-
-  getName(index: string | number): string {
-    return typeof index === 'string' ? index : this.cards[index]?.cardName;
   }
 }

@@ -1,7 +1,7 @@
 // tslint:disable: variable-name
 
 import { Injectable } from '@angular/core';
-import { getDate } from '../common/date-utils';
+import { getDate } from '../../common/date-utils';
 
 const DB_NAME = 'freecell-db';
 const DB_VERSION = 1;
