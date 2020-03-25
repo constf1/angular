@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Autoplay } from '../common/autoplay';
+import { Autoplay } from '../../common/autoplay';
 
 @Injectable({
   providedIn: 'root'

@@ -2,11 +2,11 @@
 
 import { Injectable } from '@angular/core';
 
-import { StateSubject } from '../common/state-subject';
+import { StateSubject } from '../../common/state-subject';
 
-import { giverAt, takerAt, nextPath, IFreecellReplay, IFreecellBasis } from './freecell-model';
-import { FreecellGameView } from './freecell-game';
-import { playForward, FreecellPlayCallback } from './freecell-play';
+import { nextPath, IFreecellReplay, IFreecellBasis } from '../freecell-model';
+import { FreecellGameView } from '../freecell-game';
+import { playForward, FreecellPlayCallback } from '../freecell-play';
 
 export interface FreecellGameState extends IFreecellReplay {
   game: FreecellGameView | null;
@@ -38,11 +38,14 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
   }
 
   set basis({ base, cell, pile }: IFreecellBasis) {
-    const { path, mark } = initialState;
-    this._next({
-      base, cell, pile,
-      path, mark
-    });
+    const state = this.value;
+    if (base !== state.base || cell !== state.cell || pile !== state.pile) {
+      const { path, mark } = initialState;
+      this._next({
+        base, cell, pile,
+        path, mark
+      });
+    }
   }
 
   get replay(): FreecellReplayState {
@@ -51,7 +54,9 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
   }
 
   set replay({ deal, mark, path }: FreecellReplayState) {
-    this._next({ deal, mark, path });
+    if (deal !== this.deal || mark !== this.mark || path !== this.path) {
+      this._next({ deal, mark, path });
+    }
   }
 
   get deal() {
@@ -86,14 +91,6 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
     if (this.path !== value) {
       this._next({ path: value });
     }
-  }
-
-  get canUndo() {
-    return this.mark > 0;
-  }
-
-  get canRedo() {
-    return 2 * this.mark < this.path.length;
   }
 
   constructor() {
@@ -143,34 +140,11 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
     this._stateSubject.next(state);
   }
 
-  undo() {
-    if (this.canUndo) {
-      this.mark = this.mark - 1;
-    }
-  }
-
-  redo() {
-    if (this.canRedo) {
-      this.mark = this.mark + 1;
-    }
-  }
-
   move(giver: number, taker: number) {
-    const state = this.value;
-    if (this.canUndo &&
-      giver === takerAt(state.path, state.mark) &&
-      taker === giverAt(state.path, state.mark)) {
-      this.undo();
-    } else if (this.canRedo &&
-      giver === giverAt(state.path, state.mark + 1) &&
-      taker === takerAt(state.path, state.mark + 1)) {
-      this.redo();
-    } else {
-      const path = nextPath(this.path, this.mark, giver, taker);
-      this._next({
-        mark: path.length / 2,
-        path
-      });
-    }
+    const path = nextPath(this.path, this.mark, giver, taker);
+    this._next({
+      mark: path.length / 2,
+      path
+    });
   }
 }
