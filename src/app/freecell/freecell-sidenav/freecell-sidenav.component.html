@@ -53,38 +53,22 @@
       <!-- <app-freecell-action-list (command)="onAction(game, $event)" [canUndo]="canUndo" [canRedo]="canRedo" [canAuto]="!!game.nextMove"></app-freecell-action-list> -->
     </mat-sidenav>
 
-    <mat-sidenav opened="false" mode="side" position="end">End content</mat-sidenav>
+    <!-- <mat-sidenav opened="false" mode="side" position="end">End content</mat-sidenav> -->
 
     <!-- Sidenav Content -->
     <mat-sidenav-content>
-      <!-- <div class="testing" [style.height]="sidenav.opened ? 0 : '64px'"> -->
-      <!-- </div> -->
-
-      <div class="freecell-content">
-        <div class="freecell-content-outer">
-          <div class="freecell-content-inner">
-            <app-freecell-main>
-              <button
-                *ngIf="sidenavClosed"
-                class="sidenav-open-button"
-                [class.sidenav-open-button-active]="!sidenavOpened"
-                mat-icon-button color="primary"
-                (click)="sidenav.open()"
-              >
-                <mat-icon>double_arrow</mat-icon>
-              </button>
-              <!-- <button mat-icon-button style="position: absolute; top: 0; right: 0"><mat-icon>keyboard_arrow_up</mat-icon></button> -->
-            </app-freecell-main>
-          </div>
-        </div>
-      </div>
+      <app-freecell-main [aspectRatio]="0.56">
+        <button
+          *ngIf="sidenavClosed"
+          class="sidenav-open-button"
+          [class.sidenav-open-button-active]="!sidenavOpened"
+          mat-icon-button color="primary"
+          (click)="sidenav.open()"
+        >
+          <mat-icon>double_arrow</mat-icon>
+        </button>
+      </app-freecell-main>
 
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>
-
-<!--
-  [style.width.px]="getContentWidth(bs)"
-        [style.height.px]="getContentHeight(bs)"
-[class.freecell-sidenav-opened]="sidenav.opened && sidenav.mode === 'side'"
- -->

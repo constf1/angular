@@ -6,15 +6,11 @@
     <app-freecell-action-buttons [noLabel]="noLabel"></app-freecell-action-buttons>
     <span class="flex-space-filler-1"></span>
   </mat-toolbar>
-  <div appSandwichContent>
-    <div class="freecell-content-outer">
-      <div class="freecell-content-inner">
-        <app-freecell-main></app-freecell-main>
-      </div>
-    </div>
-  </div>
+  <app-freecell-main appSandwichContent [aspectRatio]="0.625"></app-freecell-main>
   <mat-toolbar appSandwichFooter color="primary">
-    <app-freecell-history class="mat-typography"></app-freecell-history>
+    <div class="mat-typography padding-top-half-rem">
+      <app-freecell-history></app-freecell-history>
+    </div>
     <span class="flex-space-filler-1"></span>
   </mat-toolbar>
 </app-sandwich>

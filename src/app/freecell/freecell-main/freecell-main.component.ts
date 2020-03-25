@@ -1,5 +1,5 @@
 // tslint:disable: variable-name
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 
@@ -16,6 +16,7 @@ import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
   styleUrls: ['./freecell-main.component.scss']
 })
 export class FreecellMainComponent extends UnsubscribableComponent implements OnInit, OnDestroy {
+  @Input() aspectRatio = 0.56; // iphone 6/7/8
   layout: FreecellLayout;
 
   constructor(

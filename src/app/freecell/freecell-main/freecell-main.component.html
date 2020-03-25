@@ -1,6 +1,11 @@
 <app-freecell-router></app-freecell-router>
-<div class="main">
-  <app-freecell-deck *ngIf="layout" [layout]="layout" (lineChange)="onLineChange($event)">
-    <ng-content></ng-content>
-  </app-freecell-deck>
+
+<div class="freecell-content" [style.padding-top.%]="aspectRatio * 100">
+  <div class="freecell-content-outer">
+    <div class="freecell-content-inner">
+      <app-freecell-deck *ngIf="layout" [layout]="layout" (lineChange)="onLineChange($event)">
+        <ng-content></ng-content>
+      </app-freecell-deck>
+    </div>
+  </div>
 </div>
