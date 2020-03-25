@@ -25,16 +25,12 @@ import { FreecellDealMenuComponent } from './freecell/freecell-deal-menu/freecel
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
 import { FreecellSidenavComponent } from './freecell/freecell-sidenav/freecell-sidenav.component';
 
-// import { FreecellActionListComponent } from './freecell/freecell-action-list/freecell-action-list.component';
-// import { FreecellGridComponent } from './freecell/freecell-grid/freecell-grid.component';
-
 /**
  * Routes:
  */
 const appRoutes: Routes = [
   { path: 'freecell-view-4x3', component: FreecellView4x3Component },
   { path: 'freecell-sidenav', component: FreecellSidenavComponent },
-  // { path: 'freecell-grid', component: FreecellGridComponent },
   { path: 'freecell-dom', component: FreecellMainComponent },
   { path: '', redirectTo: '/freecell-sidenav', pathMatch: 'full' },
   // { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
@@ -44,7 +40,6 @@ const appRoutes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
-    // FreecellActionListComponent,
     FreecellMainComponent,
     FreecellDeckComponent,
     RatioKeeperComponent,
@@ -55,7 +50,6 @@ const appRoutes: Routes = [
     FreecellRouterComponent,
     FreecellSidenavComponent,
     FreecellActionButtonsComponent,
-    // FreecellGridComponent,
     FreecellView4x3Component,
     FreecellDealMenuComponent
   ],
