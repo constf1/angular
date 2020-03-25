@@ -3,61 +3,82 @@
 </ng-template>
 
 <div class="freecell-container" *ngIf="breakpoints$ | async as bs" >
+  <!-- Sidenav Container -->
   <mat-sidenav-container class="freecell-sidenav-container">
-    <mat-sidenav #sidenav [mode]="getSideNavMode(bs)">
-      <mat-toolbar color="primary" class="example-toolbar">
-        <button mat-icon-button (click)="sidenav.close()"><mat-icon>close</mat-icon></button>
-        <span>Menu</span>
+    <!-- Sidenav Drawer -->
+    <mat-sidenav #sidenav [mode]="(!sidenavModeSide || bs.breakpoints[BP_XS]) ? 'over' : 'side'"
+      (closedStart)="sidenavClosed=true"
+      (openedStart)="sidenavClosed=false"
+      (openedChange)="sidenavOpened=$event"
+    >
+      <mat-toolbar color="primary" class="freecell-toolbar">
+        <button mat-icon-button (click)="sidenav.close()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <span class="flex-space-filler-1"></span>
+        <span>Freecell</span>
+        <span class="flex-space-filler-1"></span>
+        <mat-slide-toggle *ngIf="!bs.breakpoints[BP_XS]" color="primary"
+          [checked]="sidenavModeSide"
+          (change)="sidenavModeSide=$event.checked"
+        ></mat-slide-toggle>
       </mat-toolbar>
       <mat-action-list>
-        <button mat-list-item (click)="game.onDeal()">
-          <mat-icon color="primary">autorenew</mat-icon>
-          DEAL
-        </button>
-        <button mat-list-item (click)="game.onUndo()" [disabled]="!game.history.canUndo">
-          <mat-icon [color]="game.history.canUndo ? 'primary' : 'grey'">undo</mat-icon>
+        <app-freecell-deal-menu [listItem]="true"></app-freecell-deal-menu>
+        <button mat-list-item
+          [disabled]="!actionService.canUndo"
+          (click)="actionService.undo()"
+        >
+          <mat-icon color="primary">undo</mat-icon>
           UNDO
         </button>
-        <button mat-list-item (click)="game.onRedo()" [disabled]="!game.history.canRedo">
-          <mat-icon [color]="game.history.canRedo ? 'primary' : 'grey'">redo</mat-icon>
+        <button mat-list-item
+          [disabled]="!actionService.canRedo"
+          (click)="actionService.redo()"
+        >
+          <mat-icon color="primary">redo</mat-icon>
           REDO
         </button>
-        <button mat-list-item (click)="game.onAuto()" [disabled]="!game.nextMove">
-          <mat-icon [color]="game.nextMove ? 'accent' : 'grey'">emoji_objects</mat-icon>
+        <button mat-list-item
+          [disabled]="!actionService.nextMove"
+          (click)="actionService.playNext()"
+        >
+          <mat-icon color="accent">emoji_objects</mat-icon>
           AUTO
         </button>
       </mat-action-list>
+      <div style="padding: 1em;">
+        <app-freecell-history></app-freecell-history>
+      </div>
+      <!-- <app-freecell-action-list (command)="onAction(game, $event)" [canUndo]="canUndo" [canRedo]="canRedo" [canAuto]="!!game.nextMove"></app-freecell-action-list> -->
     </mat-sidenav>
 
-    <mat-sidenav-content>
-      <mat-toolbar color="primary" class="example-toolbar">
-        <button mat-icon-button (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
-        <span> {{getStateName(bs)}} </span>
-        <span>Freecell #{{game.history.deal}}</span>
-        <span class="flex-space-filler-1"></span>
+    <mat-sidenav opened="false" mode="side" position="end">End content</mat-sidenav>
 
-        <ng-container *ngIf="bs.breakpoints[BP_XS]">
-          <button mat-icon-button [matMenuTriggerFor]="gameMenu"><mat-icon>more_vert</mat-icon></button>
-          <mat-menu #gameMenu="matMenu">
-            <app-freecell-history
-              [items]="game.historyItems"
-              [selection]="game.historySelection"
-              (selectionChange)="game.onHistorySelectionChange($event)"
-            ></app-freecell-history>
-          </mat-menu>
-        </ng-container>
-        <app-freecell-history class="mat-typography" style="padding: 0 1rem;" *ngIf="!bs.breakpoints[BP_XS]"
-          [items]="game.historyItems"
-          [selection]="game.historySelection"
-          (selectionChange)="game.onHistorySelectionChange($event)"
-        ></app-freecell-history>
-      </mat-toolbar>
+    <!-- Sidenav Content -->
+    <mat-sidenav-content>
+      <!-- <div class="testing" [style.height]="sidenav.opened ? 0 : '64px'"> -->
+      <!-- </div> -->
 
       <div class="freecell-content">
-        <div style="position: absolute; top:0; left:0; bottom:0; right:0">
-          <app-freecell-main #game></app-freecell-main>
+        <div class="freecell-content-outer">
+          <div class="freecell-content-inner">
+            <app-freecell-main>
+              <button
+                *ngIf="sidenavClosed"
+                class="sidenav-open-button"
+                [class.sidenav-open-button-active]="!sidenavOpened"
+                mat-icon-button color="primary"
+                (click)="sidenav.open()"
+              >
+                <mat-icon>double_arrow</mat-icon>
+              </button>
+              <!-- <button mat-icon-button style="position: absolute; top: 0; right: 0"><mat-icon>keyboard_arrow_up</mat-icon></button> -->
+            </app-freecell-main>
+          </div>
         </div>
       </div>
+
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>
