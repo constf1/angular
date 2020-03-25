@@ -23,8 +23,8 @@ import { FreecellActionButtonsComponent } from './freecell/freecell-action-butto
 import { FreecellView4x3Component } from './freecell/freecell-view4x3/freecell-view4x3.component';
 import { FreecellDealMenuComponent } from './freecell/freecell-deal-menu/freecell-deal-menu.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
+import { FreecellSidenavComponent } from './freecell/freecell-sidenav/freecell-sidenav.component';
 
-// import { FreecellSidenavComponent } from './freecell/freecell-sidenav/freecell-sidenav.component';
 // import { FreecellActionListComponent } from './freecell/freecell-action-list/freecell-action-list.component';
 // import { FreecellGridComponent } from './freecell/freecell-grid/freecell-grid.component';
 
@@ -33,10 +33,10 @@ import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-h
  */
 const appRoutes: Routes = [
   { path: 'freecell-view-4x3', component: FreecellView4x3Component },
-  // { path: 'freecell-layout', component: FreecellSidenavComponent },
+  { path: 'freecell-sidenav', component: FreecellSidenavComponent },
   // { path: 'freecell-grid', component: FreecellGridComponent },
   { path: 'freecell-dom', component: FreecellMainComponent },
-  { path: '', redirectTo: '/freecell-view-4x3', pathMatch: 'full' },
+  { path: '', redirectTo: '/freecell-sidenav', pathMatch: 'full' },
   // { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
   { path: '**', component: FreecellMainComponent }
 ];
@@ -53,7 +53,7 @@ const appRoutes: Routes = [
     SimpleVirtualListComponent,
     SimpleVirtualListItemDirective,
     FreecellRouterComponent,
-    // FreecellSidenavComponent,
+    FreecellSidenavComponent,
     FreecellActionButtonsComponent,
     // FreecellGridComponent,
     FreecellView4x3Component,

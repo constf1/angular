@@ -13,7 +13,11 @@
   </button>
 </mat-menu>
 
-<button mat-button [matMenuTriggerFor]="appMenu" (menuOpened)="isMenuOpened = true" (menuClosed)="isMenuOpened = false">
+<button mat-button
+  [class.mat-list-item]="listItem"
+  [matMenuTriggerFor]="appMenu"
+  (menuOpened)="isMenuOpened=true"
+  (menuClosed)="isMenuOpened=false">
   <label>{{dealLabel}}</label>
   <mat-icon>{{isMenuOpened ? 'remove' : 'expand_more'}}</mat-icon>
 </button>

@@ -217,6 +217,18 @@ export class FreecellDesk extends FreecellBasis {
     }
     return false;
   }
+
+  findMoveToBase(): { source: number, destination: number } | null {
+    let move = null;
+    this.findMoves((source, destination) => {
+      if (!this.isBase(source) && this.isBase(destination)) {
+        move = { source, destination };
+        return true;
+      }
+      return false;
+    });
+    return move;
+  }
 }
 
 export type FreecellDeskView = Omit<FreecellDesk, 'moveCard' | 'deal' | 'addCard' | 'clear'>;

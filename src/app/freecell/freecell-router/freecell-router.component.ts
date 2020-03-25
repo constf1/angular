@@ -4,7 +4,7 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 
-import { FreecellGameService } from '../freecell-game.service';
+import { FreecellGameService } from '../services/freecell-game.service';
 
 @Component({
   selector: 'app-freecell-router',

@@ -7,8 +7,8 @@ import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { FreecellLayout } from '../freecell-layout';
 // import { FreecellDbService } from '../freecell-db.service';
 import { LineChangeEvent } from '../freecell-deck/freecell-deck.component';
-import { FreecellGameService } from '../freecell-game.service';
-import { FreecellAutoplayService } from '../freecell-autoplay.service';
+import { FreecellGameService } from '../services/freecell-game.service';
+import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
 
 @Component({
   selector: 'app-freecell-main',

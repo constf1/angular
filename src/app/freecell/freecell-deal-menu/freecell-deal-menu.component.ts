@@ -1,11 +1,11 @@
 // tslint:disable: variable-name
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { randomInteger } from '../../common/math-utils';
 import { padLeft } from '../../common/string-utils';
 
-import { FreecellGameService } from '../freecell-game.service';
+import { FreecellGameService } from '../services/freecell-game.service';
 
 @Component({
   selector: 'app-freecell-deal-menu',
@@ -16,6 +16,8 @@ export class FreecellDealMenuComponent extends UnsubscribableComponent implement
   readonly minDeal = 0;
   readonly maxDeal = 0x80000000;
   readonly digitCount = this.maxDeal.toString(10).length;
+
+  @Input() listItem = false;
 
   deal: number;
   dealLabel = '';

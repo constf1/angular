@@ -21,8 +21,8 @@ import { Linkable, connect, append } from '../../common/linkable';
 
 import { FreecellGameView } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
-import { FreecellGameService } from '../freecell-game.service';
-import { FreecellAutoplayService } from '../freecell-autoplay.service';
+import { FreecellGameService } from '../services/freecell-game.service';
+import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
 import { countEqualMoves } from '../freecell-model';
 import { playForward } from '../freecell-play';
 
@@ -171,7 +171,8 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   onDragStart(tableau: Readonly<number[]>) {
     for (const cardIndex of tableau) {
       const card = this.cards[cardIndex];
-      card.ngStyle.zIndex = (card.ngStyle.zIndex % CARD_NUM) + CARD_NUM;
+      // card.ngStyle.zIndex = (card.ngStyle.zIndex % CARD_NUM) + CARD_NUM;
+      card.ngStyle.zIndex += CARD_NUM;
       card.ngClass.dragged = true;
     }
   }
@@ -194,7 +195,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       const card = this.cards[index];
       const lineIndex = game.toLine(index);
 
-      card.ngStyle.zIndex = card.ngStyle.zIndex % CARD_NUM;
+      card.ngStyle.zIndex -= CARD_NUM;
       card.ngStyle.transform = this.getCardTransform(game, lineIndex, index);
       delete card.ngClass.dragged;
       setTransition(card.ngClass, 'transition_fast');

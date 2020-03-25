@@ -4,7 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { CARD_NUM, suitFullNameOf, playNameOf } from '../../common/deck';
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 
-import { FreecellGameService } from '../freecell-game.service';
+import { FreecellGameService } from '../services/freecell-game.service';
 import { playForward, FreecellPlayCallback } from '../freecell-play';
 import { FreecellBasis } from '../freecell-basis';
 
