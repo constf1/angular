@@ -9,6 +9,7 @@ import { FreecellLayout } from '../freecell-layout';
 import { LineChangeEvent } from '../freecell-deck/freecell-deck.component';
 import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
+import { FreecellSettingsService } from '../services/freecell-settings.service';
 
 @Component({
   selector: 'app-freecell-main',
@@ -16,10 +17,11 @@ import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
   styleUrls: ['./freecell-main.component.scss']
 })
 export class FreecellMainComponent extends UnsubscribableComponent implements OnInit, OnDestroy {
-  @Input() aspectRatio = 0.56; // iphone 6/7/8
+  // @Input() aspectRatio = 0.56; // iphone 6/7/8
   layout: FreecellLayout;
 
   constructor(
+    public settings: FreecellSettingsService,
     // private _dbService: FreecellDbService,
     private _gameService: FreecellGameService,
     private _playService: FreecellAutoplayService) {

@@ -6,25 +6,27 @@
   <!-- Sidenav Container -->
   <mat-sidenav-container class="freecell-sidenav-container">
     <!-- Sidenav Drawer -->
-    <mat-sidenav #sidenav [mode]="(!sidenavModeSide || bs.breakpoints[BP_XS]) ? 'over' : 'side'"
-      (closedStart)="sidenavClosed=true"
-      (openedStart)="sidenavClosed=false"
+    <mat-sidenav
+      [mode]="(!settings.sidenavModeSide || bs.breakpoints[BP_XS]) ? 'over' : 'side'"
+      [opened]="!settings.sidenavClosed"
+      (closedStart)="settings.sidenavClosed=true"
       (openedChange)="sidenavOpened=$event"
     >
       <mat-toolbar color="primary" class="freecell-toolbar">
-        <button mat-icon-button (click)="sidenav.close()">
+        <button mat-icon-button (click)="settings.sidenavClosed=true">
           <mat-icon>close</mat-icon>
         </button>
         <span class="flex-space-filler-1"></span>
         <span>Freecell</span>
         <span class="flex-space-filler-1"></span>
         <mat-slide-toggle *ngIf="!bs.breakpoints[BP_XS]" color="primary"
-          [checked]="sidenavModeSide"
-          (change)="sidenavModeSide=$event.checked"
+          [checked]="settings.sidenavModeSide"
+          (change)="settings.sidenavModeSide=$event.checked"
         ></mat-slide-toggle>
       </mat-toolbar>
       <mat-action-list>
         <app-freecell-deal-menu [listItem]="true"></app-freecell-deal-menu>
+        <div mat-subheader>Actions:</div>
         <button mat-list-item
           [disabled]="!actionService.canUndo"
           (click)="actionService.undo()"
@@ -44,26 +46,57 @@
           (click)="actionService.playNext()"
         >
           <mat-icon color="accent">emoji_objects</mat-icon>
-          AUTO
+          <span>AUTO</span>
         </button>
       </mat-action-list>
       <div style="padding: 1em;">
         <app-freecell-history></app-freecell-history>
       </div>
-      <!-- <app-freecell-action-list (command)="onAction(game, $event)" [canUndo]="canUndo" [canRedo]="canRedo" [canAuto]="!!game.nextMove"></app-freecell-action-list> -->
-    </mat-sidenav>
+      <span class="flex-space-filler-1"></span>
+      <mat-divider></mat-divider>
+      <mat-action-list>
+        <button mat-list-item (click)="settingsChange.emit()">
+          <mat-icon>settings</mat-icon>
+          <span>SETTINGS</span>
+        </button>
+      </mat-action-list>
 
-    <!-- <mat-sidenav opened="false" mode="side" position="end">End content</mat-sidenav> -->
+      <!-- <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Settings
+            </mat-panel-title>
+            <mat-panel-description>
+              <mat-icon>settings</mat-icon>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <mat-nav-list>
+            <a mat-list-item routerLink="/freecell-sandwich" queryParamsHandling="preserve">
+              <mat-icon>view_day</mat-icon>
+              <span>Toggle view</span>
+            </a>
+          </mat-nav-list>
+
+          <mat-slider [min]="0.40" [max]="0.75"  [step]="0.01" [(ngModel)]="aspectRatio"></mat-slider>
+
+
+            <mat-label>Aspect ratio</mat-label>
+            <input matInput type="number" [min]="0.40" [max]="0.75"  [step]="0.01" [(ngModel)]="aspectRatio">
+        </mat-expansion-panel>
+      </mat-accordion> -->
+
+    </mat-sidenav>
 
     <!-- Sidenav Content -->
     <mat-sidenav-content>
-      <app-freecell-main [aspectRatio]="0.56">
+      <app-freecell-main>
         <button
-          *ngIf="sidenavClosed"
+          *ngIf="settings.sidenavClosed"
           class="sidenav-open-button"
           [class.sidenav-open-button-active]="!sidenavOpened"
           mat-icon-button color="primary"
-          (click)="sidenav.open()"
+          (click)="settings.sidenavClosed=false"
         >
           <mat-icon>double_arrow</mat-icon>
         </button>

@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Freecell Settings</h2>
+<mat-dialog-content class="mat-typography">
+  <h3>Layout</h3>
+  <mat-button-toggle-group [value]="settings.view">
+    <mat-button-toggle value="sidenav" (click)="settings.view='sidenav'">
+      <mat-icon>panorama_horizontal</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle value="sandwich" (click)="settings.view='sandwich'">
+      <mat-icon>panorama_vertical</mat-icon>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <h3 style="padding-top: 20px;">Aspect ratio</h3>
+  <mat-slider thumbLabel="true"
+    [displayWith]="formatLabel"
+    [min]="aspectRatioMin"
+    [max]="aspectRatioMax"
+    [step]="aspectRatioStep"
+    [(ngModel)]="aspectRatio"
+  ></mat-slider>
+</mat-dialog-content>
+
+<mat-dialog-actions align="center">
+  <button mat-button (click)="settings.restoreDefaults()">
+    <mat-icon>settings_backup_restore</mat-icon>
+    <label>RESET</label>
+  </button>
+  <button mat-button matDialogClose cdkFocusInitial>
+    <mat-icon>close</mat-icon>
+    <label>CLOSE</label>
+  </button>
+</mat-dialog-actions>

@@ -1,5 +1,5 @@
 // tslint:disable: variable-name
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 
@@ -8,11 +8,13 @@ import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 // import { FreecellGameService } from '../freecell-game.service';
 
 @Component({
-  selector: 'app-freecell-view4x3',
-  templateUrl: './freecell-view4x3.component.html',
-  styleUrls: ['./freecell-view4x3.component.scss']
+  selector: 'app-freecell-sandwich',
+  templateUrl: './freecell-sandwich.component.html',
+  styleUrls: ['./freecell-sandwich.component.scss']
 })
-export class FreecellView4x3Component extends UnsubscribableComponent implements OnInit {
+export class FreecellSandwichComponent extends UnsubscribableComponent implements OnInit {
+  @Output() settingsChange = new EventEmitter<void>();
+
   readonly BP_XS = Breakpoints.XSmall; // (max-width: 599.99px)
   readonly BP_SM = Breakpoints.Small; // (min-width: 600px) and (max-width: 959.99px)
 

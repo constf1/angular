@@ -1,6 +1,7 @@
 .freecell-content {
   position: relative;
   width: 100%;
+  overflow: hidden;
 
   .freecell-content-outer {
     position: absolute;

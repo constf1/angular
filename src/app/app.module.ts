@@ -20,20 +20,23 @@ import { FreecellMainComponent } from './freecell/freecell-main/freecell-main.co
 import { FreecellDeckComponent } from './freecell/freecell-deck/freecell-deck.component';
 import { FreecellRouterComponent } from './freecell/freecell-router/freecell-router.component';
 import { FreecellActionButtonsComponent } from './freecell/freecell-action-buttons/freecell-action-buttons.component';
-import { FreecellView4x3Component } from './freecell/freecell-view4x3/freecell-view4x3.component';
+import { FreecellSandwichComponent } from './freecell/freecell-sandwich/freecell-sandwich.component';
 import { FreecellDealMenuComponent } from './freecell/freecell-deal-menu/freecell-deal-menu.component';
 import { FreecellHistoryComponent } from './freecell/freecell-history/freecell-history.component';
 import { FreecellSidenavComponent } from './freecell/freecell-sidenav/freecell-sidenav.component';
+import { FreecellViewComponent } from './freecell/freecell-view/freecell-view.component';
+import { FreecellSettingsDialogComponent } from './freecell/freecell-settings-dialog/freecell-settings-dialog.component';
 
 /**
  * Routes:
  */
 const appRoutes: Routes = [
-  { path: 'freecell-view-4x3', component: FreecellView4x3Component },
+  { path: 'freecell-sandwich', component: FreecellSandwichComponent },
   { path: 'freecell-sidenav', component: FreecellSidenavComponent },
-  { path: 'freecell-dom', component: FreecellMainComponent },
-  { path: '', redirectTo: '/freecell-sidenav', pathMatch: 'full' },
-  // { path: '', redirectTo: '/freecell-dom', pathMatch: 'full' },
+  { path: 'freecell-main', component: FreecellMainComponent },
+  { path: 'freecell-view', component: FreecellViewComponent },
+
+  { path: '', redirectTo: '/freecell-view', pathMatch: 'full' },
   { path: '**', component: FreecellMainComponent }
 ];
 
@@ -50,8 +53,10 @@ const appRoutes: Routes = [
     FreecellRouterComponent,
     FreecellSidenavComponent,
     FreecellActionButtonsComponent,
-    FreecellView4x3Component,
-    FreecellDealMenuComponent
+    FreecellSandwichComponent,
+    FreecellDealMenuComponent,
+    FreecellViewComponent,
+    FreecellSettingsDialogComponent
   ],
   imports: [
     RouterModule.forRoot(appRoutes, {

@@ -1,0 +1,11 @@
+<!-- <ng-template #portal>
+  <ng-content></ng-content>
+</ng-template> -->
+
+<ng-template #sandwich>
+  <app-freecell-sandwich (settingsChange)="openSettingsDialog()"></app-freecell-sandwich>
+</ng-template>
+
+<app-freecell-sidenav *ngIf="settings.view === 'sidenav';else sandwich" (settingsChange)="openSettingsDialog()">
+  <!-- <ng-container [ngTemplateOutlet]="portal"></ng-container> -->
+</app-freecell-sidenav>

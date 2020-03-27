@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
 import { Observable } from 'rxjs';
 
 import { FreecellActionService } from '../services/freecell-action.service';
+import { FreecellSettingsService } from '../services/freecell-settings.service';
 
 const BP_XS = Breakpoints.XSmall; // (max-width: 599.99px)
 const BP_SM = Breakpoints.Small; // (min-width: 600px) and (max-width: 959.99px)
@@ -43,6 +44,8 @@ function getStateName(state: BreakpointState): string {
   styleUrls: ['./freecell-sidenav.component.scss']
 })
 export class FreecellSidenavComponent {
+  @Output() settingsChange = new EventEmitter<void>();
+
   readonly BP_XS = BP_XS;
   readonly BP_SM = BP_SM;
   readonly BP_MD = BP_MD;
@@ -52,10 +55,11 @@ export class FreecellSidenavComponent {
   breakpoints$: Observable<BreakpointState>;
 
   sidenavOpened = false;
-  sidenavClosed = true;
-  sidenavModeSide = false;
 
-  constructor(breakpointObserver: BreakpointObserver, public actionService: FreecellActionService) {
+  constructor(
+    public actionService: FreecellActionService,
+    public settings: FreecellSettingsService,
+    breakpointObserver: BreakpointObserver) {
     this.breakpoints$ = breakpointObserver.observe([BP_XS, BP_SM, BP_MD, BP_LG, BP_XL]);
   }
 

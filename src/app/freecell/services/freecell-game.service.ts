@@ -97,8 +97,7 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
     super(initialState);
   }
 
-  private _next(params: Partial<Readonly<FreecellGameState>>) {
-    const state = { ...this.value, ...params };
+  protected _validate(state: FreecellGameState) {
     if (state.base > 0) {
       // Path validation:
       let validPath = initialState.path;
@@ -135,9 +134,7 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
       state.previous = initialState.previous;
     }
 
-    // console.log('Params:', params);
-    // console.log('Next state:', state);
-    this._stateSubject.next(state);
+    return state;
   }
 
   move(giver: number, taker: number) {

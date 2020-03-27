@@ -6,11 +6,14 @@
     <app-freecell-action-buttons [noLabel]="noLabel"></app-freecell-action-buttons>
     <span class="flex-space-filler-1"></span>
   </mat-toolbar>
-  <app-freecell-main appSandwichContent [aspectRatio]="0.625"></app-freecell-main>
+  <app-freecell-main appSandwichContent></app-freecell-main>
   <mat-toolbar appSandwichFooter color="primary">
     <div class="mat-typography padding-top-half-rem">
       <app-freecell-history></app-freecell-history>
     </div>
     <span class="flex-space-filler-1"></span>
+    <button mat-icon-button (click)="settingsChange.emit()" style="margin-right: 40px;">
+      <mat-icon>settings</mat-icon>
+    </button>
   </mat-toolbar>
 </app-sandwich>

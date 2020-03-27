@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FreecellView4x3Component } from './freecell-view4x3.component';
+import { FreecellViewComponent } from './freecell-view.component';
 
-describe('FreecellView4X3Component', () => {
-  let component: FreecellView4x3Component;
-  let fixture: ComponentFixture<FreecellView4x3Component>;
+describe('FreecellViewComponent', () => {
+  let component: FreecellViewComponent;
+  let fixture: ComponentFixture<FreecellViewComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FreecellView4x3Component ]
+      declarations: [ FreecellViewComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FreecellView4x3Component);
+    fixture = TestBed.createComponent(FreecellViewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
