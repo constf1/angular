@@ -1,5 +1,8 @@
 <mat-form-field>
-  <mat-label>Game History:</mat-label>
+  <mat-label>
+    <mat-icon color="accent" *ngIf="isSolved">emoji_events</mat-icon>
+    Game History:
+  </mat-label>
   <mat-select [value]="selection" (valueChange)="setSelection($event)">
     <mat-option [value]="-1">Start</mat-option>
     <mat-option *ngFor="let item of items; index as i" [value]="i" >

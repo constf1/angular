@@ -46,6 +46,8 @@ function getSpotName(basis: FreecellBasis, index: number) {
 //   'sentiment_very_satisfied',
 // ] as const;
 
+const WIN_MESSAGE = 'solved!';
+
 export const OUTCOMES = [
   'danger-critical',
   'danger-extreme',
@@ -64,6 +66,7 @@ export const OUTCOMES = [
 export class FreecellHistoryComponent extends UnsubscribableComponent implements OnInit {
   items: HistoryItem[] = [];
   selection = -1;
+  isSolved = false;
 
   readonly cards: { [key: number]: { className: string, cardName: string } } = {};
 
@@ -82,7 +85,8 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
       item.cardClass = this.cards[item.card].className;
 
       if (item.outcome === view.PILE_NUM + view.CELL_NUM) {
-        item.outcomeName = 'solved!';
+        this.isSolved = true;
+        item.outcomeName = WIN_MESSAGE;
       } else {
         item.outcomeName = 'free ' + item.outcome;
       }
@@ -98,6 +102,10 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
       }
 
       this.items[index] = item as HistoryItem;
+    } else {
+      if (item.outcomeName === WIN_MESSAGE) {
+        this.isSolved = true;
+      }
     }
   }
 
@@ -115,9 +123,11 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
 
     this._addSubscription(this._gameService.state.subscribe(state => {
       if (!state.path || !state.previous) {
+        this.isSolved = false;
         this.items.length = 0;
       }
       if (state.game && state.path) {
+        this.isSolved = false;
         playForward(state, this.onMoveCallback);
         this.items.splice(state.path.length / 2);
       }
