@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FreecellSettingsService } from '../services/freecell-settings.service';
 import { MatDialog } from '@angular/material/dialog';
+
+import { FreecellSettingsService } from '../services/freecell-settings.service';
 import { FreecellSettingsDialogComponent } from '../freecell-settings-dialog/freecell-settings-dialog.component';
 
 @Component({
@@ -16,10 +17,11 @@ export class FreecellViewComponent implements OnInit {
   }
 
   openSettingsDialog() {
-    const dialogRef = this.dialog.open(FreecellSettingsDialogComponent);
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    });
+    // const dialogRef =
+    this.dialog.open(FreecellSettingsDialogComponent);
+    // dialogRef.afterClosed().subscribe(result => {
+    //   console.log(`Dialog result: ${result}`);
+    // });
   }
 
 }
