@@ -1,4 +1,4 @@
-<div class="freecell_deck">
+<div class="freecell_deck" [class.use-svg-background]="settings.deckUseSvg">
   <ng-content></ng-content>
   <div matRipple *ngFor="let item of items; index as i; trackBy: trackByIndex"
     [ngClass]="item.ngClass"

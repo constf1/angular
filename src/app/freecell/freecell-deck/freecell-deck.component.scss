@@ -28,11 +28,24 @@
   cursor: pointer;
   position: absolute;
 
-  background-image: url('../../../assets/freecell/cards.svg');
+  background-image: url('../../../assets/freecell/cards_3.png');
+
+  @media (min-width: 600px) and (max-width: 1279.99px) {
+    background-image: url('../../../assets/freecell/cards_2.png');
+  }
+
+  @media (max-width: 599.99px) {
+    background-image: url('../../../assets/freecell/cards_1.png');
+  }
+
   background-size: 900% 900%;
   background-repeat: no-repeat;
 
   border-radius: 8.333% / 6.25%;
+}
+
+.use-svg-background .freecell_spot, .freecell_card {
+    background-image: url('../../../assets/freecell/cards.svg');
 }
 
 .freecell_spot {

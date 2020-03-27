@@ -1,6 +1,23 @@
 <h2 mat-dialog-title>Freecell Settings</h2>
 <mat-dialog-content class="mat-typography">
-  <h3>Layout</h3>
+  <h3>Cards</h3>
+  <mat-slide-toggle
+    [checked]="settings.deckUseSvg"
+    (change)="settings.deckUseSvg=$event.checked"
+  >
+    Use SVG
+  </mat-slide-toggle>
+
+  <h3 class="pad-top-20">Aspect ratio</h3>
+  <mat-slider thumbLabel="true"
+    [displayWith]="formatLabel"
+    [min]="aspectRatioMin"
+    [max]="aspectRatioMax"
+    [step]="aspectRatioStep"
+    [(ngModel)]="aspectRatio"
+  ></mat-slider>
+
+  <h3 class="pad-top-20">Layout</h3>
   <mat-button-toggle-group [value]="settings.view">
     <mat-button-toggle value="sidenav" (click)="settings.view='sidenav'">
       <mat-icon>panorama_horizontal</mat-icon>
@@ -10,14 +27,6 @@
     </mat-button-toggle>
   </mat-button-toggle-group>
 
-  <h3 style="padding-top: 20px;">Aspect ratio</h3>
-  <mat-slider thumbLabel="true"
-    [displayWith]="formatLabel"
-    [min]="aspectRatioMin"
-    [max]="aspectRatioMax"
-    [step]="aspectRatioStep"
-    [(ngModel)]="aspectRatio"
-  ></mat-slider>
 </mat-dialog-content>
 
 <mat-dialog-actions align="center">

@@ -25,6 +25,7 @@ import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
 import { countEqualMoves } from '../freecell-model';
 import { playForward } from '../freecell-play';
+import { FreecellSettingsService } from '../services/freecell-settings.service';
 
 interface Item {
   ngStyle: { [klass: string]: any };
@@ -74,6 +75,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   private _dragger: MyDragger | null = null;
 
   constructor(
+    public settings: FreecellSettingsService,
     private _renderer: Renderer2,
     private _playService: FreecellAutoplayService,
     private _gameService: FreecellGameService) {

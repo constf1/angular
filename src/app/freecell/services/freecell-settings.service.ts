@@ -13,6 +13,8 @@ export interface FreecellSettingsState {
 
   sidenavModeSide: boolean;
   sidenavClosed: boolean;
+
+  deckUseSvg: boolean;
 }
 
 export const initialState: Readonly<FreecellSettingsState> = {
@@ -20,8 +22,13 @@ export const initialState: Readonly<FreecellSettingsState> = {
   aspectRatio: 0.56, // good for iphone 6/7/8; 0.625 for ipad
 
   sidenavModeSide: true,
-  sidenavClosed: true
+  sidenavClosed: true,
+
+  deckUseSvg: false
 };
+
+// type FreecellSettingsStateKey = keyof typeof initialState;
+// const settingsKeys = Object.keys(initialState);
 
 export const minState: Readonly<Partial<FreecellSettingsState>> = {
   aspectRatio: 0.40
@@ -74,6 +81,14 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
     this._next({ sidenavClosed: !!value });
   }
 
+  get deckUseSvg() {
+    return this.value.deckUseSvg;
+  }
+
+  set deckUseSvg(value: boolean) {
+    this._next({ deckUseSvg: !!value });
+  }
+
   constructor() {
     super(initialState);
 
@@ -82,7 +97,7 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
       const data = JSON.parse(text);
       if (data) {
         const state = { ...initialState };
-        for (const key of Object.keys(state)) {
+        for (const key of this.keys) {
           if (typeof state[key] === typeof data[key]) {
             state[key] = data[key];
           }
@@ -102,16 +117,14 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
     }
 
     state.aspectRatio = Math.max(minState.aspectRatio, Math.min(maxState.aspectRatio, state.aspectRatio));
+    return state;
+  }
 
-    let shouldUpdate = state.sidenavModeSide !== this.sidenavModeSide;
-    shouldUpdate = shouldUpdate || state.sidenavClosed !== this.sidenavClosed;
-    shouldUpdate = shouldUpdate || state.view !== this.view;
-    shouldUpdate = shouldUpdate || state.aspectRatio !== this.aspectRatio;
-
-    if (shouldUpdate) {
-      localStorage.setItem(KEY, JSON.stringify(state));
-      return state;
+  protected _next(params: Partial<Readonly<FreecellSettingsState>>): boolean {
+    const ok = super._next(params);
+    if (ok) {
+      localStorage.setItem(KEY, JSON.stringify(this.value));
     }
-    return null;
+    return ok;
   }
 }
