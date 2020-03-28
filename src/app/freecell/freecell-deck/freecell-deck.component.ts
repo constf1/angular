@@ -19,13 +19,15 @@ import { suitFullNameOf, CARD_NUM, rankFullNameOf } from '../../common/deck';
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { Linkable, connect, append } from '../../common/linkable';
 
-import { FreecellGameView } from '../freecell-game';
-import { FreecellLayout } from '../freecell-layout';
 import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
+import { FreecellSettingsService } from '../services/freecell-settings.service';
+import { FreecellSoundService } from '../services/freecell-sound.service';
+
+import { FreecellGameView } from '../freecell-game';
+import { FreecellLayout } from '../freecell-layout';
 import { countEqualMoves } from '../freecell-model';
 import { playForward } from '../freecell-play';
-import { FreecellSettingsService } from '../services/freecell-settings.service';
 
 interface Item {
   ngStyle: { [klass: string]: any };
@@ -78,7 +80,8 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     public settings: FreecellSettingsService,
     private _renderer: Renderer2,
     private _playService: FreecellAutoplayService,
-    private _gameService: FreecellGameService) {
+    private _gameService: FreecellGameService,
+    private _soundService: FreecellSoundService) {
     super();
   }
 
@@ -223,6 +226,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       this.updateLine(game, i, 'transition_deal');
     }
     this.updateZIndex();
+    this._soundService.playDeal();
   }
 
   updateZIndex() {
@@ -291,6 +295,16 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     for (const line of lineSet.keys()) {
       this.updateLine(state.game, line, transition);
     }
+    if (transition === 'transition_fast') {
+      this._soundService.playShuffle();
+    } else if (transition === 'transition_norm') {
+      this._soundService.playCard();
+    }
+
+    if (state.game.countEmptyPiles() === state.game.PILE_NUM &&
+      state.game.countEmptyCells() === state.game.CELL_NUM) {
+      this._soundService.playVictory();
+     }
   }
 
   createSpots(): Item[] {

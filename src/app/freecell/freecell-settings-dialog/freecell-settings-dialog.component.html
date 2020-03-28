@@ -1,6 +1,19 @@
 <h2 mat-dialog-title>Freecell Settings</h2>
 <mat-dialog-content class="mat-typography">
-  <h3>Cards</h3>
+  <h3><mat-icon>{{settings.enableSound ? 'volume_up' : 'volume_off' }}</mat-icon>
+    Game Sounds
+  </h3>
+  <mat-slide-toggle
+    [checked]="settings.enableSound"
+    (change)="settings.enableSound=$event.checked"
+  >
+    Enable
+  </mat-slide-toggle>
+
+  <h3 class="pad-top-20">
+    <mat-icon>layers</mat-icon>
+    Cards
+  </h3>
   <mat-slide-toggle
     [checked]="settings.deckUseSvg"
     (change)="settings.deckUseSvg=$event.checked"
@@ -8,7 +21,10 @@
     Use SVG
   </mat-slide-toggle>
 
-  <h3 class="pad-top-20">Aspect ratio</h3>
+  <h3 class="pad-top-20">
+    <mat-icon>aspect_ratio</mat-icon>
+    Aspect ratio
+  </h3>
   <mat-slider thumbLabel="true"
     [displayWith]="formatLabel"
     [min]="aspectRatioMin"
@@ -17,7 +33,10 @@
     [(ngModel)]="aspectRatio"
   ></mat-slider>
 
-  <h3 class="pad-top-20">Layout</h3>
+  <h3 class="pad-top-20">
+    <mat-icon>table_chart</mat-icon>
+    Layout
+  </h3>
   <mat-button-toggle-group [value]="settings.view">
     <mat-button-toggle value="sidenav" (click)="settings.view='sidenav'">
       <mat-icon>panorama_horizontal</mat-icon>

@@ -15,6 +15,8 @@ export interface FreecellSettingsState {
   sidenavClosed: boolean;
 
   deckUseSvg: boolean;
+
+  enableSound: boolean;
 }
 
 export const initialState: Readonly<FreecellSettingsState> = {
@@ -24,7 +26,9 @@ export const initialState: Readonly<FreecellSettingsState> = {
   sidenavModeSide: true,
   sidenavClosed: true,
 
-  deckUseSvg: false
+  deckUseSvg: false,
+
+  enableSound: false
 };
 
 // type FreecellSettingsStateKey = keyof typeof initialState;
@@ -87,6 +91,14 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
 
   set deckUseSvg(value: boolean) {
     this._next({ deckUseSvg: !!value });
+  }
+
+  get enableSound() {
+    return this.value.enableSound;
+  }
+
+  set enableSound(value: boolean) {
+    this._next({ enableSound: !!value });
   }
 
   constructor() {
