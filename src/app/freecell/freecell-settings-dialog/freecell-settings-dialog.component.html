@@ -45,16 +45,18 @@
       <mat-icon>panorama_vertical</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
-
 </mat-dialog-content>
 
-<mat-dialog-actions align="center">
-  <button mat-button (click)="settings.restoreDefaults()">
-    <mat-icon>settings_backup_restore</mat-icon>
-    <label>RESET</label>
-  </button>
-  <button mat-button matDialogClose cdkFocusInitial>
-    <mat-icon>close</mat-icon>
-    <label>CLOSE</label>
-  </button>
-</mat-dialog-actions>
+<div class="pad-top-20">
+  <mat-divider></mat-divider>
+  <mat-dialog-actions align="center">
+    <button mat-button (click)="settings.restoreDefaults()">
+      <mat-icon>settings_backup_restore</mat-icon>
+      <label>RESET</label>
+    </button>
+    <button mat-button matDialogClose cdkFocusInitial>
+      <mat-icon>close</mat-icon>
+      <label>CLOSE</label>
+    </button>
+  </mat-dialog-actions>
+</div>
