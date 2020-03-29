@@ -12,14 +12,25 @@
 
   <h3 class="pad-top-20">
     <mat-icon>layers</mat-icon>
-    Cards
+    Card Effects
   </h3>
-  <mat-slide-toggle
-    [checked]="settings.state.deckUseSvg"
-    (change)="settings.set({ deckUseSvg: !!$event.checked })"
-  >
-    Use SVG
-  </mat-slide-toggle>
+
+  <div>
+    <mat-slide-toggle
+      [checked]="settings.state.deckUseSvg"
+      (change)="settings.set({ deckUseSvg: !!$event.checked })"
+    >
+      Use SVG
+    </mat-slide-toggle>
+  </div>
+  <div class="pad-top-20">
+    <mat-slide-toggle
+      [checked]="settings.state.enableRipples"
+      (change)="settings.set({ enableRipples: !!$event.checked })"
+    >
+      Enable Ripples
+    </mat-slide-toggle>
+  </div>
 
   <h3 class="pad-top-20">
     <mat-icon>aspect_ratio</mat-icon>

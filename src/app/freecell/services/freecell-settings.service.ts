@@ -17,6 +17,8 @@ export interface FreecellSettingsState {
   deckUseSvg: boolean;
 
   enableSound: boolean;
+
+  enableRipples: boolean;
 }
 
 export const initialState: Readonly<FreecellSettingsState> = {
@@ -28,7 +30,9 @@ export const initialState: Readonly<FreecellSettingsState> = {
 
   deckUseSvg: false,
 
-  enableSound: false
+  enableSound: false,
+
+  enableRipples: true
 };
 
 type SubType<A, T> = Pick<A, { [K in keyof A]: A[K] extends T ? K : never }[keyof A]>;

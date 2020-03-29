@@ -1,6 +1,7 @@
 <div class="freecell_deck" [class.use-svg-background]="settings.state.deckUseSvg">
   <ng-content></ng-content>
   <div matRipple *ngFor="let item of items; index as i; trackBy: trackByIndex"
+    [matRippleDisabled]="!settings.state.enableRipples"
     [ngClass]="item.ngClass"
     [ngStyle]="item.ngStyle"
     (mousedown)="onMouseDown($event, i)"
