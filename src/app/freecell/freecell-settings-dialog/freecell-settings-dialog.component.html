@@ -1,11 +1,11 @@
 <h2 mat-dialog-title>Freecell Settings</h2>
 <mat-dialog-content class="mat-typography">
-  <h3><mat-icon>{{settings.enableSound ? 'volume_up' : 'volume_off' }}</mat-icon>
+  <h3><mat-icon>{{settings.state.enableSound ? 'volume_up' : 'volume_off' }}</mat-icon>
     Game Sounds
   </h3>
   <mat-slide-toggle
-    [checked]="settings.enableSound"
-    (change)="settings.enableSound=$event.checked"
+    [checked]="settings.state.enableSound"
+    (change)="settings.set({ enableSound: !!$event.checked })"
   >
     Enable
   </mat-slide-toggle>
@@ -15,8 +15,8 @@
     Cards
   </h3>
   <mat-slide-toggle
-    [checked]="settings.deckUseSvg"
-    (change)="settings.deckUseSvg=$event.checked"
+    [checked]="settings.state.deckUseSvg"
+    (change)="settings.set({ deckUseSvg: !!$event.checked })"
   >
     Use SVG
   </mat-slide-toggle>
@@ -37,11 +37,11 @@
     <mat-icon>table_chart</mat-icon>
     Layout
   </h3>
-  <mat-button-toggle-group [value]="settings.view">
-    <mat-button-toggle value="sidenav" (click)="settings.view='sidenav'">
+  <mat-button-toggle-group [value]="settings.state.view">
+    <mat-button-toggle value="sidenav" (click)="settings.set({ view: 'sidenav' })">
       <mat-icon>panorama_horizontal</mat-icon>
     </mat-button-toggle>
-    <mat-button-toggle value="sandwich" (click)="settings.view='sandwich'">
+    <mat-button-toggle value="sandwich" (click)="settings.set({ view: 'sandwich' })">
       <mat-icon>panorama_vertical</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>

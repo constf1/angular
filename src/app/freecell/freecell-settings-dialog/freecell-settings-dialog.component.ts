@@ -15,11 +15,11 @@ export class FreecellSettingsDialogComponent implements OnInit {
   readonly aspectRatioStep = S;
 
   get aspectRatio() {
-    return Math.round(this.settings.aspectRatio * D);
+    return Math.round(this.settings.state.aspectRatio * D);
   }
 
   set aspectRatio(value) {
-    this.settings.aspectRatio = +value / D;
+    this.settings.set({ aspectRatio: +value / D });
   }
 
   constructor(public settings: FreecellSettingsService) { }
@@ -30,5 +30,4 @@ export class FreecellSettingsDialogComponent implements OnInit {
   formatLabel(value: number) {
     return (value / D).toFixed(3);
   }
-
 }

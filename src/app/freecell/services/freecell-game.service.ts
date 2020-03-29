@@ -32,64 +32,17 @@ const initialState: FreecellGameState = {
   providedIn: 'root'
 })
 export class FreecellGameService extends StateSubject<FreecellGameState> {
-  get basis(): IFreecellBasis {
-    const { base, cell, pile }: IFreecellBasis = this.value;
-    return { base, cell, pile };
-  }
-
-  set basis({ base, cell, pile }: IFreecellBasis) {
-    const state = this.value;
-    if (base !== state.base || cell !== state.cell || pile !== state.pile) {
-      const { path, mark } = initialState;
-      this._next({
-        base, cell, pile,
-        path, mark
-      });
-    }
-  }
-
-  get replay(): FreecellReplayState {
-    const { deal, mark, path }: FreecellReplayState = this.value;
-    return { deal, mark, path };
-  }
-
-  set replay({ deal, mark, path }: FreecellReplayState) {
-    if (deal !== this.deal || mark !== this.mark || path !== this.path) {
-      this._next({ deal, mark, path });
-    }
-  }
-
   get deal() {
-    return this.value.deal;
+    return this.state.deal;
   }
 
   set deal(value: number) {
     if (this.deal !== value) {
       const { path, mark } = initialState;
-      this._next({
+      this.set({
         deal: value,
         path, mark
       });
-    }
-  }
-
-  get mark() {
-    return this.value.mark;
-  }
-
-  set mark(value: number) {
-    if (this.mark !== value) {
-      this._next({ mark: value });
-    }
-  }
-
-  get path() {
-    return this.value.path;
-  }
-
-  set path(value: string) {
-    if (this.path !== value) {
-      this._next({ path: value });
     }
   }
 
@@ -129,7 +82,7 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
     }
 
     if (state.deal === this.deal) {
-      state.previous = this.value;
+      state.previous = this.state;
     } else {
       state.previous = initialState.previous;
     }
@@ -138,8 +91,9 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
   }
 
   move(giver: number, taker: number) {
-    const path = nextPath(this.path, this.mark, giver, taker);
-    this._next({
+    const state = this.state;
+    const path = nextPath(state.path, state.mark, giver, taker);
+    this.set({
       mark: path.length / 2,
       path
     });

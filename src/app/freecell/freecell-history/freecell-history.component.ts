@@ -121,7 +121,7 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
       };
     }
 
-    this._addSubscription(this._gameService.state.subscribe(state => {
+    this._addSubscription(this._gameService.stateChange.subscribe(state => {
       if (!state.path || !state.previous) {
         this.isSolved = false;
         this.items.length = 0;
@@ -137,7 +137,7 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
 
   setSelection(value: number) {
     if (this.selection !== value && value <= this.items.length && value >= -1) {
-      this._gameService.mark = value + 1;
+      this._gameService.set({ mark: value + 1 });
     }
   }
 }

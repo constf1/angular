@@ -53,7 +53,7 @@ export class FreecellSoundService extends UnsubscribableComponent {
     super();
     this.disable();
 
-    this._addSubscription(settings.state.subscribe(state => {
+    this._addSubscription(settings.stateChange.subscribe(state => {
       this._nextState = this._nextState.then(() => {
         if (!this._enabled && state.enableSound) {
           // enabling can make some time. wait for it.

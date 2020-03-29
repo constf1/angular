@@ -49,7 +49,7 @@ export class FreecellRouterComponent extends UnsubscribableComponent implements 
       this._lock = true;
       Promise
         .resolve()
-        .then(() => this._gameService.replay = { deal, path, mark })
+        .then(() => this._gameService.set({ deal, path, mark }))
         .finally(() => this._lock = false);
     } else {
       this._lock = false;
@@ -62,7 +62,7 @@ export class FreecellRouterComponent extends UnsubscribableComponent implements 
     // console.log('Params:', params);
 
     this._lock = true; // lock until the first route update
-    this._addSubscription(this._gameService.state.subscribe(state => {
+    this._addSubscription(this._gameService.stateChange.subscribe(state => {
       if (!this._lock &&
         (this.deal !== state.deal || this.path !== state.path || this.mark !== state.mark)) {
         this.deal = state.deal;

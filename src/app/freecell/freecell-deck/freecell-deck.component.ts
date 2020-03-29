@@ -86,7 +86,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   ngOnInit() {
-    this._addSubscription(this._gameService.state.subscribe(state => {
+    this._addSubscription(this._gameService.stateChange.subscribe(state => {
       if (this.layout) {
         if (!state.previous) {
           this.onDeal();
@@ -133,7 +133,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       if (index < this.spots.length) {
         this.setSpotSelection(this._spotSelection === index ? -1 : index);
       } else {
-        const game = this._gameService.value.game;
+        const game = this._gameService.state.game;
         if (!game) {
           return;
         }
@@ -209,7 +209,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   onDeal() {
     this.setSpotSelection(-1);
-    const game = this._gameService.value.game;
+    const game = this._gameService.state.game;
     if (!game) {
       return;
     }
@@ -248,7 +248,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   onCardMove() {
     this.setSpotSelection(-1);
-    const state = this._gameService.value;
+    const state = this._gameService.state;
     if (!state.game || !state.previous) {
       return;
     }

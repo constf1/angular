@@ -23,21 +23,21 @@ const initialValue: FreecellActionState = {
 })
 export class FreecellActionService extends UnsubscribableStateSubject<FreecellActionState> {
   get canUndo() {
-    return this.value.canUndo;
+    return this.state.canUndo;
   }
 
   get canRedo() {
-    return this.value.canRedo;
+    return this.state.canRedo;
   }
 
   get nextMove() {
-    return this.value.nextMove;
+    return this.state.nextMove;
   }
 
   constructor(private _gameService: FreecellGameService, private _playService: FreecellAutoplayService) {
     super(initialValue);
 
-    this._addSubscription(this._gameService.state.subscribe(state => {
+    this._addSubscription(this._gameService.stateChange.subscribe(state => {
       this._stateSubject.next({
         canUndo: state.mark > 0,
         canRedo: 2 * state.mark < state.path.length,
@@ -48,13 +48,13 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
 
   undo() {
     if (this.canUndo) {
-      this._gameService.mark = this._gameService.mark - 1;
+      this._gameService.set({ mark: this._gameService.state.mark - 1 });
     }
   }
 
   redo() {
     if (this.canRedo) {
-      this._gameService.mark = this._gameService.mark + 1;
+      this._gameService.set({ mark: this._gameService.state.mark + 1 });
     }
   }
 

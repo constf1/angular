@@ -7,21 +7,21 @@
   <mat-sidenav-container class="freecell-sidenav-container">
     <!-- Sidenav Drawer -->
     <mat-sidenav
-      [mode]="(!settings.sidenavModeSide || bs.breakpoints[BP_XS]) ? 'over' : 'side'"
-      [opened]="!settings.sidenavClosed"
-      (closedStart)="settings.sidenavClosed=true"
+      [mode]="(!settings.state.sidenavModeSide || bs.breakpoints[BP_XS]) ? 'over' : 'side'"
+      [opened]="!settings.state.sidenavClosed"
+      (closedStart)="settings.set({ sidenavClosed: true })"
       (openedChange)="sidenavOpened=$event"
     >
       <mat-toolbar color="primary" class="freecell-toolbar">
-        <button mat-icon-button (click)="settings.sidenavClosed=true">
+        <button mat-icon-button (click)="settings.set({ sidenavClosed: true })">
           <mat-icon>close</mat-icon>
         </button>
         <span class="flex-space-filler-1"></span>
         <span>Freecell</span>
         <span class="flex-space-filler-1"></span>
         <mat-slide-toggle *ngIf="!bs.breakpoints[BP_XS]" color="primary"
-          [checked]="settings.sidenavModeSide"
-          (change)="settings.sidenavModeSide=$event.checked"
+          [checked]="settings.state.sidenavModeSide"
+          (change)="settings.set({ sidenavModeSide: !!$event.checked})"
         ></mat-slide-toggle>
       </mat-toolbar>
       <mat-action-list>
@@ -66,11 +66,11 @@
     <mat-sidenav-content>
       <app-freecell-main>
         <button
-          *ngIf="settings.sidenavClosed"
+          *ngIf="settings.state.sidenavClosed"
           class="sidenav-open-button"
           [class.sidenav-open-button-active]="!sidenavOpened"
           mat-icon-button color="primary"
-          (click)="settings.sidenavClosed=false"
+          (click)="settings.set({ sidenavClosed: false })"
         >
           <mat-icon>double_arrow</mat-icon>
         </button>

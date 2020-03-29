@@ -31,14 +31,13 @@ export const initialState: Readonly<FreecellSettingsState> = {
   enableSound: false
 };
 
-// type FreecellSettingsStateKey = keyof typeof initialState;
-// const settingsKeys = Object.keys(initialState);
+type SubType<A, T> = Pick<A, { [K in keyof A]: A[K] extends T ? K : never }[keyof A]>;
 
-export const minState: Readonly<Partial<FreecellSettingsState>> = {
+export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.40
 };
 
-export const maxState: Readonly<Partial<FreecellSettingsState>> = {
+export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.70
 };
 
@@ -48,59 +47,6 @@ const KEY = '[FreecellSettingsState]';
   providedIn: 'root'
 })
 export class FreecellSettingsService extends StateSubject<FreecellSettingsState> {
-  get view() {
-    return this.value.view;
-  }
-
-  set view(value: FreecellSettingsView) {
-    if (this.view !== value) {
-      this._next({ view: value });
-    }
-  }
-
-  get aspectRatio() {
-    return this.value.aspectRatio;
-  }
-
-  set aspectRatio(value: number) {
-    const aspectRatio = +value;
-    if (aspectRatio !== this.aspectRatio && !isNaN(aspectRatio)) {
-      this._next({ aspectRatio });
-    }
-  }
-
-  get sidenavModeSide() {
-    return this.value.sidenavModeSide;
-  }
-
-  set sidenavModeSide(value: boolean) {
-    this._next({ sidenavModeSide: !!value });
-  }
-
-  get sidenavClosed() {
-    return this.value.sidenavClosed;
-  }
-
-  set sidenavClosed(value: boolean) {
-    this._next({ sidenavClosed: !!value });
-  }
-
-  get deckUseSvg() {
-    return this.value.deckUseSvg;
-  }
-
-  set deckUseSvg(value: boolean) {
-    this._next({ deckUseSvg: !!value });
-  }
-
-  get enableSound() {
-    return this.value.enableSound;
-  }
-
-  set enableSound(value: boolean) {
-    this._next({ enableSound: !!value });
-  }
-
   constructor() {
     super(initialState);
 
@@ -114,13 +60,13 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
             state[key] = data[key];
           }
         }
-        this._next(state);
+        this.set(state);
       }
     }
   }
 
   restoreDefaults() {
-    this._next(initialState);
+    this.set(initialState);
   }
 
   protected _validate(state: FreecellSettingsState) {
@@ -132,10 +78,10 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
     return state;
   }
 
-  protected _next(params: Partial<Readonly<FreecellSettingsState>>): boolean {
-    const ok = super._next(params);
+  set(params: Partial<Readonly<FreecellSettingsState>>): boolean {
+    const ok = super.set(params);
     if (ok) {
-      localStorage.setItem(KEY, JSON.stringify(this.value));
+      localStorage.setItem(KEY, JSON.stringify(this.state));
     }
     return ok;
   }

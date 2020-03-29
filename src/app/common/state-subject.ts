@@ -5,11 +5,11 @@ export class StateSubject<T> {
   protected _stateSubject: BehaviorSubject<Readonly<T>>;
   protected _stateKeys: Readonly<string[]>;
 
-  get state(): Observable<Readonly<T>>  {
+  get stateChange(): Observable<Readonly<T>>  {
     return this._stateSubject.asObservable();
   }
 
-  get value(): Readonly<T> {
+  get state(): Readonly<T> {
     return this._stateSubject.value;
   }
 
@@ -22,9 +22,9 @@ export class StateSubject<T> {
     this._stateKeys = Object.keys(initialValue);
   }
 
-  // getItem(key: keyof T) {
-  //   return this.value[key];
-  // }
+  get<K extends keyof T>(key: K): Readonly<T[K]> {
+    return this.state[key];
+  }
 
   /**
    * Overwrite this function to validate the new state. Default implementation just returns the unaltered state object.
@@ -34,8 +34,8 @@ export class StateSubject<T> {
     return state;
   }
 
-  protected _next(params: Partial<Readonly<T>>): boolean {
-    const state = this._validate({ ...this.value, ...params });
+  set(params: Partial<Readonly<T>>): boolean {
+    const state = this._validate({ ...this.state, ...params });
     if (state && !this.equials(state)) {
       this._stateSubject.next(state);
       return true;
@@ -44,7 +44,7 @@ export class StateSubject<T> {
   }
 
   equials(newState: Readonly<T>): boolean {
-    const oldState = this.value;
+    const oldState = this.state;
     for (const key of this.keys) {
       if (newState[key] !== oldState[key]) {
         return false;

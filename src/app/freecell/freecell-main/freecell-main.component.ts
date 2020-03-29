@@ -30,9 +30,9 @@ export class FreecellMainComponent extends UnsubscribableComponent implements On
 
   ngOnInit() {
     // Set standard freecell basis.
-    this._gameService.basis = { base: 4, cell: 4, pile: 8 };
+    this._gameService.set({ base: 4, cell: 4, pile: 8 });
 
-    this._addSubscription(this._gameService.state.subscribe(state => {
+    this._addSubscription(this._gameService.stateChange.subscribe(state => {
       if (state.game) {
         if (!this.layout) {
           this.layout = new FreecellLayout(state.game);
@@ -50,7 +50,7 @@ export class FreecellMainComponent extends UnsubscribableComponent implements On
   onLineChange(event: LineChangeEvent) {
     // console.log('Line Change Event:', event);
     this._playService.stop();
-    const game = this._gameService.value.game;
+    const game = this._gameService.state.game;
     if (!game) {
       return;
     }
