@@ -18,7 +18,7 @@
   height:100%;
   position: relative;
 
-  background:#c9d9e9 url('../../../assets/freecell/blue_gray_paper_grid.jpg') repeat;
+  background:#ccffee url('../../../assets/freecell/bg-desk.jpg') repeat;
 }
 
 .freecell_spot, .freecell_card {
@@ -41,8 +41,10 @@
   border-radius: 8.333% / 6.25%;
 }
 
-.use-svg-background .freecell_spot, .freecell_card {
+div.use-svg-background {
+  .freecell_spot, .freecell_card {
     background-image: url('../../../assets/freecell/cards.svg');
+  }
 }
 
 .freecell_spot {
