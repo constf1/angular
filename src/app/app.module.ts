@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 
 import { XrangePipe } from './common/pipes/xrange.pipe';
 import { RatioKeeperComponent } from './common/components/ratio-keeper/ratio-keeper.component';
+import { GestureDirective } from './common/directives/gesture.directive';
 
 import {
   SimpleVirtualListComponent,
@@ -56,7 +57,8 @@ const appRoutes: Routes = [
     FreecellSandwichComponent,
     FreecellDealMenuComponent,
     FreecellViewComponent,
-    FreecellSettingsDialogComponent
+    FreecellSettingsDialogComponent,
+    GestureDirective
   ],
   imports: [
     RouterModule.forRoot(appRoutes, {

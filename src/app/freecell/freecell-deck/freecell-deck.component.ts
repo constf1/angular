@@ -81,7 +81,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     private _renderer: Renderer2,
     private _playService: FreecellAutoplayService,
     private _gameService: FreecellGameService,
-    private _soundService: FreecellSoundService) {
+    public soundService: FreecellSoundService) {
     super();
   }
 
@@ -226,7 +226,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       this.updateLine(game, i, 'transition_deal');
     }
     this.updateZIndex();
-    this._soundService.playDeal();
+    this.soundService.play('deal');
   }
 
   updateZIndex() {
@@ -296,14 +296,14 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       this.updateLine(state.game, line, transition);
     }
     if (transition === 'transition_fast') {
-      this._soundService.playShuffle();
+      this.soundService.play('shuffle');
     } else if (transition === 'transition_norm') {
-      this._soundService.playCard();
+      this.soundService.play('card');
     }
 
     if (state.game.countEmptyPiles() === state.game.PILE_NUM &&
       state.game.countEmptyCells() === state.game.CELL_NUM) {
-      this._soundService.playVictory();
+      this.soundService.play('victory');
      }
   }
 
@@ -399,5 +399,13 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       }
     }
     return -1;
+  }
+
+  activateOnGesture(event: Event) {
+    // console.log('Gesture:', event);
+    // SoundService is not activated by default to comply with the Chrome autoplay policy.
+    if (event.isTrusted) {
+      this.soundService.activate();
+    }
   }
 }

@@ -28,140 +28,167 @@ function randomPan() {
   return randomInteger(-100, 100 + 1) / 100;
 }
 
-type PlaySound = () => void;
+function createDestination(context: AudioContext): AudioNode {
+  // Create static nodes. These nodes can be used multiple times.
+  // Source -> DynamicsCompressorNode -> AudioDestination
+  const compressor: DynamicsCompressorNode = context.createDynamicsCompressor();
+  compressor.connect(context.destination);
+  return compressor;
+}
+
+function createSource(
+  context: AudioContext,
+  destination: AudioNode,
+  buffer: AudioBuffer,
+  gain: number = 1,
+  stereoPan: number = 0
+): AudioBufferSourceNode {
+  // Build graph: source -> gain? -> panner? -> destination
+  const source: AudioBufferSourceNode = context.createBufferSource();
+  source.buffer = buffer;
+
+  let node: AudioNode = source;
+  if (gain !== 1) {
+    const volume: GainNode = context.createGain();
+    volume.gain.value = gain;
+    node.connect(volume);
+    node = volume;
+  }
+
+  if (stereoPan !== 0) {
+    const panner: StereoPannerNode = context.createStereoPanner();
+    panner.pan.value = stereoPan;
+    node.connect(panner);
+    node = panner;
+  }
+
+  node.connect(destination);
+  return source;
+}
+
+// function dummy() {
+//   // console.log('Audio is not ready!');
+// }
+// type PlaySound = typeof dummy;
+
+export const FreecellSoundNames = [ 'deal', 'card', 'shuffle', 'victory'] as const;
+export type FreecellSoundType = typeof FreecellSoundNames[number];
+export type FreecellSounds = { [key in FreecellSoundType]: () => void };
+
+// function createDummySounds(): FreecellSounds {
+//   const sounds = {} as FreecellSounds;
+//   FreecellSoundNames.forEach(name => sounds[name] = dummy);
+//   return sounds;
+// }
+
+function createSounds(
+  context: AudioContext,
+  buffers: AudioBuffer[]): FreecellSounds {
+  const destination = createDestination(context);
+  const sounds = {} as FreecellSounds;
+
+  sounds.deal = () => {
+    createSource(context, destination, buffers[Resources.deal], 1).start();
+  };
+
+  sounds.shuffle = () => {
+    createSource(context, destination, buffers[Resources.shuffle], 1.5).start();
+  };
+
+  let playCardCount = 0;
+  sounds.card = () => {
+    if (playCardCount++ === 0) {
+      setTimeout(() => {
+        const source = (playCardCount === 1)
+          ? createSource(context, destination, buffers[Resources.card], 0.8)
+          : createSource(context, destination, buffers[Resources.shuffle], 1.0);
+        source.start();
+        playCardCount = 0;
+      });
+    }
+  };
+
+  sounds.victory = () => {
+    const minValue = Resources.aplause_001;
+    const maxValue = Resources.aplause_007;
+    const time = context.currentTime;
+    for (let i = 0, count = randomInteger(1, 4); i < count; i++) {
+      const source = createSource(
+        context,
+        destination,
+        buffers[randomInteger(minValue, maxValue + 1)],
+        randomNumber(0.75, 1.75),
+        randomPan()
+      );
+      source.playbackRate.value = randomNumber(0.85, 1.75);
+      source.start(time + Math.random() * 3);
+    }
+  };
+
+  return sounds;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class FreecellSoundService extends UnsubscribableComponent {
   private _context: AudioContext;
+
   private _buffers: Promise<AudioBuffer[]>;
-  private _destination: AudioNode;
+
   private _enabled = false;
+  private _activated = false; // AudioContext is not activated by default to comply with the Chrome autoplay policy.
+  private _sounds = null;
+
   private _nextState: Promise<any> = Promise.resolve();
 
-  get isEnabled() {
+  get enabled() {
     return this._enabled;
   }
 
-  playCard: PlaySound;
-  playDeal: PlaySound;
-  playShuffle: PlaySound;
-  playVictory: PlaySound;
+  get activated() {
+    return this._activated;
+  }
 
   constructor(settings: FreecellSettingsService) {
     super();
-    this.disable();
 
     this._addSubscription(settings.stateChange.subscribe(state => {
-      this._nextState = this._nextState.then(() => {
-        if (!this._enabled && state.enableSound) {
-          // enabling can make some time. wait for it.
-          return this.enable();
-        }
-        if (this._enabled && !state.enableSound) {
-          // disabling is fast.
-          this.disable();
-        }
-        return Promise.resolve(this._enabled);
-      });
+      if (state.enableSound) {
+        this.enable();
+      } else {
+        this.disable();
+      }
     }));
   }
 
+  private async _next(state: () => Promise<any>) {
+    try {
+      await this._nextState;
+    } finally {
+      this._nextState = state();
+    }
+  }
+
+  activate() {
+    this._activated = true;
+  }
+
   disable() {
-    this._enabled = false;
-    this.playCard =
-    this.playDeal =
-    this.playShuffle =
-    this.playVictory = () => {
-      // console.log('Audio is not ready!');
-    };
+    this._next(async () => this._enabled = false);
   }
 
-  enable(): Promise<boolean> {
-    if (this._enabled) {
-      return Promise.resolve(true);
-    }
-
-    if (!this._destination) {
-      this._init();
-    }
-
-    return this._getBuffers().then(buffers => {
-      this.playDeal = () => {
-        this._makeSource(buffers[Resources.deal], 1).start();
-      };
-
-      this.playShuffle = () => {
-        this._makeSource(buffers[Resources.shuffle], 1.5).start();
-      };
-
-      let playCardCount = 0;
-      this.playCard = () => {
-        if (playCardCount++ === 0) {
-          setTimeout(() => {
-            const source = (playCardCount === 1)
-              ? this._makeSource(buffers[Resources.card], 0.8)
-              : this._makeSource(buffers[Resources.shuffle], 1.0);
-            source.start();
-            playCardCount = 0;
-          });
+  enable() {
+    this._next(async () => {
+      if (!this._sounds) {
+        if (!this._context) {
+          this._context = new AudioContext();
         }
-      };
-
-      this.playVictory = () => {
-        const minValue = Resources.aplause_001;
-        const maxValue = Resources.aplause_007;
-        const time = this._context.currentTime;
-        for (let i = 0, count = randomInteger(1, 4); i < count; i++) {
-          const source = this._makeSource(
-            buffers[randomInteger(minValue, maxValue + 1)],
-            randomNumber(0.75, 1.75),
-            randomPan()
-          );
-          source.playbackRate.value = randomNumber(0.85, 1.75);
-          source.start(time + Math.random() * 3);
-        }
-      };
-
-    }).then(() => this._enabled = true);
-  }
-
-  private _makeSource(
-    buffer: AudioBuffer,
-    gain: number = 1,
-    stereoPan: number = 0
-  ): AudioBufferSourceNode {
-    // Build graph: source -> gain? -> panner? -> destination
-    const source: AudioBufferSourceNode = this._context.createBufferSource();
-    source.buffer = buffer;
-
-    let node: AudioNode = source;
-    if (gain !== 1) {
-      const volume: GainNode = this._context.createGain();
-      volume.gain.value = gain;
-      node.connect(volume);
-      node = volume;
-    }
-
-    if (stereoPan !== 0) {
-      const panner: StereoPannerNode = this._context.createStereoPanner();
-      panner.pan.value = stereoPan;
-      node.connect(panner);
-      node = panner;
-    }
-
-    node.connect(this._destination);
-    return source;
-  }
-
-  private _init() {
-    this._context = new AudioContext();
-    // Create static nodes. These nodes can be used multiple times.
-    // Source -> DynamicsCompressorNode -> AudioDestination
-    const compressor: DynamicsCompressorNode = this._context.createDynamicsCompressor();
-    compressor.connect(this._context.destination);
-    this._destination = compressor;
+        const buffers = await this._getBuffers();
+        this._sounds = createSounds(this._context, buffers);
+      }
+      this._enabled = true;
+    });
   }
 
   private _getBuffers() {
@@ -178,5 +205,22 @@ export class FreecellSoundService extends UnsubscribableComponent {
       resources.push(RESOURCE_DIR + Resources[i] + RESOURCE_EXT);
     }
     return loadAudioFiles(this._context, resources);
+  }
+
+  async play(soundName: FreecellSoundType) {
+    await this._nextState;
+    if (this._enabled && this._activated) {
+      if (this._sounds) {
+        const play = this._sounds[soundName];
+        if (typeof play === 'function') {
+          // The browser may suspend the AudioContext to require user interaction to play audio.
+          // If you are allowed to play, it should immediately switch to running. Otherwise it will be suspended.
+          if (this._context.state === 'suspended') {
+            await this._context.resume();
+          }
+          play();
+        }
+      }
+    }
   }
 }
