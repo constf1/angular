@@ -31,21 +31,21 @@
           [disabled]="!actionService.canUndo"
           (click)="actionService.undo()"
         >
-          <mat-icon color="primary">undo</mat-icon>
+          <mat-icon [ngClass]="!actionService.canUndo ? 'disabled-color' : 'mat-primary'">undo</mat-icon>
           UNDO
         </button>
         <button mat-list-item
           [disabled]="!actionService.canRedo"
           (click)="actionService.redo()"
         >
-          <mat-icon color="primary">redo</mat-icon>
+          <mat-icon [ngClass]="!actionService.canRedo ? 'disabled-color' : 'mat-primary'">redo</mat-icon>
           REDO
         </button>
         <button mat-list-item
           [disabled]="!actionService.nextMove"
           (click)="actionService.playNext()"
         >
-          <mat-icon color="accent">emoji_objects</mat-icon>
+          <mat-icon [ngClass]="!actionService.nextMove ? 'disabled-color' : 'mat-accent'">emoji_objects</mat-icon>
           <span>AUTO</span>
         </button>
       </mat-action-list>
