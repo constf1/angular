@@ -75,13 +75,14 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   private _spotSelection = -1;
   private _dragger: MyDragger | null = null;
+  private _emptySpotCount = 0;
 
   constructor(
     public settings: FreecellSettingsService,
+    public soundService: FreecellSoundService,
     private _renderer: Renderer2,
     private _playService: FreecellAutoplayService,
-    private _gameService: FreecellGameService,
-    public soundService: FreecellSoundService) {
+    private _gameService: FreecellGameService) {
     super();
   }
 
@@ -213,13 +214,11 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     if (!game) {
       return;
     }
+
+    this._emptySpotCount = game.countEmpty();
+
     for (let i = game.DESK_SIZE; i-- > 0;) {
       for (const cardIndex of game.getLine(i)) {
-        // const node = this.cards[cardIndex];
-        // const list = node.list;
-        // if (list && list.tail && list.tail !== node) {
-        //   append(list.tail, node);
-        // }
         this.bringToFront(cardIndex);
       }
 
@@ -281,11 +280,6 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     // Updating Z Index.
     for (const card of cards) {
       this.bringToFront(card);
-      // const node = this.cards[card];
-      // const list = node.list;
-      // if (list && list.tail && list.tail !== node) {
-      //   append(list.tail, node);
-      // }
     }
     this.updateZIndex();
 
@@ -301,10 +295,11 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       this.soundService.play('card');
     }
 
-    if (state.game.countEmptyPiles() === state.game.PILE_NUM &&
-      state.game.countEmptyCells() === state.game.CELL_NUM) {
+    const emptyCount = state.game.countEmpty();
+    if (emptyCount > this._emptySpotCount) {
+      this._emptySpotCount = emptyCount;
       this.soundService.play('victory');
-     }
+    }
   }
 
   createSpots(): Item[] {
