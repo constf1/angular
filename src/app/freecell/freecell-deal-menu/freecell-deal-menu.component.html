@@ -1,4 +1,4 @@
-<mat-menu #appMenu="matMenu">
+<mat-menu #appMenu="matMenu" xPosition="before">
   <button mat-menu-item [disabled]="deal >= maxDeal" (click)="setDeal(deal + 1)">
     <mat-icon>navigate_next</mat-icon>
     <span>Next</span>
