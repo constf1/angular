@@ -54,6 +54,7 @@
         >
           <mat-icon [ngClass]="!actionService.state.canAssist ? 'disabled-color' : 'mat-warn'">assistant</mat-icon>
           <span>ASSIST</span>
+          <mat-progress-bar *ngIf="actionService.state.assistRequest" mode="indeterminate" color="warn"></mat-progress-bar>
         </button>
       </mat-action-list>
       <div style="padding: 1em;">

@@ -1,24 +1,29 @@
 // tslint:disable: variable-name
 
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { UnsubscribableStateSubject } from '../../common/unsubscribable-state-subject';
+
 import { FreecellGameService } from './freecell-game.service';
 import { FreecellAutoplayService } from './freecell-autoplay.service';
 import { IFreecellMove, IFreecellDesk } from '../freecell-model';
+import { IFreecellWorkerInput, IFreecellWorkerOutput } from '../freecell-worker-model';
 
 export interface FreecellActionState {
   canAssist: boolean;
   canUndo: boolean;
   canRedo: boolean;
   nextMove: Readonly<IFreecellMove> | null;
+  assistRequest: string | null;
 }
 
 const initialValue: Readonly<FreecellActionState> = {
   canAssist: false,
   canUndo: false,
   canRedo: false,
-  nextMove: null
+  nextMove: null,
+  assistRequest: null
 } as const;
 
 // let worker: Worker = null;
@@ -34,6 +39,7 @@ const initialValue: Readonly<FreecellActionState> = {
 //   // You should add a fallback so that your program still executes correctly.
 // }
 
+const ACTION_CLOSE = String.fromCharCode(0x0D7); // MULTIPLICATION SIGN
 
 @Injectable({
   providedIn: 'root'
@@ -41,21 +47,14 @@ const initialValue: Readonly<FreecellActionState> = {
 export class FreecellActionService extends UnsubscribableStateSubject<FreecellActionState> {
   private _worker: Worker = null;
 
-  constructor(private _gameService: FreecellGameService, private _playService: FreecellAutoplayService) {
+  constructor(
+    private _gameService: FreecellGameService,
+    private _playService: FreecellAutoplayService,
+    private _snackBar: MatSnackBar
+    ) {
     super(initialValue);
 
-    if (typeof Worker !== 'undefined') {
-      // Create a new web worker.
-      this._worker = new Worker('../freecell.worker', { type: 'module' });
-      this._worker.onmessage = ({ data }) => {
-        if (data) {
-          console.log('Worker has got a message for you:', data);
-          this.play(data);
-        } else {
-          console.log('Worker was unable to assist ;-(');
-        }
-      };
-    }
+    this._createWorker();
 
     this._addSubscription(this._gameService.stateChange.subscribe(state => {
       const nextState = { ...initialValue };
@@ -64,7 +63,7 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
 
       if (count < game.PILE_NUM + game.CELL_NUM) {
         const moves = game.getMoves();
-        nextState.canAssist = moves.length > 0 && count <= game.CELL_NUM;
+        nextState.canAssist = !!this._worker && moves.length > 0 && count <= game.CELL_NUM;
         for (const move of moves) {
           if (game.isBase(move.taker)) {
             nextState.nextMove = move;
@@ -122,6 +121,10 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
   }
 
   assist() {
+    if (!this._worker) {
+      return;
+    }
+
     const game = this._gameService.game;
     const desk: IFreecellDesk = {
         base: game.BASE_NUM,
@@ -129,6 +132,31 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
         pile: game.PILE_NUM,
         desk: game.toArray()
     };
-    this._worker.postMessage(JSON.stringify(desk));
+    const assistRequest = JSON.stringify(desk);
+    const message: IFreecellWorkerInput = {
+      requestId: assistRequest,
+      desk
+    };
+    this._worker.postMessage(message);
+    this._set({ assistRequest, canAssist: false });
+  }
+
+  private _createWorker() {
+    if (typeof Worker !== 'undefined') {
+      // Create a new web worker.
+      this._worker = new Worker('../freecell.worker', { type: 'module' });
+      this._worker.onmessage = (event: MessageEvent) => {
+        const data = event.data as IFreecellWorkerOutput;
+        if (data.requestId === this.state.assistRequest) {
+          let message = 'Unable to assist ;-(';
+          if (data.path) {
+            message = 'Assisting...';
+            this.play(data.path);
+          }
+          this._snackBar.open(message, ACTION_CLOSE, { duration: 2000 });
+          this._set({ assistRequest: initialValue.assistRequest });
+        }
+      };
+    }
   }
 }

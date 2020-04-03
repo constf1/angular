@@ -15,10 +15,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { SandwichComponent } from './sandwich/sandwich.component';
@@ -40,11 +42,13 @@ import { SandwichComponent } from './sandwich/sandwich.component';
     MatFormFieldModule,
     MatListModule,
     MatMenuModule,
+    MatProgressBarModule,
     MatRippleModule,
     MatSelectModule,
     MatSidenavModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatSnackBarModule,
     MatToolbarModule
   ],
   exports: [
@@ -62,11 +66,13 @@ import { SandwichComponent } from './sandwich/sandwich.component';
     MatFormFieldModule,
     MatListModule,
     MatMenuModule,
+    MatProgressBarModule,
     MatRippleModule,
     MatSelectModule,
     MatSidenavModule,
     MatSliderModule,
     MatSlideToggleModule,
+    MatSnackBarModule,
     MatToolbarModule,
 
     SandwichComponent
