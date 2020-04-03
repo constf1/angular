@@ -2,8 +2,8 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export class StateSubject<T> {
-  protected _stateSubject: BehaviorSubject<Readonly<T>>;
-  protected _stateKeys: Readonly<string[]>;
+  private readonly _stateSubject: BehaviorSubject<Readonly<T>>;
+  private readonly _stateKeys: Readonly<string[]>;
 
   get stateChange(): Observable<Readonly<T>>  {
     return this._stateSubject.asObservable();
@@ -27,16 +27,18 @@ export class StateSubject<T> {
   }
 
   /**
-   * Overwrite this function to validate the new state. Default implementation just returns the unaltered state object.
+   * Overwrite this function to validate the new state.
+   * Default implementation returns null if states are equial and the unaltered state object otherwise.
    * @param state new state
    */
   protected _validate(state: T): T | null {
-    return state;
+    return this.equials(state) ? null : state;
   }
 
-  set(params: Partial<Readonly<T>>): boolean {
+  protected _set(params: Partial<Readonly<T>>): boolean {
     const state = this._validate({ ...this.state, ...params });
-    if (state && !this.equials(state)) {
+    if (state) {
+      console.log('Next State:', state);
       this._stateSubject.next(state);
       return true;
     }

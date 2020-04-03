@@ -64,7 +64,7 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
             state[key] = data[key];
           }
         }
-        this.set(state);
+        this._set(state);
       }
     }
   }
@@ -79,11 +79,11 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
     }
 
     state.aspectRatio = Math.max(minState.aspectRatio, Math.min(maxState.aspectRatio, state.aspectRatio));
-    return state;
+    return super._validate(state);
   }
 
   set(params: Partial<Readonly<FreecellSettingsState>>): boolean {
-    const ok = super.set(params);
+    const ok = this._set(params);
     if (ok) {
       localStorage.setItem(KEY, JSON.stringify(this.state));
     }
