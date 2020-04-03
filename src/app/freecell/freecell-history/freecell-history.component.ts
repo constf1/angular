@@ -122,22 +122,23 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
     }
 
     this._addSubscription(this._gameService.stateChange.subscribe(state => {
-      if (!state.path || !state.previous) {
+      if (state.deal !== this._gameService.previous.deal) {
         this.isSolved = false;
         this.items.length = 0;
       }
-      if (state.game && state.path) {
+      if (state.path) {
         this.isSolved = false;
         playForward(state, this.onMoveCallback);
         this.items.splice(state.path.length / 2);
       }
       this.selection = state.mark - 1;
+      // this.isSolved = !!this.items.find(item => item.outcomeName === WIN_MESSAGE);
     }));
   }
 
   setSelection(value: number) {
     if (this.selection !== value && value <= this.items.length && value >= -1) {
-      this._gameService.set({ mark: value + 1 });
+      this._gameService.mark = value + 1;
     }
   }
 }

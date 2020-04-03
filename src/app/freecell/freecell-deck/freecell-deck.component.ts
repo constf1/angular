@@ -27,7 +27,7 @@ import { FreecellSoundService } from '../services/freecell-sound.service';
 import { FreecellGameView } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
 import { countEqualMoves } from '../freecell-model';
-import { playForward } from '../freecell-play';
+import { playToMark } from '../freecell-play';
 
 interface Item {
   ngStyle: { [klass: string]: any };
@@ -89,7 +89,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   ngOnInit() {
     this._addSubscription(this._gameService.stateChange.subscribe(state => {
       if (this.layout) {
-        if (!state.previous) {
+        if (state.deal !== this._gameService.previous.deal) {
           this.onDeal();
         } else {
           this.onCardMove();
@@ -134,10 +134,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       if (index < this.spots.length) {
         this.setSpotSelection(this._spotSelection === index ? -1 : index);
       } else {
-        const game = this._gameService.state.game;
-        if (!game) {
-          return;
-        }
+        const game = this._gameService.game;
 
         const cardIndex = index - this.spots.length;
         const tableau = game.asTablaeu(cardIndex);
@@ -210,10 +207,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   onDeal() {
     this.setSpotSelection(-1);
-    const game = this._gameService.state.game;
-    if (!game) {
-      return;
-    }
+    const game = this._gameService.game;
 
     this._emptySpotCount = game.countEmpty();
 
@@ -247,19 +241,17 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   onCardMove() {
     this.setSpotSelection(-1);
-    const state = this._gameService.state;
-    if (!state.game || !state.previous) {
-      return;
-    }
+    const newState = this._gameService.state;
+    const oldState = this._gameService.previous;
 
-    const oldPath = state.previous.path.substring(0, state.previous.mark * 2);
-    const newPath = state.path.substring(0, state.mark * 2);
+    const oldPath = oldState.path.substring(0, oldState.mark * 2);
+    const newPath = newState.path.substring(0, newState.mark * 2);
     const lineSet = new Set<number>();
 
     const count = countEqualMoves(oldPath, newPath);
     const cards: number[] = [];
-    if (oldPath.length > count + count) {
-      playForward({ ...state, path: oldPath }, (v, g, t, i) => {
+    if (oldState.mark > count) {
+      playToMark(oldState, (v, g, t, i) => {
         if (i >= count) {
           lineSet.add(g);
           lineSet.add(t);
@@ -268,8 +260,8 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       });
       cards.reverse();
     }
-    if (newPath.length > count + count) {
-      playForward({ ...state, path: newPath }, (v, g, t, i) => {
+    if (newState.mark > count) {
+      playToMark(newState, (v, g, t, i) => {
         if (i >= count) {
           lineSet.add(g);
           lineSet.add(t);
@@ -286,8 +278,9 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     // console.log('Line Set:', lineSet);
 
     const transition: Transition = lineSet.size > 2 ? 'transition_fast' : 'transition_norm';
+    const game = this._gameService.game;
     for (const line of lineSet.keys()) {
-      this.updateLine(state.game, line, transition);
+      this.updateLine(game, line, transition);
     }
     if (transition === 'transition_fast') {
       this.soundService.play('shuffle');
@@ -295,7 +288,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       this.soundService.play('card');
     }
 
-    const emptyCount = state.game.countEmpty();
+    const emptyCount = game.countEmpty();
     if (emptyCount > this._emptySpotCount) {
       this._emptySpotCount = emptyCount;
       this.soundService.play('victory');

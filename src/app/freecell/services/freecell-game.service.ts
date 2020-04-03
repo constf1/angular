@@ -1,37 +1,31 @@
 // tslint:disable: variable-name
 
 import { Injectable } from '@angular/core';
+import { UnsubscribableStateSubject } from '../../common/unsubscribable-state-subject';
+import { FreecellBasisService, initialState as basisState } from './freecell-basis.service';
 
-import { StateSubject } from '../../common/state-subject';
-
-import { nextPath, IFreecellReplay, IFreecellBasis } from '../freecell-model';
+import { nextPath, IFreecellReplay } from '../freecell-model';
+import { getValidPath, playToMark } from '../freecell-play';
 import { FreecellGameView } from '../freecell-game';
-import { playForward, FreecellPlayCallback } from '../freecell-play';
 
-export interface FreecellGameState extends IFreecellReplay {
-  game: FreecellGameView | null;
-  previous: FreecellGameState;
-}
-
-export type FreecellReplayState = Pick<FreecellGameState, 'deal' | 'path' | 'mark'>;
-
-const initialState: FreecellGameState = {
-  base: 0,
-  cell: 0,
-  pile: 0,
-
+export const initialState: IFreecellReplay = {
+  ...basisState,
   deal: -1,
-  path: '',
   mark: 0,
-
-  game: null,
-  previous: null
-};
+  path: '',
+} as const;
 
 @Injectable({
   providedIn: 'root'
 })
-export class FreecellGameService extends StateSubject<FreecellGameState> {
+export class FreecellGameService extends UnsubscribableStateSubject<IFreecellReplay> {
+  private _game: FreecellGameView = null;
+  private _lastState = initialState;
+
+  get previous() {
+    return this._lastState;
+  }
+
   get deal() {
     return this.state.deal;
   }
@@ -39,63 +33,80 @@ export class FreecellGameService extends StateSubject<FreecellGameState> {
   set deal(value: number) {
     if (this.deal !== value) {
       const { path, mark } = initialState;
-      this.set({
+      this._set({
         deal: value,
         path, mark
       });
     }
   }
 
-  constructor() {
-    super(initialState);
+  get mark() {
+    return this.state.mark;
   }
 
-  protected _validate(state: FreecellGameState) {
-    if (state.base > 0) {
-      // Path validation:
-      let validPath = initialState.path;
-      const onmove: FreecellPlayCallback = (_v, giver, taker, _i) => {
-        validPath = nextPath(validPath, validPath.length / 2, giver, taker);
-      };
-      const onerror: FreecellPlayCallback = (_v, _g, _t, i) => {
-        console.warn('Invalid path:', state.path.substring(i + i));
-      };
-      playForward(state, onmove, onerror);
+  set mark(value: number) {
+    if (this.mark !== value) {
+      this._set({ mark: value });
+    }
+  }
 
-      if (state.path !== validPath) {
-        console.warn('Replacing path with:', validPath);
-        state.path = validPath;
-        state.mark = validPath.length / 2;
-      }
+  get path() {
+    return this.state.path;
+  }
 
-      // Mark validation:
-      state.mark = Math.max(0, Math.min(state.path.length / 2, state.mark));
+  set path(value: string) {
+    if (this.path !== value) {
+      this._set({ path: value });
+    }
+  }
 
-      state.game = playForward({
-        ...state,
-        path: state.path.substring(0, state.mark + state.mark)
-      });
-    } else {
-      state.game = initialState.game;
-      state.mark = initialState.mark;
-      state.path = initialState.path;
+  get game(): FreecellGameView {
+    return this._game || (this._game = playToMark(this.state));
+  }
+
+  constructor(basis: FreecellBasisService) {
+    super(initialState);
+    this._addSubscription(basis.stateChange.subscribe(state => {
+      this._set({ ...state });
+    }));
+  }
+
+  protected _validate(state: IFreecellReplay) {
+    // Path validation:
+    const path = getValidPath(state);
+    if (state.path !== path) {
+      console.warn('Replacing path with:', path);
+      state.path = path;
     }
 
-    if (state.deal === this.deal) {
-      state.previous = this.state;
-    } else {
-      state.previous = initialState.previous;
-    }
+    // Mark validation:
+    state.mark = Math.max(0, Math.min(state.path.length / 2, state.mark));
 
+    state = super._validate(state);
+    if (state) {
+      // Get ready to state update.
+      // new state -> new game
+      this._game = null;
+      this._lastState = this.state;
+    }
     return state;
   }
 
   move(giver: number, taker: number) {
     const state = this.state;
     const path = nextPath(state.path, state.mark, giver, taker);
-    this.set({
-      mark: path.length / 2,
-      path
+    const mark = path.length / 2;
+
+    this._set({
+      mark,
+      path: state.path.startsWith(path) ? state.path : path // keep the longest path
     });
+  }
+
+  set(deal: number, path: string, mark: number) {
+    const state = this.state;
+    if (deal !== state.deal || path !== state.path || mark !== state.mark) {
+      this._set({ deal, path, mark });
+    }
   }
 }

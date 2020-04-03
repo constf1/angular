@@ -1,26 +1,26 @@
 <ng-template #buttons>
-  <button mat-stroked-button [disabled]="!actionService.canUndo" (click)="actionService.undo()">
+  <button mat-stroked-button [disabled]="!actionService.state.canUndo" (click)="actionService.undo()">
     <mat-icon>undo</mat-icon>
     <label>UNDO</label>
   </button>
-  <button mat-stroked-button [disabled]="!actionService.canRedo" (click)="actionService.redo()">
+  <button mat-stroked-button [disabled]="!actionService.state.canRedo" (click)="actionService.redo()">
     <mat-icon>redo</mat-icon>
     <label>REDO</label>
   </button>
-  <button mat-stroked-button [disabled]="!actionService.nextMove" (click)="actionService.playNext()" color="accent">
+  <button mat-stroked-button [disabled]="!actionService.state.nextMove" (click)="actionService.playNext()" color="accent">
     <mat-icon>emoji_objects</mat-icon>
     <label>AUTO</label>
   </button>
 </ng-template>
 
 <ng-container *ngIf="noLabel; else buttons">
-  <button mat-icon-button [disabled]="!actionService.canUndo" (click)="actionService.undo()">
+  <button mat-icon-button [disabled]="!actionService.state.canUndo" (click)="actionService.undo()">
     <mat-icon>undo</mat-icon>
   </button>
-  <button mat-icon-button [disabled]="!actionService.canRedo" (click)="actionService.redo()">
+  <button mat-icon-button [disabled]="!actionService.state.canRedo" (click)="actionService.redo()">
     <mat-icon>redo</mat-icon>
   </button>
-  <button mat-icon-button [disabled]="!actionService.nextMove" (click)="actionService.playNext()" color="accent">
+  <button mat-icon-button [disabled]="!actionService.state.nextMove" (click)="actionService.playNext()" color="accent">
     <mat-icon>emoji_objects</mat-icon>
   </button>
 </ng-container>

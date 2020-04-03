@@ -28,25 +28,32 @@
         <app-freecell-deal-menu [listItem]="true"></app-freecell-deal-menu>
         <div mat-subheader>Actions:</div>
         <button mat-list-item
-          [disabled]="!actionService.canUndo"
+          [disabled]="!actionService.state.canUndo"
           (click)="actionService.undo()"
         >
-          <mat-icon [ngClass]="!actionService.canUndo ? 'disabled-color' : 'mat-primary'">undo</mat-icon>
+          <mat-icon [ngClass]="!actionService.state.canUndo ? 'disabled-color' : 'mat-primary'">undo</mat-icon>
           UNDO
         </button>
         <button mat-list-item
-          [disabled]="!actionService.canRedo"
+          [disabled]="!actionService.state.canRedo"
           (click)="actionService.redo()"
         >
-          <mat-icon [ngClass]="!actionService.canRedo ? 'disabled-color' : 'mat-primary'">redo</mat-icon>
+          <mat-icon [ngClass]="!actionService.state.canRedo ? 'disabled-color' : 'mat-primary'">redo</mat-icon>
           REDO
         </button>
         <button mat-list-item
-          [disabled]="!actionService.nextMove"
+          [disabled]="!actionService.state.nextMove"
           (click)="actionService.playNext()"
         >
-          <mat-icon [ngClass]="!actionService.nextMove ? 'disabled-color' : 'mat-accent'">emoji_objects</mat-icon>
+          <mat-icon [ngClass]="!actionService.state.nextMove ? 'disabled-color' : 'mat-accent'">emoji_objects</mat-icon>
           <span>AUTO</span>
+        </button>
+        <button mat-list-item
+          [disabled]="!actionService.state.canAssist"
+          (click)="actionService.assist()"
+        >
+          <mat-icon [ngClass]="!actionService.state.canAssist ? 'disabled-color' : 'mat-warn'">assistant</mat-icon>
+          <span>ASSIST</span>
         </button>
       </mat-action-list>
       <div style="padding: 1em;">

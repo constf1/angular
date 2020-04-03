@@ -7,6 +7,15 @@ export interface IFreecellBasis {
   pile: number;
 }
 
+export interface IFreecellDesk extends IFreecellBasis {
+  desk: number[][];
+}
+
+export interface IFreecellMove {
+  giver: number;
+  taker: number;
+}
+
 export interface IFreecellPlay extends IFreecellBasis {
   deal: number;
   path: string;

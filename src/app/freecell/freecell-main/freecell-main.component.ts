@@ -1,15 +1,15 @@
 // tslint:disable: variable-name
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 
-// import { FreecellGameView } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
 // import { FreecellDbService } from '../freecell-db.service';
 import { LineChangeEvent } from '../freecell-deck/freecell-deck.component';
 import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
 import { FreecellSettingsService } from '../services/freecell-settings.service';
+import { FreecellBasisService } from '../services/freecell-basis.service';
 
 @Component({
   selector: 'app-freecell-main',
@@ -17,30 +17,19 @@ import { FreecellSettingsService } from '../services/freecell-settings.service';
   styleUrls: ['./freecell-main.component.scss']
 })
 export class FreecellMainComponent extends UnsubscribableComponent implements OnInit, OnDestroy {
-  // @Input() aspectRatio = 0.56; // iphone 6/7/8
   layout: FreecellLayout;
 
   constructor(
     public settings: FreecellSettingsService,
     // private _dbService: FreecellDbService,
     private _gameService: FreecellGameService,
-    private _playService: FreecellAutoplayService) {
+    private _playService: FreecellAutoplayService,
+    basisService: FreecellBasisService) {
     super();
+    this._addSubscription(basisService.stateChange.subscribe(_state => this.layout = new FreecellLayout(basisService.basis)));
   }
 
   ngOnInit() {
-    // Set standard freecell basis.
-    this._gameService.set({ base: 4, cell: 4, pile: 8 });
-
-    this._addSubscription(this._gameService.stateChange.subscribe(state => {
-      if (state.game) {
-        if (!this.layout) {
-          this.layout = new FreecellLayout(state.game);
-        }
-      } else {
-        this.layout = null;
-      }
-    }));
   }
 
   ngOnDestroy() {
@@ -50,10 +39,7 @@ export class FreecellMainComponent extends UnsubscribableComponent implements On
   onLineChange(event: LineChangeEvent) {
     // console.log('Line Change Event:', event);
     this._playService.stop();
-    const game = this._gameService.state.game;
-    if (!game) {
-      return;
-    }
+    const game = this._gameService.game;
 
     let path = '';
     if (event.destination === undefined) {

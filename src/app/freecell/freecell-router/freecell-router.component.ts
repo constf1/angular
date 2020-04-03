@@ -49,7 +49,12 @@ export class FreecellRouterComponent extends UnsubscribableComponent implements 
       this._lock = true;
       Promise
         .resolve()
-        .then(() => this._gameService.set({ deal, path, mark }))
+        .then(() => {
+          const state = this._gameService.state;
+          if (state.deal !== deal || state.path !== path || state.mark !== mark) {
+            this._gameService.set(deal, path, mark);
+          }
+        })
         .finally(() => this._lock = false);
     } else {
       this._lock = false;
