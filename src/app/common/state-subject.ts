@@ -38,7 +38,7 @@ export class StateSubject<T> {
   protected _set(params: Partial<Readonly<T>>): boolean {
     const state = this._validate({ ...this.state, ...params });
     if (state) {
-      console.log('Next State:', state);
+      // console.log('Next State:', state);
       this._stateSubject.next(state);
       return true;
     }

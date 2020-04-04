@@ -8,7 +8,8 @@ import { UnsubscribableStateSubject } from '../../common/unsubscribable-state-su
 import { FreecellGameService } from './freecell-game.service';
 import { FreecellAutoplayService } from './freecell-autoplay.service';
 import { IFreecellMove, IFreecellDesk } from '../freecell-model';
-import { IFreecellWorkerInput, IFreecellWorkerOutput } from '../freecell-worker-model';
+import { IFreecellWorkerInput, IFreecellWorkerOutput, IFreecellWorkerMessage } from '../freecell-worker-model';
+import { FreecellSettingsService } from './freecell-settings.service';
 
 export interface FreecellActionState {
   canAssist: boolean;
@@ -41,6 +42,11 @@ const initialValue: Readonly<FreecellActionState> = {
 
 const ACTION_CLOSE = String.fromCharCode(0x0D7); // MULTIPLICATION SIGN
 
+const ASSIST_MSG_ACTION = 'Assisting...';
+const ASSIST_MSG_CANCEL = 'Assist was canceled.';
+const ASSIST_MSG_FAIL = 'Unable to assist ;-(';
+const ASSIST_MSG_THINK = 'Thinking...';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -50,6 +56,7 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
   constructor(
     private _gameService: FreecellGameService,
     private _playService: FreecellAutoplayService,
+    private _settings: FreecellSettingsService,
     private _snackBar: MatSnackBar
     ) {
     super(initialValue);
@@ -74,6 +81,11 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
 
       nextState.canUndo = state.mark > 0;
       nextState.canRedo = 2 * state.mark < state.path.length;
+
+      if (this.state.assistRequest) {
+        this.cancelAssist();
+        this._snackBar.open(ASSIST_MSG_CANCEL, ACTION_CLOSE, { duration: 1000 });
+      }
 
       // Update state in the next frame.
       Promise.resolve().then(() => this._set(nextState));
@@ -121,7 +133,7 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
   }
 
   assist() {
-    if (!this._worker) {
+    if (!this._worker || !this.state.canAssist) {
       return;
     }
 
@@ -135,10 +147,29 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
     const assistRequest = JSON.stringify(desk);
     const message: IFreecellWorkerInput = {
       requestId: assistRequest,
-      desk
+      desk,
+      searchThreshold: this._settings.state.assistLevel
     };
     this._worker.postMessage(message);
     this._set({ assistRequest, canAssist: false });
+
+    const snackBarRef = this._snackBar.open(ASSIST_MSG_THINK, ACTION_CLOSE);
+    const sub = snackBarRef.onAction().subscribe(() => {
+      sub.unsubscribe();
+      this.cancelAssist();
+      this._set({ assistRequest: null, canAssist: true });
+    });
+  }
+
+  cancelAssist() {
+    if (!this._worker) {
+      return;
+    }
+
+    const message: IFreecellWorkerMessage = {
+      requestId: null
+    };
+    this._worker.postMessage(message);
   }
 
   private _createWorker() {
@@ -148,9 +179,9 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
       this._worker.onmessage = (event: MessageEvent) => {
         const data = event.data as IFreecellWorkerOutput;
         if (data.requestId === this.state.assistRequest) {
-          let message = 'Unable to assist ;-(';
+          let message = ASSIST_MSG_FAIL;
           if (data.path) {
-            message = 'Assisting...';
+            message = ASSIST_MSG_ACTION;
             this.play(data.path);
           }
           this._snackBar.open(message, ACTION_CLOSE, { duration: 2000 });

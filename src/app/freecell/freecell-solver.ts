@@ -19,6 +19,10 @@ export class FreecellSolver extends FreecellBasis {
   private iteration = 0;
   private path = '';
 
+  get doneSize() {
+    return this.done.size;
+  }
+
   // Default do-nothing implementation.
   onMove: (card: number, source: number, destination: number) => void =
    (card: number, source: number, destination: number) => {}
@@ -49,10 +53,39 @@ export class FreecellSolver extends FreecellBasis {
     this.path = '';
   }
 
-  solve(): boolean {
+  prepare() {
     this.clear();
     this.done.add(this.toKey());
     this.buffers[0][0] = '';
+  }
+
+  nextIteration() {
+    const input = this.buffers[this.iteration % 2];
+    this.iteration++;
+
+    if (input.length <= 0) {
+      return false;
+    }
+
+    try {
+      for (const path of input) {
+        this.skipForward(path);
+        this.findMoves();
+        this.skipBackward();
+      }
+    } catch (err) {
+      return false;
+    }
+
+    // clear input
+    input.length = 0;
+
+    const output = this.buffers[this.iteration % 2];
+    return output.length > 0;
+  }
+
+  solve(): boolean {
+    this.prepare();
 
     const startTime = Date.now();
     try {

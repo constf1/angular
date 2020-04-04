@@ -11,6 +11,19 @@
   </mat-slide-toggle>
 
   <h3 class="pad-top-20">
+    <mat-icon>assistant</mat-icon>
+    Assist level
+  </h3>
+  <mat-slider thumbLabel="true"
+    [displayWith]="assistLevelLabel"
+    [min]="assistLevelMin"
+    [max]="assistLevelMax"
+    [step]="assistLevelStep"
+    [(ngModel)]="assistLevel"
+    [color]="assistLevelColor()"
+  ></mat-slider>
+
+  <h3 class="pad-top-20">
     <mat-icon>layers</mat-icon>
     Card Effects
   </h3>
@@ -37,7 +50,7 @@
     Aspect ratio
   </h3>
   <mat-slider thumbLabel="true"
-    [displayWith]="formatLabel"
+    [displayWith]="aspectRatioLabel"
     [min]="aspectRatioMin"
     [max]="aspectRatioMax"
     [step]="aspectRatioStep"

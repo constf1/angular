@@ -1,11 +1,16 @@
 import { IFreecellDesk } from './freecell-model';
 
-export interface IFreecellWorkerInput {
-  requestId: string;
-  desk: IFreecellDesk;
+export interface IFreecellWorkerMessage {
+  requestId: string | null;
 }
 
-export interface IFreecellWorkerOutput {
+export interface IFreecellWorkerInput extends IFreecellWorkerMessage {
+  requestId: string;
+  desk: IFreecellDesk;
+  searchThreshold: number;
+}
+
+export interface IFreecellWorkerOutput extends IFreecellWorkerMessage {
   requestId: string;
   path: string;
 }

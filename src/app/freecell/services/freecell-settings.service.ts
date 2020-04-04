@@ -19,6 +19,8 @@ export interface FreecellSettingsState {
   enableSound: boolean;
 
   enableRipples: boolean;
+
+  assistLevel: number;
 }
 
 export const initialState: Readonly<FreecellSettingsState> = {
@@ -32,17 +34,21 @@ export const initialState: Readonly<FreecellSettingsState> = {
 
   enableSound: false,
 
-  enableRipples: true
+  enableRipples: true,
+
+  assistLevel: 1000000,
 };
 
 type SubType<A, T> = Pick<A, { [K in keyof A]: A[K] extends T ? K : never }[keyof A]>;
 
 export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
-  aspectRatio: 0.40
+  aspectRatio: 0.40,
+  assistLevel: 20000,
 };
 
 export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
-  aspectRatio: 0.70
+  aspectRatio: 0.70,
+  assistLevel: 2000000
 };
 
 const KEY = '[FreecellSettingsState]';
@@ -78,7 +84,9 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
       state.view = initialState.view;
     }
 
-    state.aspectRatio = Math.max(minState.aspectRatio, Math.min(maxState.aspectRatio, state.aspectRatio));
+    for (const key of Object.keys(minState)) {
+      state[key] = Math.max(minState[key], Math.min(maxState[key], state[key]));
+    }
     return super._validate(state);
   }
 
