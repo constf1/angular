@@ -18,7 +18,10 @@ export class FreecellViewComponent implements OnInit {
 
   openSettingsDialog() {
     // const dialogRef =
-    this.dialog.open(FreecellSettingsDialogComponent);
+    this.dialog.open(FreecellSettingsDialogComponent, {
+      // minHeight: '50vh',
+      maxHeight: '100vh',
+    });
     // dialogRef.afterClosed().subscribe(result => {
     //   console.log(`Dialog result: ${result}`);
     // });
