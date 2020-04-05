@@ -113,27 +113,27 @@ div.use-svg-background {
   0%   {
     left: 0%;
     top: 0%;
-    rotate: 1 0 1 0deg;
   }
   25%  {
-    left: 0%;
-    top: 0%;
-    rotate: 1 0 1 -90deg;
+    left: -4%;
+    top: 4%;
   }
   50%  {
-    left: -25%;
-    top: 25%;
-    rotate: 1 0 1 -180deg;
+    left: 4%;
+    top: 4%;
+  }
+  75%  {
+    left: -4%;
+    top: -4%;
   }
   100% {
     left: 0%;
     top: 0%;
-    rotate: 1 0 1 -360deg;
   }
 }
 
-$animation-duration: 5s;
-$animation-delay: 1s;
+$animation-duration: 4s;
+$animation-delay: 0.5s;
 @mixin animation_card($order) {
   $delta-delay: $order * 0.1s;
   animation-delay: $animation-delay + $delta-delay;
