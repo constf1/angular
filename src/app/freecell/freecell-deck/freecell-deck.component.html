@@ -1,6 +1,8 @@
 <div *ngIf="soundService.enabled && !soundService.activated" appGesture (userGesture)="activateOnGesture($event)"></div>
 
-<div class="freecell_deck" [class.use-svg-background]="settings.state.deckUseSvg">
+<div class="freecell_deck"
+  [class.use-svg-background]="settings.state.deckUseSvg"
+  [class.freecell_deck_solved]="solved">
   <ng-content></ng-content>
   <div matRipple *ngFor="let item of items; index as i; trackBy: trackByIndex"
     [matRippleDisabled]="!settings.state.enableRipples"

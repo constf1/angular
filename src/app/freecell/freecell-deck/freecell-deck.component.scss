@@ -108,3 +108,56 @@ div.use-svg-background {
     cursor: grabbing;
   }
 }
+
+@keyframes animation-solved {
+  0%   {
+    left: 0%;
+    top: 0%;
+    rotate: 1 0 1 0deg;
+  }
+  25%  {
+    left: 0%;
+    top: 0%;
+    rotate: 1 0 1 -90deg;
+  }
+  50%  {
+    left: -25%;
+    top: 25%;
+    rotate: 1 0 1 -180deg;
+  }
+  100% {
+    left: 0%;
+    top: 0%;
+    rotate: 1 0 1 -360deg;
+  }
+}
+
+$animation-duration: 5s;
+$animation-delay: 1s;
+@mixin animation_card($order) {
+  $delta-delay: $order * 0.1s;
+  animation-delay: $animation-delay + $delta-delay;
+  animation-duration: $animation-duration - 2 * $delta-delay;
+}
+
+.freecell_deck_solved {
+  .freecell_card {
+    animation-name: animation-solved;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+
+    &.freecell_Ace { @include animation_card(12); }
+    &.freecell_Two { @include animation_card(11); }
+    &.freecell_Three { @include animation_card(10); }
+    &.freecell_Four { @include animation_card(9); }
+    &.freecell_Five { @include animation_card(8); }
+    &.freecell_Six { @include animation_card(7); }
+    &.freecell_Seven { @include animation_card(6); }
+    &.freecell_Eight { @include animation_card(5); }
+    &.freecell_Nine { @include animation_card(4); }
+    &.freecell_Ten { @include animation_card(3); }
+    &.freecell_Jack { @include animation_card(2); }
+    &.freecell_Queen { @include animation_card(1); }
+    &.freecell_King { @include animation_card(0); }
+  }
+}

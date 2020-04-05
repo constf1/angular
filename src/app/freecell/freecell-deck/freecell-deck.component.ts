@@ -73,6 +73,8 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   spots: Item[] = [];
   cards: CardItem[] = [];
 
+  solved = false;
+
   private _spotSelection = -1;
   private _dragger: MyDragger | null = null;
   private _emptySpotCount = 0;
@@ -88,6 +90,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   ngOnInit() {
     this._addSubscription(this._gameService.stateChange.subscribe(state => {
+      this.solved = this._gameService.game.isSolved();
       if (this.layout) {
         if (state.deal !== this._gameService.previous.deal) {
           this.onDeal();
@@ -209,7 +212,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     this.setSpotSelection(-1);
     const game = this._gameService.game;
 
-    this._emptySpotCount = game.countEmpty();
+    this._emptySpotCount = Math.max(game.CELL_NUM, game.countEmpty());
 
     for (let i = game.DESK_SIZE; i-- > 0;) {
       for (const cardIndex of game.getLine(i)) {
