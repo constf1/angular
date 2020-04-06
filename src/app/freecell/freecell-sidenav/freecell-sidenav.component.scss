@@ -1,7 +1,7 @@
 button.sidenav-open-button {
   position: absolute;
   left: -64px;
-  top: calc(50% - 20px);
+  top: 1px;
   transition: left 2s 1s;
 
   &.sidenav-open-button-active {

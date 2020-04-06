@@ -6,7 +6,7 @@
     <app-freecell-action-buttons [noLabel]="noLabel"></app-freecell-action-buttons>
     <span class="flex-space-filler-1"></span>
   </mat-toolbar>
-  <app-freecell-main appSandwichContent></app-freecell-main>
+  <ng-content appSandwichContent></ng-content>
   <mat-toolbar appSandwichFooter color="primary">
     <div class="mat-typography padding-top-half-rem">
       <app-freecell-history></app-freecell-history>

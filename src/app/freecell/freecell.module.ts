@@ -24,12 +24,13 @@ import { FreecellDealMenuComponent } from './freecell-deal-menu/freecell-deal-me
 import { FreecellViewComponent } from './freecell-view/freecell-view.component';
 import { FreecellSettingsDialogComponent } from './freecell-settings-dialog/freecell-settings-dialog.component';
 import { FreecellHistoryComponent } from './freecell-history/freecell-history.component';
+import { FreecellDemoComponent } from './freecell-demo/freecell-demo.component';
 
 /**
  * Routes:
  */
 const routes: Routes = [
-  { path: '', component: FreecellViewComponent },
+  { path: '', component: FreecellDemoComponent },
 ];
 
 @NgModule({
@@ -44,6 +45,7 @@ const routes: Routes = [
     FreecellViewComponent,
     FreecellSettingsDialogComponent,
     FreecellHistoryComponent,
+    FreecellDemoComponent,
   ],
   imports: [
     RouterModule.forChild(routes),

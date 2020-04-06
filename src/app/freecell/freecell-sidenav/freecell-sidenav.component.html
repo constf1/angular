@@ -72,18 +72,16 @@
 
     <!-- Sidenav Content -->
     <mat-sidenav-content>
-      <app-freecell-main>
-        <button
+      <ng-content></ng-content>
+      <button
           *ngIf="settings.state.sidenavClosed"
           class="sidenav-open-button"
           [class.sidenav-open-button-active]="!sidenavOpened"
           mat-icon-button color="primary"
           (click)="settings.set({ sidenavClosed: false })"
         >
-          <mat-icon>double_arrow</mat-icon>
-        </button>
-      </app-freecell-main>
-
+        <mat-icon>double_arrow</mat-icon>
+      </button>
     </mat-sidenav-content>
   </mat-sidenav-container>
 </div>
