@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Output, HostListener } from '@angular/core';
+import { Directive, Output, EventEmitter, HostListener } from '@angular/core';
 
 @Directive({
   selector: '[appGesture]'
