@@ -109,7 +109,7 @@ div.use-svg-background {
   }
 }
 
-@keyframes animation-solved {
+@keyframes animation-card {
   0%   {
     left: 0%;
     top: 0%;
@@ -132,9 +132,24 @@ div.use-svg-background {
   }
 }
 
+@keyframes animation-spot {
+  0%   {
+    opacity: 1;
+  }
+  25%  {
+    opacity: 0;
+  }
+  75%  {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 $animation-duration: 4s;
 $animation-delay: 0.5s;
-@mixin animation_card($order) {
+@mixin animation_order($order) {
   $delta-delay: $order * 0.1s;
   animation-delay: $animation-delay + $delta-delay;
   animation-duration: $animation-duration - 2 * $delta-delay;
@@ -142,22 +157,29 @@ $animation-delay: 0.5s;
 
 .freecell_deck_solved {
   .freecell_card {
-    animation-name: animation-solved;
+    animation-name: animation-card;
     animation-iteration-count: 1;
     animation-timing-function: ease-in-out;
 
-    &.freecell_Ace { @include animation_card(12); }
-    &.freecell_Two { @include animation_card(11); }
-    &.freecell_Three { @include animation_card(10); }
-    &.freecell_Four { @include animation_card(9); }
-    &.freecell_Five { @include animation_card(8); }
-    &.freecell_Six { @include animation_card(7); }
-    &.freecell_Seven { @include animation_card(6); }
-    &.freecell_Eight { @include animation_card(5); }
-    &.freecell_Nine { @include animation_card(4); }
-    &.freecell_Ten { @include animation_card(3); }
-    &.freecell_Jack { @include animation_card(2); }
-    &.freecell_Queen { @include animation_card(1); }
-    &.freecell_King { @include animation_card(0); }
+    &.freecell_Ace { @include animation_order(12); }
+    &.freecell_Two { @include animation_order(11); }
+    &.freecell_Three { @include animation_order(10); }
+    &.freecell_Four { @include animation_order(9); }
+    &.freecell_Five { @include animation_order(8); }
+    &.freecell_Six { @include animation_order(7); }
+    &.freecell_Seven { @include animation_order(6); }
+    &.freecell_Eight { @include animation_order(5); }
+    &.freecell_Nine { @include animation_order(4); }
+    &.freecell_Ten { @include animation_order(3); }
+    &.freecell_Jack { @include animation_order(2); }
+    &.freecell_Queen { @include animation_order(1); }
+    &.freecell_King { @include animation_order(0); }
+  }
+
+  .freecell_spot {
+    animation-name: animation-spot;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+    @include animation_order(0);
   }
 }
