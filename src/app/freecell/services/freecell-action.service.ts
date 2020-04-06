@@ -47,9 +47,7 @@ const ASSIST_MSG_CANCEL = 'Assist was canceled.';
 const ASSIST_MSG_FAIL = 'Unable to assist ;-(';
 const ASSIST_MSG_THINK = 'Thinking...';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FreecellActionService extends UnsubscribableStateSubject<FreecellActionState> {
   private _worker: Worker = null;
 

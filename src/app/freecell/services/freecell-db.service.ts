@@ -22,9 +22,7 @@ function toPromise<T>(request: IDBRequest<T>) {
   });
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FreecellDbService {
   private _openPromise: Promise<void>; // Note: .then() may be called many times on the same promise.
 

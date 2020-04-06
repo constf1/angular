@@ -15,9 +15,7 @@ export const initialState: IFreecellReplay = {
   path: '',
 } as const;
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FreecellGameService extends UnsubscribableStateSubject<IFreecellReplay> {
   private _game: FreecellGameView = null;
   private _lastState = initialState;

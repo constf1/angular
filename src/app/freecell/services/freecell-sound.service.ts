@@ -128,9 +128,7 @@ function createSounds(
   return sounds;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FreecellSoundService extends UnsubscribableComponent {
   private _context: AudioContext;
 

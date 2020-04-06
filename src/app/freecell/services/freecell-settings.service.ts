@@ -53,9 +53,7 @@ export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
 
 const KEY = '[FreecellSettingsState]';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FreecellSettingsService extends StateSubject<FreecellSettingsState> {
   constructor() {
     super(initialState);

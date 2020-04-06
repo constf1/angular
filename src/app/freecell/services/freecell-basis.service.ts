@@ -13,9 +13,7 @@ export const initialState: IFreecellBasis = {
   pile: 8
 } as const;
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class FreecellBasisService extends StateSubject<IFreecellBasis> {
   private _basis = new FreecellBasis(initialState.pile, initialState.cell, initialState.base);
 
