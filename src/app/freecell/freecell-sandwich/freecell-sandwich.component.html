@@ -1,4 +1,4 @@
-<app-sandwich>
+<app-sandwich (sandwichOrderChange)="settings.set({ sandwichOrder: $event })" [sandwichOrder]=settings.state.sandwichOrder>
   <mat-toolbar appSandwichHeader color="primary">
     <span>Freecell</span>
     <app-freecell-deal-menu></app-freecell-deal-menu>

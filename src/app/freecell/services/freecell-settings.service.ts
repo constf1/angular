@@ -11,6 +11,8 @@ export interface FreecellSettingsState {
   view: FreecellSettingsView;
   aspectRatio: number;
 
+  sandwichOrder: number;
+
   sidenavModeSide: boolean;
   sidenavClosed: boolean;
 
@@ -26,6 +28,8 @@ export interface FreecellSettingsState {
 export const initialState: Readonly<FreecellSettingsState> = {
   view: FreecellSettingsViewTypes[0],
   aspectRatio: 0.56, // good for iphone 6/7/8; 0.625 for ipad
+
+  sandwichOrder: 0,
 
   sidenavModeSide: true,
   sidenavClosed: true,
@@ -44,11 +48,13 @@ type SubType<A, T> = Pick<A, { [K in keyof A]: A[K] extends T ? K : never }[keyo
 export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.40,
   assistLevel: 20000,
+  sandwichOrder: 0,
 };
 
 export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.70,
-  assistLevel: 2000000
+  assistLevel: 2000000,
+  sandwichOrder: 5,
 };
 
 const KEY = '[FreecellSettingsState]';

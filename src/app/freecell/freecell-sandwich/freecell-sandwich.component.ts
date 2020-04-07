@@ -5,6 +5,7 @@ import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 
+import { FreecellSettingsService } from '../services/freecell-settings.service';
 // import { FreecellGameService } from '../freecell-game.service';
 
 @Component({
@@ -20,7 +21,9 @@ export class FreecellSandwichComponent extends UnsubscribableComponent implement
 
   noLabel = false;
 
-  constructor(/* private _gameService: FreecellGameService, */ breakpointObserver: BreakpointObserver) {
+  constructor(/* private _gameService: FreecellGameService, */
+    breakpointObserver: BreakpointObserver,
+    public settings: FreecellSettingsService) {
     super();
     this._addSubscription(breakpointObserver.observe([this.BP_XS, this.BP_SM]).subscribe(bp => {
       this.noLabel = bp.breakpoints[this.BP_XS] || bp.breakpoints[this.BP_SM];
