@@ -21,14 +21,14 @@
 </ng-template>
 
 <div class="sandwich-container">
-  <div class="sandwich-header" [style.order]="order[0]">
+  <div *ngIf="!hideHeader" class="sandwich-header" [style.order]="order[0]">
     <ng-content select="[appSandwichHeader]"></ng-content>
     <ng-container *ngTemplateOutlet="moveButton; context: { $implicit: 0 }"></ng-container>
   </div>
   <div class="sandwich-content" [style.order]="order[1]">
     <ng-content select="[appSandwichContent]"></ng-content>
   </div>
-  <div class="sandwich-footer" [style.order]="order[2]">
+  <div *ngIf="!hideFooter" class="sandwich-footer" [style.order]="order[2]">
     <ng-content select="[appSandwichFooter]"></ng-content>
     <ng-container *ngTemplateOutlet="moveButton; context: { $implicit: 2 }"></ng-container>
   </div>

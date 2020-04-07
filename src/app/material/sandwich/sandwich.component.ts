@@ -42,6 +42,9 @@ export class SandwichComponent implements OnInit {
 
   @Output() sandwichOrderChange = new EventEmitter<number>();
 
+  @Input() hideHeader = false;
+  @Input() hideFooter = false;
+
   constructor() { }
 
   ngOnInit(): void {
