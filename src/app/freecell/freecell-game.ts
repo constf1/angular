@@ -96,7 +96,7 @@ export class FreecellGame extends FreecellDesk {
       let path = solver.getPath();
       const d = path.charCodeAt(path.length - 1);
       if (d !== destination) {
-        console.log('Swapping destinations:', destination, d);
+        // console.log('Swapping destinations:', destination, d);
         path = swap(path, destination, d);
       }
 

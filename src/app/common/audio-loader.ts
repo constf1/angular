@@ -24,7 +24,7 @@ export function loadAudioFiles(context: AudioContext, urls: Readonly<string[]>):
   return new Promise<AudioBuffer[]>((resolve, reject) => {
     let count = urls.length;
     const buffers: AudioBuffer[] = new Array(urls.length);
-    console.log(`Loading ${urls.length} track(s). Please wait...`);
+    // console.log(`Loading ${urls.length} track(s). Please wait...`);
 
     if (count === 0) {
       resolve([]);

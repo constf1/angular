@@ -105,7 +105,7 @@ export class FreecellSolver extends FreecellBasis {
 
         if (Date.now() - startTime > this.searchTime) {
           // It's time to stop the search.
-          console.log(`Oops! Search timeout on ${this.iteration} iteration!`);
+          // console.log(`Oops! Search timeout on ${this.iteration} iteration!`);
           this.stop(false);
         }
       }
@@ -116,7 +116,7 @@ export class FreecellSolver extends FreecellBasis {
         throw e;  // re-throw the error unchanged
       }
     } finally {
-      console.log('Searched: ' + this.done.size + '. Time (ms): ' + (Date.now() - startTime));
+      // console.log('Searched: ' + this.done.size + '. Time (ms): ' + (Date.now() - startTime));
     }
     return false;
   }
