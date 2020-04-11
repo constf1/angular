@@ -1,0 +1,39 @@
+<ng-template #buttons>
+  <button mat-stroked-button [disabled]="!actionService.state.canUndo" (click)="actionService.undo()">
+    <mat-icon>undo</mat-icon>
+    <label>UNDO</label>
+  </button>
+  <button mat-stroked-button [disabled]="!actionService.state.canRedo" (click)="actionService.redo()">
+    <mat-icon>redo</mat-icon>
+    <label>REDO</label>
+  </button>
+  <button mat-stroked-button [disabled]="!actionService.state.nextMove" (click)="actionService.playNext()" color="accent">
+    <mat-icon>emoji_objects</mat-icon>
+    <label>AUTO</label>
+  </button>
+  <button mat-stroked-button [disabled]="!actionService.state.canAssist" (click)="actionService.assist()" color="warn">
+    <mat-icon>assistant</mat-icon>
+    <label>ASSIST</label>
+    <mat-progress-bar *ngIf="actionService.state.assistRequest" mode="indeterminate" color="warn"
+      style="position: absolute; left: 0; bottom: 0"
+    ></mat-progress-bar>
+  </button>
+</ng-template>
+
+<ng-container *ngIf="noLabel; else buttons">
+  <button mat-icon-button [disabled]="!actionService.state.canUndo" (click)="actionService.undo()">
+    <mat-icon>undo</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!actionService.state.canRedo" (click)="actionService.redo()">
+    <mat-icon>redo</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!actionService.state.nextMove" (click)="actionService.playNext()" color="accent">
+    <mat-icon>emoji_objects</mat-icon>
+  </button>
+  <button mat-icon-button [disabled]="!actionService.state.canAssist" (click)="actionService.assist()" color="warn">
+    <mat-icon>assistant</mat-icon>
+    <mat-progress-bar *ngIf="actionService.state.assistRequest" mode="indeterminate" color="warn"
+      style="position: absolute; left: 0; bottom: 0"
+    ></mat-progress-bar>
+  </button>
+</ng-container>

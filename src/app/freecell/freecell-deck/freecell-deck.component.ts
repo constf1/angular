@@ -1,3 +1,4 @@
+// tslint:disable: variable-name
 import {
   Component,
   OnInit,
@@ -15,9 +16,18 @@ import {
 import { Dragger } from '../../common/dragger';
 import { toPercent } from '../../common/math-utils';
 import { suitFullNameOf, CARD_NUM, rankFullNameOf } from '../../common/deck';
+import { UnsubscribableComponent } from '../../common/unsubscribable-component';
+import { Linkable, connect, append } from '../../common/linkable';
+
+import { FreecellGameService } from '../services/freecell-game.service';
+import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
+import { FreecellSettingsService } from '../services/freecell-settings.service';
+import { FreecellSoundService } from '../services/freecell-sound.service';
 
 import { FreecellGameView } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
+import { countEqualMoves } from '../freecell-model';
+import { playToMark } from '../freecell-play';
 
 interface Item {
   ngStyle: { [klass: string]: any };
@@ -47,42 +57,56 @@ class MyDragger extends Dragger {
   }
 }
 
+type CardItem = Item & Linkable<CardItem> & { card: number };
+
 @Component({
   selector: 'app-freecell-deck',
   templateUrl: './freecell-deck.component.html',
   styleUrls: ['./freecell-deck.component.scss']
 })
-export class FreecellDeckComponent implements OnInit, OnChanges {
-  @Input() game: FreecellGameView;
+export class FreecellDeckComponent extends UnsubscribableComponent implements OnInit, OnChanges {
   @Input() layout: FreecellLayout;
-
   @Output() lineChange = new EventEmitter<LineChangeEvent>();
-
   @ViewChildren('elements') elementList: QueryList<ElementRef<HTMLElement>>;
 
   items: Item[] = [];
   spots: Item[] = [];
-  cards: Item[] = [];
+  cards: CardItem[] = [];
 
-  // tslint:disable-next-line: variable-name
+  solved = false;
+
   private _spotSelection = -1;
-
-  // tslint:disable-next-line: variable-name
   private _dragger: MyDragger | null = null;
+  private _emptySpotCount = 0;
 
-  constructor(private renderer: Renderer2) { }
+  constructor(
+    public settings: FreecellSettingsService,
+    public soundService: FreecellSoundService,
+    private _renderer: Renderer2,
+    private _playService: FreecellAutoplayService,
+    private _gameService: FreecellGameService) {
+    super();
+  }
 
   ngOnInit() {
+    this._addSubscription(this._gameService.stateChange.subscribe(state => {
+      this.solved = this._gameService.game.isSolved();
+      if (this.layout) {
+        if (state.deal !== this._gameService.previous.deal) {
+          this.onDeal();
+        } else {
+          this.onCardMove();
+        }
+      }
+    }));
   }
 
   ngOnChanges(changes: SimpleChanges) {
     // console.log('app-freecell.ngOnChanges', changes);
-    if (changes.layout) {
+    if (changes.layout && changes.layout.currentValue) {
       this.spots = this.createSpots();
       this.cards = this.createCards();
       this.items = this.spots.concat(this.cards);
-    }
-    if (changes.game) {
       this.onDeal();
     }
   }
@@ -102,6 +126,8 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   }
 
   onMouseDown(event: MouseEvent, index: number) {
+    this._playService.stop();
+
     // console.log('Mousedown:', index);
     if (event.button !== 0) {
       return;
@@ -111,30 +137,32 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
       if (index < this.spots.length) {
         this.setSpotSelection(this._spotSelection === index ? -1 : index);
       } else {
-        const cardIndex = index - this.spots.length;
-        const tableau = this.game.asTablaeu(cardIndex);
+        const game = this._gameService.game;
 
-        this._dragger = new MyDragger(event.screenX, event.screenY, this.renderer);
+        const cardIndex = index - this.spots.length;
+        const tableau = game.asTablaeu(cardIndex);
+
+        this._dragger = new MyDragger(event.screenX, event.screenY, this._renderer);
         this.onDragStart(tableau);
-        this._dragger.onDrag = () => this.onDrag(tableau);
+        this._dragger.onDrag = () => this.onDrag(game, tableau);
         this._dragger.onDragEnd = ev => {
-          this.onDragEnd(tableau);
+          this.onDragEnd(game, tableau);
 
           if (this._dragger.dragged) {
             const destination = this.findDestination(index, ev.clientX, ev.clientY);
             if (destination >= 0) {
-              const srcLine = this.game.toLine(cardIndex);
+              const srcLine = game.toLine(cardIndex);
               const dstLine =
                 destination < this.spots.length
                   ? destination
-                  : this.game.toLine(destination - this.spots.length);
+                  : game.toLine(destination - this.spots.length);
               if (srcLine !== dstLine) {
                 // this.setSpotSelection(-1);
                 this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
               }
             }
           } else {
-            const srcLine = this.game.toLine(cardIndex);
+            const srcLine = game.toLine(cardIndex);
             const dstLine = this._spotSelection >= 0 ? this._spotSelection : undefined;
             // this.setSpotSelection(-1);
             this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
@@ -149,16 +177,17 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
   onDragStart(tableau: Readonly<number[]>) {
     for (const cardIndex of tableau) {
       const card = this.cards[cardIndex];
-      card.ngStyle.zIndex = (card.ngStyle.zIndex % CARD_NUM) + CARD_NUM;
+      // card.ngStyle.zIndex = (card.ngStyle.zIndex % CARD_NUM) + CARD_NUM;
+      card.ngStyle.zIndex += CARD_NUM;
       card.ngClass.dragged = true;
     }
   }
 
-  onDrag(tableau: Readonly<number[]>) {
+  onDrag(game: FreecellGameView, tableau: Readonly<number[]>) {
     for (const index of tableau) {
       const card = this.cards[index];
       card.ngStyle.transform =
-        this.getCardTransform(this.game.toLine(index), index)
+        this.getCardTransform(game, game.toLine(index), index)
         + ' '
         + `translate(${this._dragger.deltaX}px, ${this._dragger.deltaY}px)`;
     }
@@ -167,13 +196,13 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
     }
   }
 
-  onDragEnd(tableau: Readonly<number[]>) {
+  onDragEnd(game: FreecellGameView, tableau: Readonly<number[]>) {
     for (const index of tableau) {
       const card = this.cards[index];
-      const lineIndex = this.game.toLine(index);
+      const lineIndex = game.toLine(index);
 
-      card.ngStyle.zIndex = card.ngStyle.zIndex % CARD_NUM;
-      card.ngStyle.transform = this.getCardTransform(lineIndex, index);
+      card.ngStyle.zIndex -= CARD_NUM;
+      card.ngStyle.transform = this.getCardTransform(game, lineIndex, index);
       delete card.ngClass.dragged;
       setTransition(card.ngClass, 'transition_fast');
     }
@@ -181,31 +210,92 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
 
   onDeal() {
     this.setSpotSelection(-1);
-    let zIndex = 0;
-    for (let i = this.game.DESK_SIZE; i-- > 0;) {
-      for (const cardIndex of this.game.getLine(i)) {
-        this.cards[cardIndex].ngStyle.zIndex = zIndex++;
+    const game = this._gameService.game;
+
+    this._emptySpotCount = Math.max(game.CELL_NUM, game.countEmpty());
+
+    for (let i = game.DESK_SIZE; i-- > 0;) {
+      for (const cardIndex of game.getLine(i)) {
+        this.bringToFront(cardIndex);
       }
-      this.updateLine(i, 'transition_deal');
+
+      this.updateLine(game, i, 'transition_deal');
+    }
+    this.updateZIndex();
+    this.soundService.play('deal');
+  }
+
+  updateZIndex() {
+    if (this.cards.length > 1) {
+      let zIndex = 1;
+      for (let node = this.cards[0].list.head; node; node = node.next) {
+        this.cards[node.card].ngStyle.zIndex = zIndex++;
+      }
     }
   }
 
   bringToFront(cardIndex: number) {
-    const cards = this.cards;
-    const oldZIndex = cards[cardIndex].ngStyle.zIndex;
-    for (let i = 0; i < CARD_NUM; i++) {
-      if (cards[i].ngStyle.zIndex > oldZIndex) {
-        cards[i].ngStyle.zIndex--;
-      }
+    const node = this.cards[cardIndex];
+    const list = node.list;
+    if (list && list.tail && list.tail !== node) {
+      append(list.tail, node);
     }
-    cards[cardIndex].ngStyle.zIndex = CARD_NUM - 1;
   }
 
-  onCardMove(source: number, destination: number, transition: Transition = 'transition_norm') {
+  onCardMove() {
     this.setSpotSelection(-1);
-    this.bringToFront(this.game.getCard(destination, -1));
-    this.updateLine(source, transition);
-    this.updateLine(destination, transition);
+    const newState = this._gameService.state;
+    const oldState = this._gameService.previous;
+
+    const oldPath = oldState.path.substring(0, oldState.mark * 2);
+    const newPath = newState.path.substring(0, newState.mark * 2);
+    const lineSet = new Set<number>();
+
+    const count = countEqualMoves(oldPath, newPath);
+    const cards: number[] = [];
+    if (oldState.mark > count) {
+      playToMark(oldState, (v, g, t, i) => {
+        if (i >= count) {
+          lineSet.add(g);
+          lineSet.add(t);
+          cards.push(v.getCard(t, -1));
+        }
+      });
+      cards.reverse();
+    }
+    if (newState.mark > count) {
+      playToMark(newState, (v, g, t, i) => {
+        if (i >= count) {
+          lineSet.add(g);
+          lineSet.add(t);
+          cards.push(v.getCard(t, -1));
+        }
+      });
+    }
+    // Updating Z Index.
+    for (const card of cards) {
+      this.bringToFront(card);
+    }
+    this.updateZIndex();
+
+    // console.log('Line Set:', lineSet);
+
+    const transition: Transition = lineSet.size > 2 ? 'transition_fast' : 'transition_norm';
+    const game = this._gameService.game;
+    for (const line of lineSet.keys()) {
+      this.updateLine(game, line, transition);
+    }
+    if (transition === 'transition_fast') {
+      this.soundService.play('shuffle');
+    } else if (transition === 'transition_norm') {
+      this.soundService.play('card');
+    }
+
+    const emptyCount = game.countEmpty();
+    if (emptyCount > this._emptySpotCount) {
+      this._emptySpotCount = emptyCount;
+      this.soundService.play('victory');
+    }
   }
 
   createSpots(): Item[] {
@@ -243,15 +333,16 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
     return placeholders;
   }
 
-  createCards(): Item[] {
-    const cards: Item[] = [];
+  createCards(): CardItem[] {
+    const cards: CardItem[] = [];
     const layout = this.layout;
     if (layout) {
       const width = toPercent(layout.itemWidth, layout.width);
       const height = toPercent(layout.itemHeight, layout.height);
 
       for (let i = 0; i < CARD_NUM; i++) {
-        const item: Item = {
+        const item: CardItem = {
+          card: i,
           ngStyle: { width, height, zIndex: i },
           ngClass: {
             ['freecell_card']: true,
@@ -261,20 +352,21 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
         };
         cards.push(item);
       }
+      connect(...cards);
     }
     return cards;
   }
 
-  getCardTransform(lineIndex: number, cardIndex: number) {
+  getCardTransform(game: FreecellGameView, lineIndex: number, cardIndex: number) {
     const pos = this.layout.getCardPosition(lineIndex,
-      this.game.toSpot(cardIndex), this.game.getLine(lineIndex).length);
+      game.toSpot(cardIndex), game.getLine(lineIndex).length);
     return `translate(${toPercent(pos.x, this.layout.itemWidth)}, ${toPercent(pos.y, this.layout.itemHeight)})`;
   }
 
-  updateLine(index: number, transition: Transition = 'transition_norm') {
-    for (const cardIndex of this.game.getLine(index)) {
+  updateLine(game: FreecellGameView, index: number, transition: Transition = 'transition_norm') {
+    for (const cardIndex of game.getLine(index)) {
       const item = this.cards[cardIndex];
-      item.ngStyle.transform = this.getCardTransform(index, cardIndex);
+      item.ngStyle.transform = this.getCardTransform(game, index, cardIndex);
       setTransition(item.ngClass, transition);
     }
   }
@@ -298,5 +390,13 @@ export class FreecellDeckComponent implements OnInit, OnChanges {
       }
     }
     return -1;
+  }
+
+  activateOnGesture(event: Event) {
+    // console.log('Gesture:', event);
+    // SoundService is not activated by default to comply with the Chrome autoplay policy.
+    if (event.isTrusted) {
+      this.soundService.activate();
+    }
   }
 }

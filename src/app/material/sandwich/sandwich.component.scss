@@ -1,0 +1,42 @@
+div.sandwich-container {
+  // position: absolute;
+  // top: 0;
+  // bottom: 0;
+  // left: 0;
+  // right: 0;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap; /* default */
+  justify-content: flex-start; /* default */
+  align-items: stretch; /* default */
+}
+
+div.sandwich-header, div.sandwich-footer {
+  position: relative;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+div.sandwich-content {
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+.sandwich-button-move-down, .sandwich-button-move-up {
+  position: absolute;
+  right: 0;
+  color: #bccfe0;
+
+  &:hover {
+    color: white;
+  }
+}
+
+.sandwich-button-move-down {
+  bottom: 0;
+}
+
+.sandwich-button-move-up {
+  top: 0;
+}

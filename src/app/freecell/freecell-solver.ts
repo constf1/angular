@@ -12,11 +12,16 @@ export class FreecellSolver extends FreecellBasis {
   cardFilter?: Filter;
   destinationFilter?: Filter;
   cardToWatch = -1;
+  searchTime = 500; // ms
 
   private readonly done = new Set<string>();
   private readonly buffers: string[][] = [[], []];
   private iteration = 0;
   private path = '';
+
+  get doneSize() {
+    return this.done.size;
+  }
 
   // Default do-nothing implementation.
   onMove: (card: number, source: number, destination: number) => void =
@@ -48,10 +53,39 @@ export class FreecellSolver extends FreecellBasis {
     this.path = '';
   }
 
-  solve(): boolean {
+  prepare() {
     this.clear();
     this.done.add(this.toKey());
     this.buffers[0][0] = '';
+  }
+
+  nextIteration() {
+    const input = this.buffers[this.iteration % 2];
+    this.iteration++;
+
+    if (input.length <= 0) {
+      return false;
+    }
+
+    try {
+      for (const path of input) {
+        this.skipForward(path);
+        this.findMoves();
+        this.skipBackward();
+      }
+    } catch (err) {
+      return false;
+    }
+
+    // clear input
+    input.length = 0;
+
+    const output = this.buffers[this.iteration % 2];
+    return output.length > 0;
+  }
+
+  solve(): boolean {
+    this.prepare();
 
     const startTime = Date.now();
     try {
@@ -69,9 +103,9 @@ export class FreecellSolver extends FreecellBasis {
         // clear input
         input.length = 0;
 
-        if (Date.now() - startTime > 500) {
+        if (Date.now() - startTime > this.searchTime) {
           // It's time to stop the search.
-          console.log('Oops! Search timeout!');
+          // console.log(`Oops! Search timeout on ${this.iteration} iteration!`);
           this.stop(false);
         }
       }
@@ -82,7 +116,7 @@ export class FreecellSolver extends FreecellBasis {
         throw e;  // re-throw the error unchanged
       }
     } finally {
-      console.log('Searched: ' + this.done.size + '. Time (ms): ' + (Date.now() - startTime));
+      // console.log('Searched: ' + this.done.size + '. Time (ms): ' + (Date.now() - startTime));
     }
     return false;
   }
@@ -205,6 +239,38 @@ export class FreecellSolver extends FreecellBasis {
       }
     }
     return -1;
+  }
+
+  countEmptyCells(): number {
+    let count = 0;
+    for (let i = this.CELL_START; i < this.CELL_END; i++) {
+      if (this.desk[i].length === 0) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  countEmptyPiles(): number {
+    let count = 0;
+    for (let i = this.PILE_START; i < this.PILE_END; i++) {
+      if (this.desk[i].length === 0) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  countEmpty(): number {
+    return this.countEmptyCells() + this.countEmptyPiles();
+  }
+
+  countCardsInBases(): number {
+    let count = 0;
+    for (let i = this.BASE_START; i < this.BASE_END; i++) {
+      count += this.desk[i].length;
+    }
+    return count;
   }
 
   getBase(card: number): number {

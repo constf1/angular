@@ -1,6 +1,7 @@
 import { deck, isTableau, suitOf, rankOf, RANK_NUM } from '../common/deck';
 import { copy } from '../common/array-utils';
 import { FreecellBasis } from './freecell-basis';
+import { IFreecellMove } from './freecell-model';
 
 export class FreecellDesk extends FreecellBasis {
   private readonly desk: number[][] = [];
@@ -205,17 +206,45 @@ export class FreecellDesk extends FreecellBasis {
     // return false;
   }
 
-  findMoves(callback: (source: number, destination: number) => boolean) {
+  getMoves(): IFreecellMove[] {
+    const moves: IFreecellMove[] = [];
     for (let i = this.DESK_SIZE; i-- > 0;) {
       for (let j = i; j-- > 0;) {
-        if (i !== j) {
-          if ((this.isMoveValid(i, j) && callback(i, j)) || (this.isMoveValid(j, i) && callback(j, i))) {
-            return;
-          }
+        if (this.isMoveValid(i, j)) {
+          moves.push({ giver: i, taker: j });
+        }
+        if (this.isMoveValid(j, i)) {
+          moves.push({ giver: j, taker: i });
         }
       }
     }
+    return moves;
   }
+
+  // findMoves(callback: (source: number, destination: number) => boolean) {
+  //   for (let i = this.DESK_SIZE; i-- > 0;) {
+  //     for (let j = i; j-- > 0;) {
+  //       if (i !== j) {
+  //         if ((this.isMoveValid(i, j) && callback(i, j)) || (this.isMoveValid(j, i) && callback(j, i))) {
+  //           return true;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return false;
+  // }
+
+  // findMoveToBase(): { source: number, destination: number } | null {
+  //   let move = null;
+  //   this.findMoves((source, destination) => {
+  //     if (!this.isBase(source) && this.isBase(destination)) {
+  //       move = { source, destination };
+  //       return true;
+  //     }
+  //     return false;
+  //   });
+  //   return move;
+  // }
 }
 
 export type FreecellDeskView = Omit<FreecellDesk, 'moveCard' | 'deal' | 'addCard' | 'clear'>;

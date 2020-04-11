@@ -1,0 +1,63 @@
+<ng-template #actionButtons>
+  <app-freecell-action-buttons [noLabel]="noLabel"></app-freecell-action-buttons>
+</ng-template>
+
+<ng-template #history>
+  <div class="mat-typography padding-top-half-rem">
+    <app-freecell-history></app-freecell-history>
+  </div>
+</ng-template>
+
+<ng-template #settingsButton>
+  <button mat-icon-button (click)="settingsChange.emit()" style="margin-right: 40px;">
+    <mat-icon>settings</mat-icon>
+  </button>
+</ng-template>
+
+<ng-template #toolbarRow3>
+  <ng-container *ngTemplateOutlet="history"></ng-container>
+  <span class="flex-space-filler-1"></span>
+  <ng-container *ngTemplateOutlet="settingsButton"></ng-container>
+</ng-template>
+
+<ng-template #toolbarRow2>
+  <span class="flex-space-filler-1"></span>
+  <ng-container *ngTemplateOutlet="actionButtons"></ng-container>
+  <span class="flex-space-filler-1"></span>
+</ng-template>
+
+<ng-template #toolbarRow1>
+  <ng-container *ngTemplateOutlet="history"></ng-container>
+  <ng-container *ngTemplateOutlet="toolbarRow2"></ng-container>
+  <ng-container *ngTemplateOutlet="settingsButton"></ng-container>
+</ng-template>
+
+<app-sandwich
+  (sandwichOrderChange)="settings.set({ sandwichOrder: $event })"
+  [sandwichOrder]=settings.state.sandwichOrder
+  [hideFooter]="2 > rowNum"
+>
+  <mat-toolbar appSandwichHeader color="primary">
+    <mat-toolbar-row>
+      <span>Freecell</span>
+      <app-freecell-deal-menu style="margin-right: 20px;"></app-freecell-deal-menu>
+
+      <ng-container *ngIf="rowNum === 1">
+        <ng-container *ngTemplateOutlet="toolbarRow1"></ng-container>
+      </ng-container>
+      <ng-container *ngIf="rowNum === 2">
+        <ng-container *ngTemplateOutlet="toolbarRow2"></ng-container>
+      </ng-container>
+    </mat-toolbar-row>
+
+    <mat-toolbar-row *ngIf="rowNum >= 3">
+      <ng-container *ngTemplateOutlet="toolbarRow2"></ng-container>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <ng-content appSandwichContent></ng-content>
+
+  <mat-toolbar appSandwichFooter *ngIf="rowNum > 1" color="primary">
+    <ng-container *ngTemplateOutlet="toolbarRow3"></ng-container>
+  </mat-toolbar>
+</app-sandwich>

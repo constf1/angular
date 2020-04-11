@@ -1,35 +1,11 @@
-<mat-toolbar color="primary">
-  <mat-toolbar-row>
-    <span>Freecell #{{history.deal}}</span>
-    <span class="toolbar-spacer-1"></span>
-    <button mat-stroked-button (click)="onDeal()">
-      <mat-icon color="white">autorenew</mat-icon>
-      DEAL
-    </button>
-    <button mat-stroked-button [disabled]="!history.canUndo" (click)="onUndo()">
-      <mat-icon [color]="history.canUndo ? 'accent' : 'grey'">undo</mat-icon>
-      UNDO
-    </button>
-    <app-freecell-history class="toolbar-select mat-typography"
-      [items]="historyItems"
-      [selection]="historySelection"
-      (selectionChange)="onHistorySelectionChange($event)"
-    ></app-freecell-history>
-    <button mat-stroked-button [disabled]="!history.canRedo" (click)="onRedo()">
-      <mat-icon [color]="history.canRedo ? 'accent' : 'grey'">redo</mat-icon>
-      REDO
-    </button>
-    <button mat-stroked-button [disabled]="!nextMove" (click)="onAuto()">
-      <mat-icon [color]="nextMove ? 'warn' : 'grey'">emoji_objects</mat-icon>
-      AUTO
-    </button>
-    <span class="toolbar-spacer-2"></span>
-    <mat-icon class="toolbar-icon" color="warn">favorite</mat-icon>
-  </mat-toolbar-row>
-</mat-toolbar>
-<div class="main" #mainRef>
-  <app-ratio-keeper [width]="width" [height]="height" [ratio]="7/5">
-    <app-freecell-deck [layout]="layout" [game]="game" (lineChange)="onLineChange($event)">
-    </app-freecell-deck>
-  </app-ratio-keeper>
+<app-freecell-router></app-freecell-router>
+
+<div class="freecell-content" [style.padding-top.%]="settings.state.aspectRatio * 100">
+  <div class="freecell-content-outer">
+    <div class="freecell-content-inner">
+      <app-freecell-deck *ngIf="layout" [layout]="layout" (lineChange)="onLineChange($event)">
+        <ng-content></ng-content>
+      </app-freecell-deck>
+    </div>
+  </div>
 </div>

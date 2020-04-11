@@ -1,0 +1,56 @@
+button.sidenav-open-button {
+  position: absolute;
+  left: -64px;
+  top: 1px;
+  transition: left 2s 1s;
+
+  &.sidenav-open-button-active {
+    left: -12px;
+
+    @media (min-width: 600px) and (max-width: 959.99px) {
+      left: -9px;
+    }
+
+    @media (min-width: 960px) and (max-width: 1279.99px) {
+      left: -6px;
+    }
+
+    @media (min-width: 1280px) and (max-width: 1919.99px) {
+      left: -3px;
+    }
+
+    @media (min-width: 1920px) {
+      left: 0px;
+    }
+  }
+}
+
+.freecell-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.freecell-sidenav-container {
+  /* When the sidenav is not fixed, stretch the sidenav container to fill the available space. This
+     causes `<mat-sidenav-content>` to act as our scrolling element for desktop layouts. */
+  flex: 1;
+}
+
+$disabled-text: #b0bec5;
+$disabled-back: #eeeeee;
+
+.disabled-color {
+  color: $disabled-text;
+}
+
+button.mat-list-item-disabled {
+  &:focus {
+    background: $disabled-back;
+  }
+  color: $disabled-text;
+}

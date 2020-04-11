@@ -1,4 +1,4 @@
-span.history-item {
+div.history-item {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -12,6 +12,18 @@ span.history-item {
 .history-item-spades,
 .history-item-clubs {
   color: black;
+}
+
+.danger-very-low,
+.danger-low,
+.danger-moderate,
+.danger-high,
+.danger-very-high,
+.danger-extreme,
+.danger-critical {
+  min-width: 4em;
+  padding-left: .25em;
+  padding-right: .25em;
 }
 
 .danger-very-low {

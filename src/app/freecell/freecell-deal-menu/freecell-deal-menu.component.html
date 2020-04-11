@@ -1,0 +1,23 @@
+<mat-menu #appMenu="matMenu" xPosition="before">
+  <button mat-menu-item [disabled]="deal >= maxDeal" (click)="setDeal(deal + 1)">
+    <mat-icon>navigate_next</mat-icon>
+    <span>Next</span>
+  </button>
+  <button mat-menu-item [disabled]="minDeal >= deal" (click)="setDeal(deal - 1)">
+    <mat-icon>navigate_before</mat-icon>
+    <span>Previous</span>
+  </button>
+  <button mat-menu-item (click)="setRandomDeal()">
+    <mat-icon>casino</mat-icon>
+    <span>Random</span>
+  </button>
+</mat-menu>
+
+<button mat-button
+  [class.mat-list-item]="listItem"
+  [matMenuTriggerFor]="appMenu"
+  (menuOpened)="isMenuOpened=true"
+  (menuClosed)="isMenuOpened=false">
+  <label>{{dealLabel}}</label>
+  <mat-icon>{{isMenuOpened ? 'remove' : 'expand_more'}}</mat-icon>
+</button>

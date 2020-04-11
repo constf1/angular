@@ -50,10 +50,10 @@ export class FreecellLayout {
     this.itemWidth = cx;
     this.itemHeight = cy;
     this.deltaWidth = dx;
-    this.deltaHeight = dy;
+    this.deltaHeight = dy / 2;
 
     this.cellStartX = dx;
-    this.cellStartY = dy;
+    this.cellStartY = this.deltaHeight;
     this.cellEndX = this.cellStartX + basis.CELL_NUM * (cx + dx) - dx;
     this.cellEndY = this.cellStartY + cy;
 
@@ -63,9 +63,9 @@ export class FreecellLayout {
     this.baseEndY = this.cellEndY;
 
     this.pileStartX = dx;
-    this.pileStartY = this.cellEndY + dy;
+    this.pileStartY = this.cellEndY + this.deltaHeight; // dy;
     this.pileEndX = this.pileStartX + basis.PILE_NUM * (cx + dx) - dx;
-    this.pileEndY = this.pileStartY + 6 * cy;
+    this.pileEndY = this.pileStartY + 4.5 * cy;
   }
 
   getCellX(index: number): number {
@@ -139,7 +139,7 @@ export class FreecellLayout {
       if (cardCount > 0) {
         const dh = Math.min(
           (this.pileEndY - this.pileStartY - this.itemHeight) / (cardCount - 1),
-          this.deltaHeight
+          this.itemHeight * 0.4
         );
         pos.y += dh * cardIndex;
       }
