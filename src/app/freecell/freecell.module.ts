@@ -25,6 +25,7 @@ import { FreecellViewComponent } from './freecell-view/freecell-view.component';
 import { FreecellSettingsDialogComponent } from './freecell-settings-dialog/freecell-settings-dialog.component';
 import { FreecellHistoryComponent } from './freecell-history/freecell-history.component';
 import { FreecellDemoComponent } from './freecell-demo/freecell-demo.component';
+import { FreecellPlaygroundComponent } from './freecell-playground/freecell-playground.component';
 
 /**
  * Routes:
@@ -46,6 +47,7 @@ const routes: Routes = [
     FreecellSettingsDialogComponent,
     FreecellHistoryComponent,
     FreecellDemoComponent,
+    FreecellPlaygroundComponent,
   ],
   imports: [
     RouterModule.forChild(routes),

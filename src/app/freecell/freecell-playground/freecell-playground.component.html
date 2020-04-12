@@ -1,0 +1,15 @@
+<div class="freecell_deck"
+  [class.use-svg-background]="settings.state.deckUseSvg"
+  [class.freecell_deck_solved]="action.state.solved">
+  <ng-content select="[appFreecellBackground]"></ng-content>
+  <!-- spots -->
+  <div class="freecell_spot" *ngFor="let spot of spots; index as i"
+    [class.freecell_selection]="selection === i"
+    [ngClass]="spot.ngClass"
+    [ngStyle]="spot.ngStyle"
+    (click)="selectionChange.emit(selection === i ? -1 : i)"
+    matRipple [matRippleDisabled]="!settings.state.enableRipples"
+    #spot
+  ></div>
+  <ng-content select="[appFreecellForeground]"></ng-content>
+</div>

@@ -1,0 +1,163 @@
+@mixin bg_pos($index) {
+  $col: $index % 8;
+  $row: ($index - $col) / 8;
+  // grid with gaps
+  background-position: (18 * $col + 1) / (16 * 8) * 100% (18 * $row + 1) / (16 * 8) * 100%;
+}
+
+@mixin bg_rank($index) {
+  $i: $index * 4;
+  &.freecell_spades { @include bg_pos($i); }
+  &.freecell_diamonds { @include bg_pos($i + 1); }
+  &.freecell_clubs { @include bg_pos($i + 2); }
+  &.freecell_hearts { @include bg_pos($i + 3); }
+}
+
+.freecell_deck {
+  width:100%;
+  height:100%;
+  position: relative;
+
+  background:#ccffee url('../../../assets/freecell/bg-desk.jpg') repeat;
+}
+
+.freecell_spot, .freecell_card {
+  cursor: pointer;
+  position: absolute;
+
+  background-image: url('../../../assets/freecell/cards_3.png');
+
+  @media (min-width: 600px) and (max-width: 1279.99px) {
+    background-image: url('../../../assets/freecell/cards_2.png');
+  }
+
+  @media (max-width: 599.99px) {
+    background-image: url('../../../assets/freecell/cards_1.png');
+  }
+
+  background-size: 900% 900%;
+  background-repeat: no-repeat;
+
+  border-radius: 8.333% / 6.25%;
+}
+
+div.use-svg-background {
+  .freecell_spot, .freecell_card {
+    background-image: url('../../../assets/freecell/cards.svg');
+  }
+}
+
+.freecell_spot {
+  background-color: lightblue;
+
+  &.freecell_selection {
+    outline-style: dotted;
+    outline-color:darkgrey;
+    outline-width: medium;
+    &.freecell_base {
+      outline-color:#bb11a1;
+    }
+    &.freecell_cell {
+      outline-color:#3e8181;
+    }
+  }
+
+  &.freecell_pile { @include bg_pos(57); }
+  &.freecell_base { @include bg_rank(13); }
+  &.freecell_cell {
+    background-color: lightseagreen;
+    @include bg_pos(56);
+  }
+}
+
+.freecell_card {
+  background-color: #f4f4d8;
+  &.freecell_Ace { @include bg_rank(0); }
+  &.freecell_Two { @include bg_rank(1); }
+  &.freecell_Three { @include bg_rank(2); }
+  &.freecell_Four { @include bg_rank(3); }
+  &.freecell_Five { @include bg_rank(4); }
+  &.freecell_Six { @include bg_rank(5); }
+  &.freecell_Seven { @include bg_rank(6); }
+  &.freecell_Eight { @include bg_rank(7); }
+  &.freecell_Nine { @include bg_rank(8); }
+  &.freecell_Ten { @include bg_rank(9); }
+  &.freecell_Jack { @include bg_rank(10); }
+  &.freecell_Queen { @include bg_rank(11); }
+  &.freecell_King { @include bg_rank(12); }
+}
+
+@keyframes animation-card {
+  0%   {
+    left: 0%;
+    top: 0%;
+  }
+  25%  {
+    left: -4%;
+    top: 4%;
+  }
+  50%  {
+    left: 4%;
+    top: 4%;
+  }
+  75%  {
+    left: -4%;
+    top: -4%;
+  }
+  100% {
+    left: 0%;
+    top: 0%;
+  }
+}
+
+@keyframes animation-spot {
+  0%   {
+    opacity: 1;
+  }
+  25%  {
+    opacity: 0;
+  }
+  75%  {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+$animation-duration: 4s;
+$animation-delay: 0.5s;
+@mixin animation_order($order) {
+  $delta-delay: $order * 0.1s;
+  animation-delay: $animation-delay + $delta-delay;
+  animation-duration: $animation-duration - 2 * $delta-delay;
+}
+
+.freecell_deck_solved {
+  .freecell_card {
+    animation-name: animation-card;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+
+    &.freecell_Ace { @include animation_order(12); }
+    &.freecell_Two { @include animation_order(11); }
+    &.freecell_Three { @include animation_order(10); }
+    &.freecell_Four { @include animation_order(9); }
+    &.freecell_Five { @include animation_order(8); }
+    &.freecell_Six { @include animation_order(7); }
+    &.freecell_Seven { @include animation_order(6); }
+    &.freecell_Eight { @include animation_order(5); }
+    &.freecell_Nine { @include animation_order(4); }
+    &.freecell_Ten { @include animation_order(3); }
+    &.freecell_Jack { @include animation_order(2); }
+    &.freecell_Queen { @include animation_order(1); }
+    &.freecell_King { @include animation_order(0); }
+  }
+
+  .freecell_spot {
+    animation-name: animation-spot;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in-out;
+    @include animation_order(0);
+  }
+}
