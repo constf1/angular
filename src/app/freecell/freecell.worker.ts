@@ -3,7 +3,7 @@
 import { Autoplay } from '../common/autoplay';
 
 import { IFreecellWorkerInput, IFreecellWorkerOutput } from './freecell-worker-model';
-import { FreecellSolver } from './freecell-solver';
+import { FreecellSolver, FreecellSolution } from './freecell-solver';
 
 const player = new Autoplay(1);
 
@@ -31,12 +31,26 @@ addEventListener('message', (event: MessageEvent) => {
         }
       }
       if (success || solver.doneSize > data.searchThreshold) {
-        const replay: IFreecellWorkerOutput = { requestId, path: success ? solver.getPath() : '' };
-        postMessage(replay);
         solver.stop(success);
       }
     };
+
     solver.prepare();
-    player.play(() => solver.nextIteration());
+    player.play(() => {
+      let path = '';
+      let next = false;
+      try {
+        next = solver.nextIteration();
+      } catch (e) {
+        if (e instanceof FreecellSolution && e.success) {
+          path = solver.getPath();
+        }
+      }
+      if (!next) {
+        const replay: IFreecellWorkerOutput = { requestId, path };
+        postMessage(replay);
+      }
+      return next;
+    });
   }
 });

@@ -67,14 +67,10 @@ export class FreecellSolver extends FreecellBasis {
       return false;
     }
 
-    try {
-      for (const path of input) {
-        this.skipForward(path);
-        this.findMoves();
-        this.skipBackward();
-      }
-    } catch (err) {
-      return false;
+    for (const path of input) {
+      this.skipForward(path);
+      this.findMoves();
+      this.skipBackward();
     }
 
     // clear input
@@ -89,20 +85,7 @@ export class FreecellSolver extends FreecellBasis {
 
     const startTime = Date.now();
     try {
-
-      for (let input: string[]; (input = this.buffers[this.iteration % 2]).length > 0;) {
-        this.iteration++;
-        // const output = this.buffers[this.iteration % 2];
-
-        for (const path of input) {
-          this.skipForward(path);
-          this.findMoves();
-          this.skipBackward();
-        }
-
-        // clear input
-        input.length = 0;
-
+      while (this.nextIteration()) {
         if (Date.now() - startTime > this.searchTime) {
           // It's time to stop the search.
           // console.log(`Oops! Search timeout on ${this.iteration} iteration!`);
