@@ -9,34 +9,30 @@ import {
   ElementRef,
   EventEmitter,
   Renderer2,
-  OnChanges,
-  SimpleChanges
+  ViewChild
 } from '@angular/core';
 
-import { Dragger } from '../../common/dragger';
 import { toPercent } from '../../common/math-utils';
 import { suitFullNameOf, CARD_NUM, rankFullNameOf } from '../../common/deck';
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { Linkable, connect, append } from '../../common/linkable';
+import { DragListener } from '../../common/drag-listener';
 
 import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
 import { FreecellSettingsService } from '../services/freecell-settings.service';
 import { FreecellSoundService } from '../services/freecell-sound.service';
 
+import { Spot, FreecellPlaygroundComponent } from '../freecell-playground/freecell-playground.component';
+
 import { FreecellGameView } from '../freecell-game';
 import { FreecellLayout } from '../freecell-layout';
 import { countEqualMoves } from '../freecell-model';
 import { playToMark } from '../freecell-play';
 
-interface Item {
-  ngStyle: { [klass: string]: any };
-  ngClass: { [klass: string]: any };
-}
-
 export interface LineChangeEvent {
   source: number;
-  tableau: number[];
+  tableau: Readonly<number[]>;
   destination?: number;
 }
 
@@ -50,47 +46,79 @@ function setTransition(classNames: TransitionMap, transition?: Transition) {
   }
 }
 
-class MyDragger extends Dragger {
-  dragged = false;
-  constructor(screenX: number, screenY: number, renderer: Renderer2) {
-    super(screenX, screenY, renderer);
-  }
+function translate(x: number, y: number, units: string = 'px') {
+  return `translate(${x}${units}, ${y}${units})`;
 }
 
-type CardItem = Item & Linkable<CardItem> & { card: number };
+function overlap(min1: number, max1: number, min2: number, max2: number): number {
+  return Math.min(max1, max2) - Math.max(min1, min2);
+}
+
+function overlapSquare(rc1: DOMRect, rc2: DOMRect): number {
+  let sq = overlap(rc1.left, rc1.right, rc2.left, rc2.right);
+  if (sq > 0) {
+    sq *= overlap(rc1.top, rc1.bottom, rc2.top, rc2.bottom);
+  }
+  return sq > 0 ? sq : 0;
+}
+
+type CardItem = Spot & Linkable<CardItem> & { card: number };
+
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface DragData {
+  game: FreecellGameView;
+  tableau: Readonly<number[]>;
+  transforms: Readonly<Position[]>;
+  dragged?: boolean;
+}
 
 @Component({
   selector: 'app-freecell-deck',
   templateUrl: './freecell-deck.component.html',
   styleUrls: ['./freecell-deck.component.scss']
 })
-export class FreecellDeckComponent extends UnsubscribableComponent implements OnInit, OnChanges {
-  @Input() layout: FreecellLayout;
-  @Output() lineChange = new EventEmitter<LineChangeEvent>();
-  @ViewChildren('elements') elementList: QueryList<ElementRef<HTMLElement>>;
-
-  items: Item[] = [];
-  spots: Item[] = [];
-  cards: CardItem[] = [];
-
-  solved = false;
-
-  private _spotSelection = -1;
-  private _dragger: MyDragger | null = null;
+export class FreecellDeckComponent extends UnsubscribableComponent implements OnInit {
+  private _dragListener = new DragListener<DragData>();
   private _emptySpotCount = 0;
+  private _layout: FreecellLayout;
+
+  public get layout(): FreecellLayout {
+    return this._layout;
+  }
+  @Input()
+  public set layout(value: FreecellLayout) {
+    if (this._layout !== value) {
+      this._layout = value;
+      if (this.layout) {
+        this.cards = this.createCards();
+        this.onDeal();
+      }
+    }
+  }
+
+  @Output() lineChange = new EventEmitter<LineChangeEvent>();
+  @ViewChildren('cards') cardList: QueryList<ElementRef<HTMLElement>>;
+  @ViewChild(FreecellPlaygroundComponent) playground: FreecellPlaygroundComponent;
+
+  cards: CardItem[] = [];
+  spotSelection = -1;
 
   constructor(
     public settings: FreecellSettingsService,
     public soundService: FreecellSoundService,
     private _renderer: Renderer2,
     private _playService: FreecellAutoplayService,
-    private _gameService: FreecellGameService) {
+    private _gameService: FreecellGameService
+    ) {
     super();
   }
 
   ngOnInit() {
     this._addSubscription(this._gameService.stateChange.subscribe(state => {
-      this.solved = this._gameService.game.isSolved();
       if (this.layout) {
         if (state.deal !== this._gameService.previous.deal) {
           this.onDeal();
@@ -99,117 +127,152 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
         }
       }
     }));
-  }
 
-  ngOnChanges(changes: SimpleChanges) {
-    // console.log('app-freecell.ngOnChanges', changes);
-    if (changes.layout && changes.layout.currentValue) {
-      this.spots = this.createSpots();
-      this.cards = this.createCards();
-      this.items = this.spots.concat(this.cards);
-      this.onDeal();
-    }
+    this._addSubscription(this._dragListener.dragChange.subscribe(event => {
+      switch (event) {
+        case 'DragStart':
+          this._onDragStart();
+          break;
+        case 'DragMove':
+          this._onDragMove();
+          break;
+        case 'DragStop':
+          this._onDragStop();
+          break;
+      }
+    }));
   }
 
   trackByIndex(index: number): number {
     return index;
   }
 
-  setSpotSelection(index: number) {
-    if (this._spotSelection >= 0) {
-      this.spots[this._spotSelection].ngClass.freecell_selection = false;
+  getTransforms(tableau: Readonly<number[]>): { x: number, y: number }[] {
+    const D = 100;
+    const transforms: { x: number, y: number }[] = [];
+
+    const elements = this.cardList.toArray();
+    const rc0 = elements[tableau[0]].nativeElement.parentElement.getBoundingClientRect();
+    const rc1 = elements[tableau[0]].nativeElement.getBoundingClientRect();
+
+    const left = rc1.left - rc0.left;
+    const top = rc1.top - rc0.top;
+    const dx = 0;
+    const dy = rc1.height / 3;
+
+    for (let i = tableau.length; i-- > 0;) {
+      const x = Math.round((left + dx * i) * D) / D;
+      const y = Math.round((top + dy * i) * D) / D;
+      transforms[i] = { x, y };
     }
-    this._spotSelection = index;
-    if (this._spotSelection >= 0) {
-      this.spots[this._spotSelection].ngClass.freecell_selection = true;
-    }
+    return transforms;
+  }
+
+  onTouchStart(event: TouchEvent, index: number) {
+    this._playService.stop();
+    // console.log('Touch Start:', index);
+    event.preventDefault();
+
+    const game = this._gameService.game;
+    const tableau = game.asTablaeu(index);
+    const transforms = this.getTransforms(tableau);
+
+    this._dragListener.touchStart(event, { game, tableau, transforms });
+  }
+
+  onTouchEnd(event: TouchEvent, index: number) {
+    // console.log('Touch End:', index);
+    event.preventDefault();
+    this._dragListener.stop();
+  }
+
+  onTouchCancel(event: TouchEvent, index: number) {
+    // console.log('Touch Cancel:', index);
+    event.preventDefault();
+    this._dragListener.stop();
+  }
+
+  onTouchMove(event: TouchEvent, index: number) {
+    // console.log('Touch Move:', index);
+    // console.table(event.changedTouches);
+    // Call preventDefault() to prevent any further handling
+    event.preventDefault();
+    this._dragListener.touchMove(event);
   }
 
   onMouseDown(event: MouseEvent, index: number) {
     this._playService.stop();
 
-    // console.log('Mousedown:', index);
+    console.log('Mousedown:', index);
     if (event.button !== 0) {
       return;
     }
     event.preventDefault();
-    if (!this._dragger) {
-      if (index < this.spots.length) {
-        this.setSpotSelection(this._spotSelection === index ? -1 : index);
-      } else {
-        const game = this._gameService.game;
 
-        const cardIndex = index - this.spots.length;
-        const tableau = game.asTablaeu(cardIndex);
+    const game = this._gameService.game;
+    const tableau = game.asTablaeu(index);
+    const transforms = this.getTransforms(tableau);
 
-        this._dragger = new MyDragger(event.screenX, event.screenY, this._renderer);
-        this.onDragStart(tableau);
-        this._dragger.onDrag = () => this.onDrag(game, tableau);
-        this._dragger.onDragEnd = ev => {
-          this.onDragEnd(game, tableau);
-
-          if (this._dragger.dragged) {
-            const destination = this.findDestination(index, ev.clientX, ev.clientY);
-            if (destination >= 0) {
-              const srcLine = game.toLine(cardIndex);
-              const dstLine =
-                destination < this.spots.length
-                  ? destination
-                  : game.toLine(destination - this.spots.length);
-              if (srcLine !== dstLine) {
-                // this.setSpotSelection(-1);
-                this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
-              }
-            }
-          } else {
-            const srcLine = game.toLine(cardIndex);
-            const dstLine = this._spotSelection >= 0 ? this._spotSelection : undefined;
-            // this.setSpotSelection(-1);
-            this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
-          }
-
-          this._dragger = null;
-        };
-      }
-    }
+    this._dragListener.mouseStart(event, this._renderer, { game, tableau, transforms });
   }
 
-  onDragStart(tableau: Readonly<number[]>) {
-    for (const cardIndex of tableau) {
-      const card = this.cards[cardIndex];
-      // card.ngStyle.zIndex = (card.ngStyle.zIndex % CARD_NUM) + CARD_NUM;
+  private _onDragStart() {
+    const { tableau, transforms } = this._dragListener.data;
+
+    for (let i = tableau.length; i-- > 0;) {
+      const card = this.cards[tableau[i]];
       card.ngStyle.zIndex += CARD_NUM;
-      card.ngClass.dragged = true;
+      card.ngStyle.transform = translate(transforms[i].x, transforms[i].y);
+      card.ngClass.grabbing = true;
+      setTransition(card.ngClass);
     }
   }
 
-  onDrag(game: FreecellGameView, tableau: Readonly<number[]>) {
-    for (const index of tableau) {
-      const card = this.cards[index];
-      card.ngStyle.transform =
-        this.getCardTransform(game, game.toLine(index), index)
-        + ' '
-        + `translate(${this._dragger.deltaX}px, ${this._dragger.deltaY}px)`;
+  private _onDragMove() {
+    const { tableau, transforms } = this._dragListener.data;
+    const dx = this._dragListener.deltaX;
+    const dy = this._dragListener.deltaY;
+
+    for (let i = tableau.length; i-- > 0;) {
+      const card = this.cards[tableau[i]];
+      card.ngClass.dragging = true;
+      card.ngStyle.transform = translate(transforms[i].x + dx, transforms[i].y + dy);
     }
-    if (Math.abs(this._dragger.deltaX) > 4 || Math.abs(this._dragger.deltaY) > 4) {
-      this._dragger.dragged = true;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      this._dragListener.data.dragged = true;
     }
   }
 
-  onDragEnd(game: FreecellGameView, tableau: Readonly<number[]>) {
+  private _onDragStop() {
+    const { game, tableau, dragged } = this._dragListener.data;
+
     for (const index of tableau) {
       const card = this.cards[index];
-      const lineIndex = game.toLine(index);
 
       card.ngStyle.zIndex -= CARD_NUM;
-      card.ngStyle.transform = this.getCardTransform(game, lineIndex, index);
-      delete card.ngClass.dragged;
+      card.ngStyle.transform = this.getCardTransform(game, game.toLine(index), index);
+      delete card.ngClass.grabbing;
+      delete card.ngClass.dragging;
       setTransition(card.ngClass, 'transition_fast');
+    }
+
+    if (dragged) {
+      const dstLine = this.getDestination(game, tableau);
+      if (dstLine >= 0) {
+        const srcLine = game.toLine(tableau[0]);
+        if (srcLine !== dstLine) {
+          this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
+        }
+      }
+    } else {
+      const srcLine = game.toLine(tableau[0]);
+      const dstLine = this.spotSelection >= 0 ? this.spotSelection : undefined;
+      this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
     }
   }
 
   onDeal() {
-    this.setSpotSelection(-1);
+    this.spotSelection = -1;
     const game = this._gameService.game;
 
     this._emptySpotCount = Math.max(game.CELL_NUM, game.countEmpty());
@@ -243,7 +306,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   onCardMove() {
-    this.setSpotSelection(-1);
+    this.spotSelection = -1;
     const newState = this._gameService.state;
     const oldState = this._gameService.previous;
 
@@ -298,41 +361,6 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     }
   }
 
-  createSpots(): Item[] {
-    const placeholders: Item[] = [];
-    const layout = this.layout;
-    if (layout) {
-      const basis = layout.basis;
-      const itemWidth = layout.itemWidth;
-      const itemHeight = layout.itemHeight;
-
-      const width = toPercent(itemWidth, layout.width);
-      const height = toPercent(itemHeight, layout.height);
-
-      for (let i = 0; i < basis.DESK_SIZE; i++) {
-        const pos = layout.getSpotPosition(i);
-        const transform = `translate(${toPercent(pos.x, itemWidth)}, ${toPercent(pos.y, itemHeight)})`;
-
-        const item: Item = {
-          ngStyle: { transform, width, height },
-          ngClass: { freecell_spot: true }
-        };
-
-        if (basis.isBase(i)) {
-          item.ngClass.freecell_base = true;
-          item.ngClass['freecell_' + suitFullNameOf(i - basis.BASE_START)] = true;
-        } else if (basis.isCell(i)) {
-          item.ngClass.freecell_cell = true;
-        } else if (basis.isPile(i)) {
-          item.ngClass.freecell_pile = true;
-        }
-
-        placeholders.push(item);
-      }
-    }
-    return placeholders;
-  }
-
   createCards(): CardItem[] {
     const cards: CardItem[] = [];
     const layout = this.layout;
@@ -371,25 +399,39 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     }
   }
 
-  findDestination(source: number, clientX: number, clientY: number): number {
-    if (this.elementList) {
-      const children = this.elementList.toArray();
-      for (let i = children.length; i-- > 0;) {
-        if (i !== source) {
-          const rc = children[i].nativeElement.getBoundingClientRect();
-          if (
-            rc.left <= clientX &&
-            clientX <= rc.right &&
-            rc.top <= clientY &&
-            clientY <= rc.bottom
-          ) {
-            // console.log("Collision at: " + i);
-            return i;
+  getDestination(game: FreecellGameView, tableau: Readonly<number[]>): number {
+    let sqMax = 0;
+    let destination = -1;
+    if (tableau.length > 0) {
+      if (this.cardList) {
+        const cards = this.cardList.toArray();
+        const rcSrc = cards[tableau[0]].nativeElement.getBoundingClientRect();
+        // Test cards.
+        for (let i = cards.length; i-- > 0;) {
+          if (tableau.indexOf(i) < 0) {
+            const rcDst = cards[i].nativeElement.getBoundingClientRect();
+            const sq = overlapSquare(rcSrc, rcDst);
+            if (sq > sqMax) {
+              sqMax = sq;
+              destination = game.toLine(i);
+            }
+          }
+        }
+        // Test spots.
+        if (this.playground?.spotList) {
+          const spots = this.playground.spotList.toArray();
+          for (let i = spots.length; i-- > 0;) {
+            const rcDst = spots[i].nativeElement.getBoundingClientRect();
+            const sq = overlapSquare(rcSrc, rcDst);
+            if (sq > sqMax) {
+              sqMax = sq;
+              destination = i;
+            }
           }
         }
       }
     }
-    return -1;
+    return destination;
   }
 
   activateOnGesture(event: Event) {

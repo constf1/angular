@@ -1,14 +1,21 @@
 <div *ngIf="soundService.enabled && !soundService.activated" appGesture (userGesture)="activateOnGesture($event)"></div>
 
-<div class="freecell_deck"
-  [class.use-svg-background]="settings.state.deckUseSvg"
-  [class.freecell_deck_solved]="solved">
-  <ng-content></ng-content>
-  <div matRipple *ngFor="let item of items; index as i; trackBy: trackByIndex"
-    [matRippleDisabled]="!settings.state.enableRipples"
-    [ngClass]="item.ngClass"
-    [ngStyle]="item.ngStyle"
-    (mousedown)="onMouseDown($event, i)"
-    #elements
-  ></div>
-</div>
+<app-freecell-playground [layout]="layout" [(selection)]="spotSelection">
+  <ng-content appFreecellBackground ></ng-content>
+  <ng-container appFreecellForeground>
+    <!-- cards -->
+    <div matRipple *ngFor="let card of cards; index as i; trackBy: trackByIndex"
+      [matRippleDisabled]="!settings.state.enableRipples"
+      [ngClass]="card.ngClass"
+      [ngStyle]="card.ngStyle"
+
+      (mousedown)="onMouseDown($event, i)"
+      (touchstart)="onTouchStart($event, i)"
+      (touchend)="onTouchEnd($event, i)"
+      (touchcancel)="onTouchCancel($event, i)"
+      (touchmove)="onTouchMove($event, i)"
+
+      #cards
+    ></div>
+  </ng-container>
+</app-freecell-playground>
