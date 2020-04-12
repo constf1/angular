@@ -203,7 +203,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   onMouseDown(event: MouseEvent, index: number) {
     this._playService.stop();
 
-    console.log('Mousedown:', index);
+    // console.log('Mousedown:', index);
     if (event.button !== 0) {
       return;
     }
