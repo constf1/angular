@@ -12,6 +12,7 @@ import { IFreecellWorkerInput, IFreecellWorkerOutput, IFreecellWorkerMessage } f
 import { FreecellSettingsService } from './freecell-settings.service';
 
 export interface FreecellActionState {
+  solved: boolean;
   canAssist: boolean;
   canUndo: boolean;
   canRedo: boolean;
@@ -20,25 +21,13 @@ export interface FreecellActionState {
 }
 
 const initialValue: Readonly<FreecellActionState> = {
+  solved: false,
   canAssist: false,
   canUndo: false,
   canRedo: false,
   nextMove: null,
   assistRequest: null
 } as const;
-
-// let worker: Worker = null;
-// if (typeof Worker !== 'undefined') {
-//   // Create a new web worker.
-//   worker = new Worker('../freecell.worker', { type: 'module' });
-//   worker.onmessage = ({ data }) => {
-//     console.log(`page got message: ${data}`);
-//   };
-//   worker.postMessage('hello');
-// } else {
-//   // Web workers are not supported in this environment.
-//   // You should add a fallback so that your program still executes correctly.
-// }
 
 const ACTION_CLOSE = String.fromCharCode(0x0D7); // MULTIPLICATION SIGN
 
@@ -64,15 +53,18 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
     this._addSubscription(this._gameService.stateChange.subscribe(state => {
       const nextState = { ...initialValue };
       const game = this._gameService.game;
-      const count = game.countEmpty();
+      nextState.solved = game.isSolved();
 
-      if (count < game.PILE_NUM + game.CELL_NUM) {
-        const moves = game.getMoves();
-        nextState.canAssist = !!this._worker && moves.length > 0 && count <= game.CELL_NUM;
-        for (const move of moves) {
-          if (game.isBase(move.taker)) {
-            nextState.nextMove = move;
-            break;
+      if (!nextState.solved) {
+        const count = game.countEmpty();
+        if (count < game.PILE_NUM + game.CELL_NUM) {
+          const moves = game.getMoves();
+          nextState.canAssist = !!this._worker && moves.length > 0 && count <= game.CELL_NUM;
+          for (const move of moves) {
+            if (game.isBase(move.taker)) {
+              nextState.nextMove = move;
+              break;
+            }
           }
         }
       }
@@ -186,6 +178,9 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
           this._set({ assistRequest: initialValue.assistRequest });
         }
       };
+    } else {
+      // Web workers are not supported in this environment.
+      // TODO: Add a fallback so that the program can hide any assist option.
     }
   }
 }
