@@ -57,7 +57,7 @@ export class FreecellGame extends FreecellDesk {
     return tableau;
   }
 
-  getBestPath(tableau: number[], destination: number): string {
+  getBestPath(tableau: Readonly<number[]>, destination: number): string {
     // Validity checks:
     if (tableau.length <= 0) {
       return '';
@@ -105,7 +105,7 @@ export class FreecellGame extends FreecellDesk {
     return '';
   }
 
-  solveFor(tableau: number[], source: number): string {
+  solveFor(tableau: Readonly<number[]>, source: number): string {
     // Validity checks:
     if (this.getLine(source).length <= 0) {
       return '';
