@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 
 import { StateSubject } from '../../common/state-subject';
+import { SubType } from '../../common/types';
 
 export const FreecellSettingsViewTypes = ['sidenav', 'sandwich'] as const;
 export type FreecellSettingsView = typeof FreecellSettingsViewTypes[number];
@@ -53,8 +54,6 @@ export const initialState: Readonly<FreecellSettingsState> = {
 
   inputMode: InputMode.All
 };
-
-type SubType<A, T> = Pick<A, { [K in keyof A]: A[K] extends T ? K : never }[keyof A]>;
 
 export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.40,
