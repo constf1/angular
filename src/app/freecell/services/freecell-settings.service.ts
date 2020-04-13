@@ -7,6 +7,13 @@ import { StateSubject } from '../../common/state-subject';
 export const FreecellSettingsViewTypes = ['sidenav', 'sandwich'] as const;
 export type FreecellSettingsView = typeof FreecellSettingsViewTypes[number];
 
+export enum InputMode {
+  Mouse = 0b001,
+  Touch = 0b010,
+  Keyboard = 0b100,
+  All = 0b111
+}
+
 export interface FreecellSettingsState {
   view: FreecellSettingsView;
   aspectRatio: number;
@@ -23,6 +30,8 @@ export interface FreecellSettingsState {
   enableRipples: boolean;
 
   assistLevel: number;
+
+  inputMode: number;
 }
 
 export const initialState: Readonly<FreecellSettingsState> = {
@@ -41,6 +50,8 @@ export const initialState: Readonly<FreecellSettingsState> = {
   enableRipples: true,
 
   assistLevel: 1000000,
+
+  inputMode: InputMode.All
 };
 
 type SubType<A, T> = Pick<A, { [K in keyof A]: A[K] extends T ? K : never }[keyof A]>;
@@ -49,12 +60,14 @@ export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.40,
   assistLevel: 20000,
   sandwichOrder: 0,
+  inputMode: 0
 };
 
 export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.70,
   assistLevel: 2000000,
   sandwichOrder: 5,
+  inputMode: InputMode.All
 };
 
 const KEY = '[FreecellSettingsState]';

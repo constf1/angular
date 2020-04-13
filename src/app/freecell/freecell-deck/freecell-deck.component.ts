@@ -12,7 +12,7 @@ import {
   ViewChild
 } from '@angular/core';
 
-import { toPercent } from '../../common/math-utils';
+import { toPercent, overlapArea } from '../../common/math-utils';
 import { suitFullNameOf, CARD_NUM, rankFullNameOf } from '../../common/deck';
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { Linkable, connect, append } from '../../common/linkable';
@@ -20,7 +20,7 @@ import { DragListener } from '../../common/drag-listener';
 
 import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
-import { FreecellSettingsService } from '../services/freecell-settings.service';
+import { FreecellSettingsService, InputMode } from '../services/freecell-settings.service';
 import { FreecellSoundService } from '../services/freecell-sound.service';
 
 import { Spot, FreecellPlaygroundComponent } from '../freecell-playground/freecell-playground.component';
@@ -48,18 +48,6 @@ function setTransition(classNames: TransitionMap, transition?: Transition) {
 
 function translate(x: number, y: number, units: string = 'px') {
   return `translate(${x}${units}, ${y}${units})`;
-}
-
-function overlap(min1: number, max1: number, min2: number, max2: number): number {
-  return Math.min(max1, max2) - Math.max(min1, min2);
-}
-
-function overlapSquare(rc1: DOMRect, rc2: DOMRect): number {
-  let sq = overlap(rc1.left, rc1.right, rc2.left, rc2.right);
-  if (sq > 0) {
-    sq *= overlap(rc1.top, rc1.bottom, rc2.top, rc2.bottom);
-  }
-  return sq > 0 ? sq : 0;
 }
 
 type CardItem = Spot & Linkable<CardItem> & { card: number };
@@ -106,6 +94,16 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   cards: CardItem[] = [];
   spotSelection = -1;
+
+  get isTouchDisabled() {
+    // tslint:disable-next-line: no-bitwise
+    return !(this.settings.state.inputMode & InputMode.Touch);
+  }
+
+  get isMouseDisabled() {
+    // tslint:disable-next-line: no-bitwise
+    return !(this.settings.state.inputMode & InputMode.Mouse);
+  }
 
   constructor(
     public settings: FreecellSettingsService,
@@ -169,6 +167,9 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   onTouchStart(event: TouchEvent, index: number) {
+    if (this.isTouchDisabled) {
+      return;
+    }
     this._playService.stop();
     // console.log('Touch Start:', index);
     event.preventDefault();
@@ -181,18 +182,27 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   onTouchEnd(event: TouchEvent, index: number) {
+    if (this.isTouchDisabled) {
+      return;
+    }
     // console.log('Touch End:', index);
     event.preventDefault();
     this._dragListener.stop();
   }
 
   onTouchCancel(event: TouchEvent, index: number) {
+    if (this.isTouchDisabled) {
+      return;
+    }
     // console.log('Touch Cancel:', index);
     event.preventDefault();
     this._dragListener.stop();
   }
 
   onTouchMove(event: TouchEvent, index: number) {
+    if (this.isTouchDisabled) {
+      return;
+    }
     // console.log('Touch Move:', index);
     // console.table(event.changedTouches);
     // Call preventDefault() to prevent any further handling
@@ -201,6 +211,9 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   onMouseDown(event: MouseEvent, index: number) {
+    if (this.isMouseDisabled) {
+      return;
+    }
     this._playService.stop();
 
     // console.log('Mousedown:', index);
@@ -217,6 +230,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   private _onDragStart() {
+    // this._playService.lock();
     const { tableau, transforms } = this._dragListener.data;
 
     for (let i = tableau.length; i-- > 0;) {
@@ -244,6 +258,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   }
 
   private _onDragStop() {
+    // this._playService.unlock();
     const { game, tableau, dragged } = this._dragListener.data;
 
     for (const index of tableau) {
@@ -410,7 +425,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
         for (let i = cards.length; i-- > 0;) {
           if (tableau.indexOf(i) < 0) {
             const rcDst = cards[i].nativeElement.getBoundingClientRect();
-            const sq = overlapSquare(rcSrc, rcDst);
+            const sq = overlapArea(rcSrc, rcDst);
             if (sq > sqMax) {
               sqMax = sq;
               destination = game.toLine(i);
@@ -422,7 +437,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
           const spots = this.playground.spotList.toArray();
           for (let i = spots.length; i-- > 0;) {
             const rcDst = spots[i].nativeElement.getBoundingClientRect();
-            const sq = overlapSquare(rcSrc, rcDst);
+            const sq = overlapArea(rcSrc, rcDst);
             if (sq > sqMax) {
               sqMax = sq;
               destination = i;

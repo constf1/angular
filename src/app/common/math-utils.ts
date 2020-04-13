@@ -3,6 +3,19 @@ import { padLeft } from './string-utils';
 /**
  * Miscellaneous math utilities.
  */
+export function overlap(min1: number, max1: number, min2: number, max2: number): number {
+  return Math.min(max1, max2) - Math.max(min1, min2);
+}
+
+type Rect = Pick<DOMRect, 'left' | 'right' | 'top' | 'bottom'>;
+
+export function overlapArea(rc1: Rect, rc2: Rect): number {
+  let sq = overlap(rc1.left, rc1.right, rc2.left, rc2.right);
+  if (sq > 0) {
+    sq *= overlap(rc1.top, rc1.bottom, rc2.top, rc2.bottom);
+  }
+  return sq > 0 ? sq : 0;
+}
 
 export function toPercent(numerator: number, denominator: number = 100, fractionDigits: number = 3): string {
   return (numerator * 100 / denominator).toFixed(fractionDigits) + '%';
