@@ -109,15 +109,11 @@ export class DragListener<T> {
 
   stop() {
     // clean up
-    if (this._listeners.length > 0) {
+    if (this._listeners.length > 0 || !isNaN(this._touchId)) {
       for (const listener of this._listeners) {
         listener();
       }
       this._listeners.length = 0;
-      this._events.next('DragStop');
-    }
-
-    if (!isNaN(this._touchId)) {
       this._touchId = NaN;
       this._events.next('DragStop');
     }
