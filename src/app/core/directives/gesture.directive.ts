@@ -4,14 +4,15 @@ import { Directive, Output, EventEmitter, HostListener } from '@angular/core';
   selector: '[appGesture]'
 })
 export class GestureDirective {
-  @Output() userGesture = new EventEmitter<KeyboardEvent | MouseEvent>();
+  @Output() userGesture = new EventEmitter<KeyboardEvent | MouseEvent | TouchEvent>();
 
   constructor() { }
 
   @HostListener('window:keydown', ['$event'])
+  @HostListener('window:touchstart', ['$event'])
   @HostListener('window:mousedown', ['$event'])
   @HostListener('window:click', ['$event'])
-  handle(event: KeyboardEvent | MouseEvent) {
+  handle(event: KeyboardEvent | MouseEvent | TouchEvent) {
     this.userGesture.emit(event);
   }
 }
