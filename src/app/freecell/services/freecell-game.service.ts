@@ -18,11 +18,6 @@ export const initialState: IFreecellReplay = {
 @Injectable()
 export class FreecellGameService extends UnsubscribableStateSubject<IFreecellReplay> {
   private _game: FreecellGameView = null;
-  private _lastState = initialState;
-
-  get previous() {
-    return this._lastState;
-  }
 
   get deal() {
     return this.state.deal;
@@ -64,7 +59,7 @@ export class FreecellGameService extends UnsubscribableStateSubject<IFreecellRep
 
   constructor(basis: FreecellBasisService) {
     super(initialState);
-    this._addSubscription(basis.stateChange.subscribe(state => {
+    this._addSubscription(basis.subscribe(state => {
       this._set({ ...state });
     }));
   }
@@ -85,7 +80,6 @@ export class FreecellGameService extends UnsubscribableStateSubject<IFreecellRep
       // Get ready to state update.
       // new state -> new game
       this._game = null;
-      this._lastState = this.state;
     }
     return state;
   }

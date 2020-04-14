@@ -50,7 +50,7 @@ export class FreecellActionService extends UnsubscribableStateSubject<FreecellAc
 
     this._createWorker();
 
-    this._addSubscription(this._gameService.stateChange.subscribe(state => {
+    this._addSubscription(this._gameService.subscribe(state => {
       const nextState = { ...initialValue };
       const game = this._gameService.game;
       nextState.solved = game.isSolved();

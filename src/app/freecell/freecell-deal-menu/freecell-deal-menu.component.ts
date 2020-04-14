@@ -28,7 +28,7 @@ export class FreecellDealMenuComponent extends UnsubscribableComponent implement
   }
 
   ngOnInit(): void {
-    this._addSubscription(this._gameService.stateChange.subscribe(state => {
+    this._addSubscription(this._gameService.subscribe(state => {
       // console.log('State:', state);
       this.deal = state.deal;
       this.dealLabel = '#' + (this.deal >= 0

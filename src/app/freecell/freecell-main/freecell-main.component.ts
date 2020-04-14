@@ -26,7 +26,7 @@ export class FreecellMainComponent extends UnsubscribableComponent implements On
     private _playService: FreecellAutoplayService,
     basisService: FreecellBasisService) {
     super();
-    this._addSubscription(basisService.stateChange.subscribe(_state => this.layout = new FreecellLayout(basisService.basis)));
+    this._addSubscription(basisService.subscribe(_state => this.layout = new FreecellLayout(basisService.basis)));
   }
 
   ngOnInit() {

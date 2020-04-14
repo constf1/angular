@@ -151,7 +151,7 @@ export class FreecellSoundService extends UnsubscribableComponent {
   constructor(settings: FreecellSettingsService) {
     super();
 
-    this._addSubscription(settings.stateChange.subscribe(state => {
+    this._addSubscription(settings.subscribe(state => {
       if (state.enableSound) {
         this.enable();
       } else {

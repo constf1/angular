@@ -121,8 +121,8 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
       };
     }
 
-    this._addSubscription(this._gameService.stateChange.subscribe(state => {
-      if (state.deal !== this._gameService.previous.deal) {
+    this._addSubscription(this._gameService.subscribe(state => {
+      if (this._gameService.isFirstChange || state.deal !== this._gameService.previousState?.deal) {
         this.isSolved = false;
         this.items.length = 0;
       }

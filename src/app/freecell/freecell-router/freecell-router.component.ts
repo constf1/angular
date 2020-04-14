@@ -67,7 +67,7 @@ export class FreecellRouterComponent extends UnsubscribableComponent implements 
     // console.log('Params:', params);
 
     this._lock = true; // lock until the first route update
-    this._addSubscription(this._gameService.stateChange.subscribe(state => {
+    this._addSubscription(this._gameService.subscribe(state => {
       if (!this._lock &&
         (this.deal !== state.deal || this.path !== state.path || this.mark !== state.mark)) {
         this.deal = state.deal;
