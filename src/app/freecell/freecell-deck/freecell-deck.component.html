@@ -1,7 +1,9 @@
 <div *ngIf="soundService.enabled && !soundService.activated" appGesture (userGesture)="activateOnGesture($event)"></div>
 
 <app-freecell-playground [layout]="layout" [(selection)]="spotSelection">
-  <ng-content appFreecellBackground ></ng-content>
+  <ng-container appFreecellBackground>
+    <ng-content select="[appFreecellBackground]"></ng-content>
+  </ng-container>
   <ng-container appFreecellForeground>
     <!-- cards -->
     <div matRipple *ngFor="let card of cards; index as i; trackBy: trackByIndex"
@@ -17,5 +19,6 @@
 
       #cards
     ></div>
+    <ng-content select="[appFreecellForeground]"></ng-content>
   </ng-container>
 </app-freecell-playground>

@@ -4,7 +4,9 @@
   <div class="freecell-content-outer">
     <div class="freecell-content-inner">
       <app-freecell-deck *ngIf="layout" [layout]="layout" (lineChange)="onLineChange($event)">
-        <ng-content></ng-content>
+        <ng-container appFreecellBackground>
+          <ng-content></ng-content>
+        </ng-container>
       </app-freecell-deck>
     </div>
   </div>

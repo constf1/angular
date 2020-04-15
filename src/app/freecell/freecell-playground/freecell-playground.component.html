@@ -12,4 +12,8 @@
     #spot
   ></div>
   <ng-content select="[appFreecellForeground]"></ng-content>
+  <ng-container *ngIf="action.state.solved" >
+    <!-- to restart svg animation we have to create a new object -->
+    <object class="freecell-fireworks" type="image/svg+xml" data="./assets/freecell/fireworks.svg"></object>
+  </ng-container>
 </div>
