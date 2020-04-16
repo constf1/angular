@@ -20,6 +20,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 import { SandwichComponent } from './sandwich/sandwich.component';
@@ -51,6 +52,7 @@ import { CommonModule } from '@angular/common';
     MatSliderModule,
     MatSlideToggleModule,
     MatSnackBarModule,
+    MatTabsModule,
     MatToolbarModule
   ],
   exports: [
@@ -75,6 +77,7 @@ import { CommonModule } from '@angular/common';
     MatSliderModule,
     MatSlideToggleModule,
     MatSnackBarModule,
+    MatTabsModule,
     MatToolbarModule,
 
     SandwichComponent

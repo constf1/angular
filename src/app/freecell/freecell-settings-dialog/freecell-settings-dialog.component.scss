@@ -1,3 +1,15 @@
-.pad-top-20 {
+.pad-top-20, .tab-content {
   padding-top: 20px;
+}
+
+.tab-content {
+  min-height: 8rem;
+}
+
+.margin-right-8 {
+  margin-right: 8px;
+}
+
+.margin-left-8 {
+  margin-left: 8px;
 }

@@ -1,74 +1,114 @@
 <h2 mat-dialog-title>Freecell Settings</h2>
 <mat-dialog-content class="mat-typography">
-  <h3><mat-icon>{{settings.state.enableSound ? 'volume_up' : 'volume_off' }}</mat-icon>
-    Game Sounds
-  </h3>
-  <mat-slide-toggle
-    [checked]="settings.state.enableSound"
-    (change)="settings.set({ enableSound: !!$event.checked })"
-  >
-    Enable
-  </mat-slide-toggle>
+  <mat-tab-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="margin-right-8">{{settings.state.enableSound ? 'volume_up' : 'volume_off' }}</mat-icon>
+        Game Sounds
+      </ng-template>
+      <div class="tab-content">
+        <mat-slide-toggle
+          [checked]="settings.state.enableSound"
+          (change)="settings.set({ enableSound: !!$event.checked })"
+        >
+          Enable
+        </mat-slide-toggle>
+      </div>
+    </mat-tab>
 
-  <h3 class="pad-top-20">
-    <mat-icon>assistant</mat-icon>
-    Assist level
-  </h3>
-  <mat-slider thumbLabel="true"
-    [displayWith]="assistLevelLabel"
-    [min]="assistLevelMin"
-    [max]="assistLevelMax"
-    [step]="assistLevelStep"
-    [(ngModel)]="assistLevel"
-    [color]="assistLevelColor()"
-  ></mat-slider>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="margin-right-8">assistant</mat-icon>
+        Assist level
+      </ng-template>
+      <div class="tab-content">
+        <p>
+          The maximum number of moves the assistant will try to solve.
+        </p>
+        <div class="pad-top-20 margin-left-8">
+          <mat-slider thumbLabel="true"
+            [displayWith]="assistLevelLabel"
+            [min]="assistLevelMin"
+            [max]="assistLevelMax"
+            [step]="assistLevelStep"
+            [(ngModel)]="assistLevel"
+            [color]="assistLevelColor()"
+          ></mat-slider>
+          {{settings.state.assistLevel}}
+        </div>
+      </div>
+    </mat-tab>
 
-  <h3 class="pad-top-20">
-    <mat-icon>layers</mat-icon>
-    Card Effects
-  </h3>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="margin-right-8">layers</mat-icon>
+        Card Effects
+      </ng-template>
+      <div class="tab-content">
+        <div>
+          <mat-slide-toggle
+            [checked]="settings.state.deckUseSvg"
+            (change)="settings.set({ deckUseSvg: !!$event.checked })"
+          >
+            Use SVG
+          </mat-slide-toggle>
+        </div>
+        <div class="pad-top-20">
+          <mat-slide-toggle
+            [checked]="settings.state.enableRipples"
+            (change)="settings.set({ enableRipples: !!$event.checked })"
+          >
+            Enable Ripples
+          </mat-slide-toggle>
+        </div>
+        <div class="pad-top-20">
+          <mat-slide-toggle
+            [checked]="settings.state.enableWinAnimation"
+            (change)="settings.set({ enableWinAnimation: !!$event.checked })"
+          >
+            Enable Victory Animation
+          </mat-slide-toggle>
+        </div>
+      </div>
+    </mat-tab>
 
-  <div>
-    <mat-slide-toggle
-      [checked]="settings.state.deckUseSvg"
-      (change)="settings.set({ deckUseSvg: !!$event.checked })"
-    >
-      Use SVG
-    </mat-slide-toggle>
-  </div>
-  <div class="pad-top-20">
-    <mat-slide-toggle
-      [checked]="settings.state.enableRipples"
-      (change)="settings.set({ enableRipples: !!$event.checked })"
-    >
-      Enable Ripples
-    </mat-slide-toggle>
-  </div>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="margin-right-8">aspect_ratio</mat-icon>
+        Aspect ratio
+      </ng-template>
+      <div class="tab-content">
+        <p>The playground height divided on its width.</p>
+        <div class="pad-top-20 margin-left-8">
+          <mat-slider thumbLabel="true"
+            [displayWith]="aspectRatioLabel"
+            [min]="aspectRatioMin"
+            [max]="aspectRatioMax"
+            [step]="aspectRatioStep"
+            [(ngModel)]="aspectRatio"
+          ></mat-slider>
+          {{settings.state.aspectRatio}}
+        </div>
+      </div>
+    </mat-tab>
 
-  <h3 class="pad-top-20">
-    <mat-icon>aspect_ratio</mat-icon>
-    Aspect ratio
-  </h3>
-  <mat-slider thumbLabel="true"
-    [displayWith]="aspectRatioLabel"
-    [min]="aspectRatioMin"
-    [max]="aspectRatioMax"
-    [step]="aspectRatioStep"
-    [(ngModel)]="aspectRatio"
-  ></mat-slider>
-
-  <h3 class="pad-top-20">
-    <mat-icon>table_chart</mat-icon>
-    Layout
-  </h3>
-  <mat-button-toggle-group [value]="settings.state.view">
-    <mat-button-toggle value="sidenav" (click)="settings.set({ view: 'sidenav' })">
-      <mat-icon>panorama_horizontal</mat-icon>
-    </mat-button-toggle>
-    <mat-button-toggle value="sandwich" (click)="settings.set({ view: 'sandwich' })">
-      <mat-icon>panorama_vertical</mat-icon>
-    </mat-button-toggle>
-  </mat-button-toggle-group>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="margin-right-8">table_chart</mat-icon>
+        Layout
+      </ng-template>
+      <div class="tab-content">
+        <mat-button-toggle-group [value]="settings.state.view">
+          <mat-button-toggle value="sidenav" (click)="settings.set({ view: 'sidenav' })">
+            <mat-icon>panorama_horizontal</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="sandwich" (click)="settings.set({ view: 'sandwich' })">
+            <mat-icon>panorama_vertical</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </mat-dialog-content>
 
 <div class="pad-top-20">
