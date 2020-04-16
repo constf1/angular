@@ -43,6 +43,18 @@ export class DragListener<T> {
     return this._deltaY;
   }
 
+  public get isTouchDragging() {
+    return !isNaN(this._touchId);
+  }
+
+  public get isMouseDragging() {
+    return this._listeners.length > 0;
+  }
+
+  public get isDragging() {
+    return this.isTouchDragging || this.isMouseDragging;
+  }
+
   touchStart(event: TouchEvent, data?: T) {
     this.stop();
     this._deltaX = this._deltaY = 0;
@@ -109,7 +121,7 @@ export class DragListener<T> {
 
   stop() {
     // clean up
-    if (this._listeners.length > 0 || !isNaN(this._touchId)) {
+    if (this.isDragging) {
       for (const listener of this._listeners) {
         listener();
       }
