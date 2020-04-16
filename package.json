@@ -1,6 +1,6 @@
 {
   "name": "freecell-demo",
-  "version": "0.0.4d",
+  "version": "0.0.5d",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
