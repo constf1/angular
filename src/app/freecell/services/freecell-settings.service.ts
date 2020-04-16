@@ -27,8 +27,8 @@ export interface FreecellSettingsState {
   deckUseSvg: boolean;
 
   enableSound: boolean;
-
   enableRipples: boolean;
+  enableWinAnimation: boolean;
 
   assistLevel: number;
 
@@ -47,8 +47,8 @@ export const initialState: Readonly<FreecellSettingsState> = {
   deckUseSvg: false,
 
   enableSound: false,
-
   enableRipples: true,
+  enableWinAnimation: true,
 
   assistLevel: 1000000,
 
@@ -59,7 +59,7 @@ export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
   aspectRatio: 0.40,
   assistLevel: 20000,
   sandwichOrder: 0,
-  inputMode: 0
+  inputMode: 1
 };
 
 export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
