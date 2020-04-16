@@ -1,6 +1,12 @@
 <div class="freecell_deck"
   [class.use-svg-background]="settings.state.deckUseSvg"
-  [class.freecell_deck_solved]="action.state.solved">
+  [class.freecell_deck_solved]="action.state.solved && settings.state.enableWinAnimation"
+
+  (touchstart)="touchChange.emit({ type: 'DragStart', event: $event})"
+  (touchend)="touchChange.emit({ type: 'DragStop', event: $event})"
+  (touchcancel)="touchChange.emit({ type: 'DragStop', event: $event})"
+  (touchmove)="touchChange.emit({ type: 'DragMove', event: $event})"
+>
   <ng-content select="[appFreecellBackground]"></ng-content>
   <!-- spots -->
   <div class="freecell_spot" *ngFor="let spot of spots; index as i"
@@ -12,7 +18,7 @@
     #spot
   ></div>
   <ng-content select="[appFreecellForeground]"></ng-content>
-  <ng-container *ngIf="action.state.solved" >
+  <ng-container *ngIf="action.state.solved && settings.state.enableWinAnimation" >
     <!-- to restart svg animation we have to create a new object -->
     <object class="freecell-fireworks" type="image/svg+xml" data="./assets/freecell/fireworks.svg"></object>
   </ng-container>

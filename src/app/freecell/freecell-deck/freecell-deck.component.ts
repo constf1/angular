@@ -16,7 +16,7 @@ import { toPercent, overlapArea } from '../../common/math-utils';
 import { suitFullNameOf, CARD_NUM, rankFullNameOf } from '../../common/deck';
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { Linkable, connect, append } from '../../common/linkable';
-import { DragListener } from '../../common/drag-listener';
+import { DragListener, DragEvent } from '../../common/drag-listener';
 
 import { FreecellGameService } from '../services/freecell-game.service';
 import { FreecellAutoplayService } from '../services/freecell-autoplay.service';
@@ -166,48 +166,20 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     return transforms;
   }
 
-  onTouchStart(event: TouchEvent, index: number) {
+  onTouch(emitValue: { type: DragEvent, event: TouchEvent }) {
     if (this.isTouchDisabled) {
       return;
     }
-    this._playService.stop();
-    // console.log('Touch Start:', index);
-    event.preventDefault();
 
-    const game = this._gameService.game;
-    const tableau = game.asTablaeu(index);
-    const transforms = this.getTransforms(tableau);
+    const { type, event } = emitValue;
+    if (this._onTouch(type, event)) {
+      // Try to prevent any further handling.
+      event.preventDefault();
+      event.stopPropagation();
 
-    this._dragListener.touchStart(event, { game, tableau, transforms });
-  }
-
-  onTouchEnd(event: TouchEvent, index: number) {
-    if (this.isTouchDisabled) {
-      return;
+      // Prevents other listeners of the same event from being called.
+      event.stopImmediatePropagation();
     }
-    // console.log('Touch End:', index);
-    event.preventDefault();
-    this._dragListener.stop();
-  }
-
-  onTouchCancel(event: TouchEvent, index: number) {
-    if (this.isTouchDisabled) {
-      return;
-    }
-    // console.log('Touch Cancel:', index);
-    event.preventDefault();
-    this._dragListener.stop();
-  }
-
-  onTouchMove(event: TouchEvent, index: number) {
-    if (this.isTouchDisabled) {
-      return;
-    }
-    // console.log('Touch Move:', index);
-    // console.table(event.changedTouches);
-    // Call preventDefault() to prevent any further handling
-    event.preventDefault();
-    this._dragListener.touchMove(event);
   }
 
   onMouseDown(event: MouseEvent, index: number) {
@@ -229,8 +201,41 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     this._dragListener.mouseStart(event, this._renderer, { game, tableau, transforms });
   }
 
+  private _onTouch(type: DragEvent, event: TouchEvent): boolean {
+    switch (type) {
+      case 'DragStart':
+        if (event.targetTouches.length > 0) {
+          const touch = event.targetTouches[0];
+          const index = this.getCardIndex(touch.clientX, touch.clientY);
+          if (index >= 0) {
+            const game = this._gameService.game;
+            const tableau = game.asTablaeu(index);
+            const transforms = this.getTransforms(tableau);
+
+            this._dragListener.touchStart(event, { game, tableau, transforms });
+            return true;
+          }
+        }
+        break;
+      case 'DragMove':
+        if (this._dragListener.isTouchDragging) {
+          this._dragListener.touchMove(event);
+          return true;
+        }
+        break;
+      case 'DragStop':
+        if (this._dragListener.isTouchDragging) {
+          this._dragListener.stop();
+          return true;
+        }
+        break;
+    }
+    return false;
+  }
+
   private _onDragStart() {
     // this._playService.lock();
+    this._playService.stop();
     const { tableau, transforms } = this._dragListener.data;
 
     for (let i = tableau.length; i-- > 0;) {
@@ -447,6 +452,22 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       }
     }
     return destination;
+  }
+
+  getCardIndex(clientX: number, clientY: number): number {
+    let index = -1;
+    if (this.cardList) {
+      const cards = this.cardList.toArray();
+      for (let i = cards.length; i-- > 0;) {
+        const rc = cards[i].nativeElement.getBoundingClientRect();
+        if (rc.left <= clientX && clientX <= rc.right && rc.top <= clientY && clientY <= rc.bottom) {
+          if (index < 0 || this.cards[index].ngStyle.zIndex < this.cards[i].ngStyle.zIndex) {
+            index = i;
+          }
+        }
+      }
+    }
+    return index;
   }
 
   activateOnGesture(event: Event) {

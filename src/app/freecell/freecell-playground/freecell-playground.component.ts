@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, ElementRef, ViewChildre
 
 import { suitFullNameOf } from '../../common/deck';
 import { toPercent } from '../../common/math-utils';
+import { DragEvent } from '../../common/drag-listener';
 
 import { FreecellLayout } from '../freecell-layout';
 import { FreecellSettingsService } from '../services/freecell-settings.service';
@@ -59,6 +60,9 @@ export class FreecellPlaygroundComponent implements OnInit {
 
   @Input() selection = -1;
   @Output() selectionChange = new EventEmitter<number>();
+
+  // Workaround. We'll be a touch proxy for cards to get around buggy firefox behaviour.
+  @Output() touchChange = new EventEmitter<{ type: DragEvent, event: TouchEvent }>();
 
   @ViewChildren('spot') spotList: QueryList<ElementRef<HTMLElement>>;
 

@@ -1,6 +1,6 @@
 <div *ngIf="soundService.enabled && !soundService.activated" appGesture (userGesture)="activateOnGesture($event)"></div>
 
-<app-freecell-playground [layout]="layout" [(selection)]="spotSelection">
+<app-freecell-playground [layout]="layout" [(selection)]="spotSelection" (touchChange)="onTouch($event)">
   <ng-container appFreecellBackground>
     <ng-content select="[appFreecellBackground]"></ng-content>
   </ng-container>
@@ -12,13 +12,13 @@
       [ngStyle]="card.ngStyle"
 
       (mousedown)="onMouseDown($event, i)"
-      (touchstart)="onTouchStart($event, i)"
-      (touchend)="onTouchEnd($event, i)"
-      (touchcancel)="onTouchCancel($event, i)"
-      (touchmove)="onTouchMove($event, i)"
-
       #cards
     ></div>
     <ng-content select="[appFreecellForeground]"></ng-content>
   </ng-container>
 </app-freecell-playground>
+
+<!-- (touchstart)="onTouchStart($event, i)"
+(touchend)="onTouchEnd($event, i)"
+(touchcancel)="onTouchCancel($event, i)"
+(touchmove)="onTouchMove($event, i)" -->
