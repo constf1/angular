@@ -22,10 +22,8 @@
         Assist level
       </ng-template>
       <div class="tab-content">
-        <p>
-          The maximum number of moves the assistant will try to solve.
-        </p>
-        <div class="pad-top-20 margin-left-8">
+        <p>The maximum number of moves the assistant will try to solve.</p>
+        <div class="pad-top-20">
           <mat-slider thumbLabel="true"
             [displayWith]="assistLevelLabel"
             [min]="assistLevelMin"
@@ -78,8 +76,8 @@
         Aspect ratio
       </ng-template>
       <div class="tab-content">
-        <p>The playground height divided on its width.</p>
-        <div class="pad-top-20 margin-left-8">
+        <p>The playground width divided by its height.</p>
+        <div class="pad-top-20">
           <mat-slider thumbLabel="true"
             [displayWith]="aspectRatioLabel"
             [min]="aspectRatioMin"
@@ -98,6 +96,11 @@
         Layout
       </ng-template>
       <div class="tab-content">
+        <p>
+          <span [class.text-selected]="settings.state.view === 'sidenav'">Horizontal</span>
+           or
+          <span [class.text-selected]="settings.state.view === 'sandwich'">vertical</span> layout.
+        </p>
         <mat-button-toggle-group [value]="settings.state.view">
           <mat-button-toggle value="sidenav" (click)="settings.set({ view: 'sidenav' })">
             <mat-icon>panorama_horizontal</mat-icon>
