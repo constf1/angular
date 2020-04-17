@@ -175,10 +175,13 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     if (this._onTouch(type, event)) {
       // Try to prevent any further handling.
       event.preventDefault();
-      event.stopPropagation();
+
+      // stopPropagation prevents gesture detection. Don't use it.
+      // preventDefault should be enough.
+      // event.stopPropagation();
 
       // Prevents other listeners of the same event from being called.
-      event.stopImmediatePropagation();
+      // event.stopImmediatePropagation();
     }
   }
 
