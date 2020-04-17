@@ -31,7 +31,10 @@ export class FreecellSettingsDialogComponent implements OnInit {
   }
 
   set assistLevel(value) {
-    this.settings.set({ assistLevel: +value * D });
+    value = Math.max(this.assistLevelMin, Math.min(this.assistLevelMax, +value));
+    if (value !== this.assistLevel) {
+      this.settings.set({ assistLevel: value * D });
+    }
   }
 
   aspectRatioLabel = (value: number) => {

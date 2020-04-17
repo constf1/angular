@@ -23,7 +23,15 @@
       </ng-template>
       <div class="tab-content">
         <p>The maximum number of moves the assistant will try to solve.</p>
-        <div class="pad-top-20">
+        <div class="pad-top">
+          <button mat-stroked-button
+            (click)="assistLevel = assistLevel - assistLevelStep"
+            [disabled]="assistLevelMin >= assistLevel"><mat-icon>chevron_left</mat-icon>
+          </button>
+          <button mat-stroked-button
+            (click)="assistLevel = assistLevel + assistLevelStep"
+            [disabled]="assistLevel >= assistLevelMax"><mat-icon>chevron_right</mat-icon>
+          </button>
           <mat-slider thumbLabel="true"
             [displayWith]="assistLevelLabel"
             [min]="assistLevelMin"
@@ -32,7 +40,7 @@
             [(ngModel)]="assistLevel"
             [color]="assistLevelColor()"
           ></mat-slider>
-          {{settings.state.assistLevel}}
+          {{settings.state.assistLevel | number:'1.0-0'}}
         </div>
       </div>
     </mat-tab>
@@ -51,7 +59,7 @@
             Use SVG
           </mat-slide-toggle>
         </div>
-        <div class="pad-top-20">
+        <div class="pad-top">
           <mat-slide-toggle
             [checked]="settings.state.enableRipples"
             (change)="settings.set({ enableRipples: !!$event.checked })"
@@ -59,7 +67,7 @@
             Enable Ripples
           </mat-slide-toggle>
         </div>
-        <div class="pad-top-20">
+        <div class="pad-top">
           <mat-slide-toggle
             [checked]="settings.state.enableWinAnimation"
             (change)="settings.set({ enableWinAnimation: !!$event.checked })"
@@ -72,58 +80,48 @@
 
     <mat-tab>
       <ng-template mat-tab-label>
-        <mat-icon class="margin-right-8">aspect_ratio</mat-icon>
-        Aspect ratio
+        <mat-icon class="margin-right-8">dashboard</mat-icon>
+        Appearance
       </ng-template>
       <div class="tab-content">
-        <p>The playground width divided by its height.</p>
-        <div class="pad-top-20">
-          <mat-slider thumbLabel="true"
-            [displayWith]="aspectRatioLabel"
-            [min]="aspectRatioMin"
-            [max]="aspectRatioMax"
-            [step]="aspectRatioStep"
-            [(ngModel)]="aspectRatio"
-          ></mat-slider>
-          {{settings.state.aspectRatio}}
+        <div>
+          <mat-icon class="margin-right-8">table_chart</mat-icon>Layout:
+          <span [class.text-selected]="settings.state.view === 'sidenav'">horizontal</span>
+          or
+          <span [class.text-selected]="settings.state.view === 'sandwich'">vertical</span>.
+          <mat-button-toggle-group [value]="settings.state.view">
+            <mat-button-toggle value="sidenav" (click)="settings.set({ view: 'sidenav' })">
+              <mat-icon>stay_current_landscape</mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="sandwich" (click)="settings.set({ view: 'sandwich' })">
+              <mat-icon>stay_current_portrait</mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
-      </div>
-    </mat-tab>
-
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <mat-icon class="margin-right-8">table_chart</mat-icon>
-        Layout
-      </ng-template>
-      <div class="tab-content">
-        <p>
-          <span [class.text-selected]="settings.state.view === 'sidenav'">Horizontal</span>
-           or
-          <span [class.text-selected]="settings.state.view === 'sandwich'">vertical</span> layout.
-        </p>
-        <mat-button-toggle-group [value]="settings.state.view">
-          <mat-button-toggle value="sidenav" (click)="settings.set({ view: 'sidenav' })">
-            <mat-icon>panorama_horizontal</mat-icon>
-          </mat-button-toggle>
-          <mat-button-toggle value="sandwich" (click)="settings.set({ view: 'sandwich' })">
-            <mat-icon>panorama_vertical</mat-icon>
-          </mat-button-toggle>
-        </mat-button-toggle-group>
+        <div class="pad-top">
+          <mat-icon class="margin-right-8">aspect_ratio</mat-icon>Aspect ratio. The playground width divided by its height.
+          <mat-slider thumbLabel="true"
+              [displayWith]="aspectRatioLabel"
+              [min]="aspectRatioMin"
+              [max]="aspectRatioMax"
+              [step]="aspectRatioStep"
+              [(ngModel)]="aspectRatio"
+          ></mat-slider>
+          {{settings.state.aspectRatio | number:'1.3-3'}}
+        </div>
       </div>
     </mat-tab>
   </mat-tab-group>
 </mat-dialog-content>
 
-<div class="pad-top-20">
-  <mat-divider></mat-divider>
-  <mat-dialog-actions align="center">
-    <button mat-button (click)="settings.restoreDefaults()">
-      <mat-icon>settings_backup_restore</mat-icon>
-      <label>RESET</label>
-    </button>
-    <button mat-button matDialogClose cdkFocusInitial>
-      <mat-icon>close</mat-icon>
-      <label>CLOSE</label>
-    </button>
-  </mat-dialog-actions>
-</div>
+<mat-divider></mat-divider>
+<mat-dialog-actions align="center">
+  <button mat-button (click)="settings.restoreDefaults()">
+    <mat-icon>settings_backup_restore</mat-icon>
+    <label>RESET</label>
+  </button>
+  <button mat-button matDialogClose cdkFocusInitial>
+    <mat-icon>close</mat-icon>
+    <label>CLOSE</label>
+  </button>
+</mat-dialog-actions>
