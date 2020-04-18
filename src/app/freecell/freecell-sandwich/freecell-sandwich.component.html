@@ -8,7 +8,10 @@
   </div>
 </ng-template>
 
-<ng-template #settingsButton>
+<ng-template #settingsButtons>
+  <button mat-icon-button (click)="settings.set({ enableDarkMode: !settings.state.enableDarkMode })">
+    <mat-icon>{{settings.state.enableDarkMode ? 'brightness_3' : 'brightness_7'}}</mat-icon>
+  </button>
   <button mat-icon-button (click)="settingsChange.emit()" style="margin-right: 40px;">
     <mat-icon>settings</mat-icon>
   </button>
@@ -17,7 +20,7 @@
 <ng-template #toolbarRow3>
   <ng-container *ngTemplateOutlet="history"></ng-container>
   <span class="flex-space-filler-1"></span>
-  <ng-container *ngTemplateOutlet="settingsButton"></ng-container>
+  <ng-container *ngTemplateOutlet="settingsButtons"></ng-container>
 </ng-template>
 
 <ng-template #toolbarRow2>
@@ -29,7 +32,7 @@
 <ng-template #toolbarRow1>
   <ng-container *ngTemplateOutlet="history"></ng-container>
   <ng-container *ngTemplateOutlet="toolbarRow2"></ng-container>
-  <ng-container *ngTemplateOutlet="settingsButton"></ng-container>
+  <ng-container *ngTemplateOutlet="settingsButtons"></ng-container>
 </ng-template>
 
 <app-sandwich

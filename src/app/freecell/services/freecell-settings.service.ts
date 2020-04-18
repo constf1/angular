@@ -29,6 +29,7 @@ export interface FreecellSettingsState {
   enableSound: boolean;
   enableRipples: boolean;
   enableWinAnimation: boolean;
+  enableDarkMode: boolean;
 
   assistLevel: number;
 
@@ -49,6 +50,7 @@ export const initialState: Readonly<FreecellSettingsState> = {
   enableSound: false,
   enableRipples: true,
   enableWinAnimation: true,
+  enableDarkMode: false,
 
   assistLevel: 1000000,
 

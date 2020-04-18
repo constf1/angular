@@ -63,6 +63,10 @@
       <span class="flex-space-filler-1"></span>
       <mat-divider></mat-divider>
       <mat-action-list>
+        <button mat-list-item (click)="settings.set({ enableDarkMode: !settings.state.enableDarkMode })">
+          <mat-icon>{{settings.state.enableDarkMode ? 'brightness_3' : 'brightness_7'}}</mat-icon>
+          <span>THEME</span>
+        </button>
         <button mat-list-item (click)="settingsChange.emit()">
           <mat-icon>settings</mat-icon>
           <span>SETTINGS</span>

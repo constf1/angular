@@ -48,11 +48,11 @@ div.use-svg-background {
 }
 
 .freecell_spot {
-  background-color: lightblue;
+  background-color: #dadaca;
 
   &.freecell_selection {
     outline-style: dotted;
-    outline-color:darkgrey;
+    outline-color:#eeeedd;
     outline-width: medium;
     &.freecell_base {
       outline-color:#bb11a1;
@@ -63,7 +63,10 @@ div.use-svg-background {
   }
 
   &.freecell_pile { @include bg_pos(57); }
-  &.freecell_base { @include bg_rank(13); }
+  &.freecell_base {
+    background-color: #f0b0f0;
+    @include bg_rank(13);
+  }
   &.freecell_cell {
     background-color: lightseagreen;
     @include bg_pos(56);
@@ -166,4 +169,12 @@ $animation-delay: 0.5s;
   width:100%;
   height:100%;
   background-color: transparent;
+}
+
+.app-dark-theme .freecell_deck {
+  background:#008080 url('../../../assets/freecell/bg-desk-dark.jpg') repeat;
+}
+
+.app-dark-theme .freecell_spot.freecell_selection.freecell_cell {
+  outline-color: #aaecec;
 }
