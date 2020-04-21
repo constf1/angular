@@ -37,8 +37,9 @@
 
   background-size: 900% 900%;
   background-repeat: no-repeat;
+  background-color: transparent;
 
-  border-radius: 8.333% / 6.25%;
+  // border-radius: 8.333% / 6.25%;
 }
 
 div.use-svg-background {
@@ -48,7 +49,7 @@ div.use-svg-background {
 }
 
 .freecell_spot {
-  background-color: #dadaca;
+  // background-color: #dadaca;
 
   &.freecell_selection {
     outline-style: dotted;
@@ -64,17 +65,17 @@ div.use-svg-background {
 
   &.freecell_pile { @include bg_pos(57); }
   &.freecell_base {
-    background-color: #f0b0f0;
+    // background-color: #f0b0f0;
     @include bg_rank(13);
   }
   &.freecell_cell {
-    background-color: lightseagreen;
+    // background-color: lightseagreen;
     @include bg_pos(56);
   }
 }
 
 .freecell_card {
-  background-color: #f4f4d8;
+  // background-color: #f4f4d8;
   &.freecell_Ace { @include bg_rank(0); }
   &.freecell_Two { @include bg_rank(1); }
   &.freecell_Three { @include bg_rank(2); }
