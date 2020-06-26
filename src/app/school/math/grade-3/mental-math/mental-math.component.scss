@@ -1,0 +1,121 @@
+@import 'src/app/school/squared-paper/squared-paper.component';
+
+.squared-paper-topic {
+  /* top | right | bottom | left */
+  margin: $squared-paper-square-side 4 * $squared-paper-square-side $squared-paper-square-side 0;
+  padding-left: 0.25 * $squared-paper-square-side;
+  text-indent: 2 * $squared-paper-square-side;
+}
+
+.squared-paper-form {
+  position: relative;
+  input {
+    font: inherit;
+    letter-spacing: inherit;
+    padding: 0 0;
+    border: none;
+    background-color: transparent;
+  }
+
+  input:focus {
+    letter-spacing: normal;
+    outline: #0000ff dashed thin;
+    background-color: #fed;
+  }
+
+  input.invalid {
+    text-decoration: solid #f00 line-through;
+  }
+
+  label {
+    cursor: pointer;
+    &:hover {
+      text-shadow: 1px 1px 2px #eba;
+    }
+  }
+
+  .squared-paper-form-main {
+    position: relative;
+    margin-right: 4 * $squared-paper-square-side;
+  }
+  .squared-paper-form-item {
+    @extend .squared-paper-col-15;
+    @extend .squared-paper-mb-1;
+  }
+  .squared-paper-form-check {
+    @extend .squared-paper-spacing;
+    @extend .squared-paper-ml-1;
+    @extend .squared-paper-pl;
+    color: red;
+    font-weight: 600;
+  }
+  .squared-paper-form-entry {
+    @extend .squared-paper-spacing;
+    @extend .squared-paper-pl;
+    input {
+      margin-left: -0.25 * $squared-paper-square-side;
+      padding-left: 0.25 * $squared-paper-square-side;
+
+      &[maxlength="1"] {
+        width: (1 - 0.25) * $squared-paper-square-side;
+      }
+
+      &[maxlength="2"] {
+        width: (2 - 0.25) * $squared-paper-square-side;
+      }
+
+      &[maxlength="3"] {
+        width: (3 - 0.25) * $squared-paper-square-side;
+      }
+
+      &[maxlength="4"] {
+        width: (4 - 0.25) * $squared-paper-square-side;
+      }
+
+      &[maxlength="5"] {
+        width: (5 - 0.25) * $squared-paper-square-side;
+      }
+    }
+  }
+
+  .squared-paper-form-submit-button {
+    @extend .squared-paper-ml-1;
+    padding: 4px;
+    float: left;
+  }
+  .squared-paper-form-submit-message {
+    @extend .squared-paper-col-30;
+    padding-left: 0.25 * $squared-paper-square-side;
+  }
+  .squared-paper-form-keyboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.6s ease-in-out;
+  }
+  .squared-paper-form-keyboard-dial {
+    position: relative;
+    border: 1px #bbf solid;
+    border-radius: 4px;
+    padding: 2px;
+    top: -$squared-paper-square-side;
+    left: $squared-paper-square-side;
+    width: 192px;
+    background-color: #ddf;
+    box-shadow: 2px 2px 4px #888;
+    .mat-button,
+    .mat-stroked-button {
+      color: #008;
+    }
+  }
+  .squared-paper-form-keyboard-icon {
+    cursor: pointer;
+    height: $squared-paper-square-side;
+    color: #bbf;
+    transition: color 0.6s ease-in-out;
+
+    &:hover {
+      color: #008;
+    }
+  }
+}

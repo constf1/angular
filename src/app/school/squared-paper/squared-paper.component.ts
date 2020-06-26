@@ -12,7 +12,7 @@ export interface Path {
   selector: 'app-squared-paper',
   templateUrl: './squared-paper.component.html',
   styleUrls: ['./squared-paper.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  // encapsulation: ViewEncapsulation.None
 })
 export class SquaredPaperComponent implements OnInit {
   @Input() rowNum = 41;

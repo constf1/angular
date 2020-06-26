@@ -7,18 +7,18 @@ import { MaterialModule } from '../material/material.module';
 import { CoreModule } from '../core/core.module';
 
 import { SquaredPaperComponent } from './squared-paper/squared-paper.component';
+import { MentalMathComponent } from './math/grade-3/mental-math/mental-math.component';
 
 /**
  * Routes:
  */
 const routes: Routes = [
-  // { path: 'mental-math', component: MentalMathComponent },
-  { path: '', component: SquaredPaperComponent },
+  { path: 'mental-math', component: MentalMathComponent },
+  { path: '', component: MentalMathComponent },
 ];
 
-
 @NgModule({
-  declarations: [SquaredPaperComponent],
+  declarations: [SquaredPaperComponent, MentalMathComponent],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,

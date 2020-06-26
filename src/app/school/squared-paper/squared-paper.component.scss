@@ -56,31 +56,6 @@ $squared-paper-background-color: #f5f5f5;
 
 .squared-paper-pl {
   padding-left: 0.25 * $squared-paper-square-side;
-
-  input {
-    margin-left: -0.25 * $squared-paper-square-side;
-    padding-left: 0.25 * $squared-paper-square-side;
-
-    &[maxlength="1"] {
-      width: (1 - 0.25) * $squared-paper-square-side;
-    }
-
-    &[maxlength="2"] {
-      width: (2 - 0.25) * $squared-paper-square-side;
-    }
-
-    &[maxlength="3"] {
-      width: (3 - 0.25) * $squared-paper-square-side;
-    }
-
-    &[maxlength="4"] {
-      width: (4 - 0.25) * $squared-paper-square-side;
-    }
-
-    &[maxlength="5"] {
-      width: (5 - 0.25) * $squared-paper-square-side;
-    }
-  }
 }
 
 .squared-paper-pr {
@@ -175,7 +150,7 @@ $squared-paper-background-color: #f5f5f5;
   letter-spacing: normal;
 }
 
-.square-by-square-spacing {
+.squared-paper-spacing {
   letter-spacing: 0.5 * $squared-paper-square-side;
 }
 
