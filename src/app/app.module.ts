@@ -14,6 +14,10 @@ const appRoutes: Routes = [
     path: 'freecell-demo',
     loadChildren: () => import('./freecell/freecell.module').then(m => m.FreecellModule)
   },
+  {
+    path: 'school-demo',
+    loadChildren: () => import('./school/school.module').then(m => m.SchoolModule)
+  },
 
   { path: '', redirectTo: '/freecell-demo', pathMatch: 'full' },
   { path: '**', redirectTo: '/freecell-demo' }
