@@ -111,7 +111,11 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
   set(params: Partial<Readonly<FreecellSettingsState>>): boolean {
     const ok = this._set(params);
     if (ok) {
-      localStorage.setItem(KEY, JSON.stringify(this.state));
+      try {
+        localStorage.setItem(KEY, JSON.stringify(this.state));
+      } catch (error) {
+        console.warn('localStorage error:', error);
+      }
     }
     return ok;
   }
