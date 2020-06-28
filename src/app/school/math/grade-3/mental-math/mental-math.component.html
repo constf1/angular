@@ -1,6 +1,13 @@
 <app-squared-paper>
   <div style="position: absolute; right:0; top:0">
-    <mat-icon class="squared-paper-trophy" svgIcon="icon_sun"></mat-icon>
+    <mat-icon class="squared-paper-trophy" *ngIf="todayVictories > 0" svgIcon="icon_sun"
+      [class.step1]="todayVictories === 1"
+      [class.step2]="todayVictories === 2"
+      [class.step3]="todayVictories === 3"
+      [class.step4]="todayVictories === 4"
+      [class.step5]="todayVictories >= 5"
+      [class.animate]="victoryAnimation"
+      ></mat-icon>
   </div>
   <div class="squared-paper-topic">{{topic}}</div>
   <form class="squared-paper-form" (ngSubmit)="onSubmit(form)" #form="ngForm">

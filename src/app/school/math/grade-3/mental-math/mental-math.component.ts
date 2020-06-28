@@ -7,6 +7,7 @@ import { MathExpression, createAddition, createSubtraction } from '../../math-mo
 import { randomInteger } from 'src/app/common/math-utils';
 import { Autoplay } from 'src/app/common/autoplay';
 import { commonPrefix } from 'src/app/common/string-utils';
+import { getDate } from 'src/app/common/date-utils';
 
 function getScoreMessage(score: number): string {
   if (score === 1) {
@@ -20,7 +21,7 @@ function getScoreMessage(score: number): string {
     return '5+ ' + message;
   } else if (score >= 0.99) {
     return '5+';
-  } else if (score >= 0.9) {
+  } else if (score > 0.9) {
     return '5';
   } else if (score >= 0.8) {
     return '5-';
@@ -47,6 +48,7 @@ function getScoreMessage(score: number): string {
 }
 
 const INPUTS = ['first', 'second', 'result'] as const;
+const KEY = '[School.Math.Grade-3.Mental-math]';
 
 interface Item {
   inputName: string;
@@ -79,6 +81,9 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
   showKeyboard = false;
   keyboardTransform = '';
   inputIndex = -1;
+
+  todayVictories = 0;
+  victoryAnimation = false;
 
   get toggleKeyboardIcon() {
     return this.showKeyboard ? 'keyboard_hide' : 'keyboard';
@@ -120,6 +125,18 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.init();
+
+    const storage = localStorage.getItem(KEY);
+    if (storage) {
+      const data = JSON.parse(storage);
+      if (data) {
+        const today = getDate('YYYY-MM-DD');
+        const todayVictories = data[today];
+        if (typeof todayVictories === 'number' && todayVictories > this.todayVictories) {
+          this.todayVictories = todayVictories;
+        }
+      }
+    }
   }
 
   ngAfterViewInit(): void {
@@ -168,13 +185,25 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
     }
 
     this.score = count / this.items.length;
+    if (this.score >= 1) {
+      this.todayVictories++;
+
+      this.victoryAnimation = (this.todayVictories > 0 && this.todayVictories <= 5);
+
+      try {
+        const today = getDate('YYYY-MM-DD');
+        localStorage.setItem(KEY, JSON.stringify({[today]: this.todayVictories }));
+      } catch (error) {
+        console.warn('localStorage error:', error);
+      }
+    }
     return getScoreMessage(this.score);
   }
 
   onSubmit(form: NgForm) {
     // console.log('Submitting:', form.value);
     if (!this.canSubmit()) {
-      console.warn('Cannot submit form:', form.value);
+      console.warn('Cannot submit:', form.value);
       return;
     }
 
@@ -204,7 +233,15 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
           } else {
             this.scoreMessage = message;
           }
-          return this.scoreMessage !== message;
+
+          if (this.scoreMessage === message) {
+            // restart victory animation
+            if (!this.victoryAnimation && this.score >= 1) {
+              this.victoryAnimation = true;
+            }
+            return false;
+          }
+          return true;
         });
       }
       return next;
