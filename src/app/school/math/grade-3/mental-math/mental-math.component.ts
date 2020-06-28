@@ -1,5 +1,8 @@
 import { Component, OnInit, Input, ViewEncapsulation, ViewChildren, QueryList, ElementRef, AfterViewInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { DomSanitizer } from '@angular/platform-browser';
+import { MatIconRegistry } from '@angular/material/icon';
+
 import { MathExpression, createAddition, createSubtraction } from '../../math-models';
 import { randomInteger } from 'src/app/common/math-utils';
 import { Autoplay } from 'src/app/common/autoplay';
@@ -81,7 +84,8 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
     return this.showKeyboard ? 'keyboard_hide' : 'keyboard';
   }
 
-  constructor() {
+  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+    iconRegistry.addSvgIcon('icon_sun', sanitizer.bypassSecurityTrustResourceUrl('assets/school/sun.svg'));
   }
 
   init(): void {

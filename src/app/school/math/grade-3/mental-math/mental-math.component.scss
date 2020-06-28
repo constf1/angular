@@ -119,3 +119,9 @@
     }
   }
 }
+
+.squared-paper-trophy {
+  display: block;
+  width: 4 * $squared-paper-square-side;
+  height: 4 * $squared-paper-square-side;
+}
