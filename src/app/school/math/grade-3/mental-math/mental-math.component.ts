@@ -1,13 +1,15 @@
-import { Component, OnInit, Input, ViewEncapsulation, ViewChildren, QueryList, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 
-import { MathExpression, createAddition, createSubtraction } from '../../math-models';
 import { randomInteger } from 'src/app/common/math-utils';
 import { Autoplay } from 'src/app/common/autoplay';
 import { commonPrefix } from 'src/app/common/string-utils';
 import { getDate } from 'src/app/common/date-utils';
+
+import { createAddition, createSubtraction } from '../../math-models';
+import { InputItem } from '../../math-input-group/math-input-group.component';
 
 function getScoreMessage(score: number): string {
   if (score === 1) {
@@ -19,23 +21,23 @@ function getScoreMessage(score: number): string {
     ];
     const message = messages[randomInteger(0, messages.length)];
     return '5+ ' + message;
-  } else if (score >= 0.99) {
+  } else if (score >= 0.98) {
     return '5+';
   } else if (score > 0.9) {
     return '5';
-  } else if (score >= 0.8) {
+  } else if (score > 0.8) {
     return '5-';
-  } else if (score >= 0.7) {
+  } else if (score > 0.7) {
     return '4';
-  } else if (score >= 0.6) {
+  } else if (score > 0.6) {
     return '4-';
-  } else if (score >= 0.5) {
+  } else if (score > 0.5) {
     return '3';
-  } else if (score >= 0.4) {
+  } else if (score > 0.4) {
     return '3-';
-  } else if (score >= 0.3) {
+  } else if (score > 0.3) {
     return '2';
-  } else if (score >= 0.2) {
+  } else if (score > 0.2) {
     return '2-';
   } else {
     const messages = [
@@ -47,47 +49,46 @@ function getScoreMessage(score: number): string {
   }
 }
 
+/**
+ * Removes all non-numeric characters from the string
+ * @param str string
+ */
+function digitsOnly(str: string): string {
+  const pattern = /[^0-9]/g;
+  return str.replace(pattern, '');
+}
+
 const INPUTS = ['first', 'second', 'result'] as const;
 const KEY = '[School.Math.Grade-3.Mental-math]';
 
-interface Item {
-  inputName: string;
-  inputValue: string;
-  inputIndex: 'first' | 'second' | 'result';
-  inputLength: number;
-  isValid?: boolean;
-  isChecked?: boolean;
-  expression: MathExpression;
-}
+type FormStatus = 'active' | 'validation' | 'done';
 
 @Component({
   selector: 'app-mental-math',
   templateUrl: './mental-math.component.html',
   styleUrls: ['./mental-math.component.scss']
 })
-export class MentalMathComponent implements OnInit, AfterViewInit {
-  @Input() topic = 'Найди значение каждого выражения.';
-    // 'Вычисли, переставляя, где удобно, слагаемые или заменяя соседние слагаемые их суммой.';
+export class MentalMathComponent implements OnInit {
+  // 'Вычисли, переставляя, где удобно, слагаемые или заменяя соседние слагаемые их суммой.'
+  primeMessage = 'Найди значение каждого выражения.';
+  extraMessage = 'Работа над ошибками:'; // correction of mistakes
 
-  @Input() items: Item[] = [];
-  @ViewChildren('itemInputs') inputList: QueryList<ElementRef<HTMLInputElement>>;
+  primeStatus: FormStatus;
+  extraStatus: FormStatus;
 
-  status: 'active' | 'validation' | 'done' = 'active';
+  primeItems: InputItem[];
+  extraItems: InputItem[];
+
+  @ViewChild('menuButton', { read: ElementRef }) menuButtonRef: ElementRef<HTMLButtonElement>;
+
+  canPrimeSubmit = false;
   scoreMessage = '';
   score = 0;
 
   autoplay = new Autoplay();
 
-  showKeyboard = false;
-  keyboardTransform = '';
-  inputIndex = -1;
-
   todayVictories = 0;
   victoryAnimation = false;
-
-  get toggleKeyboardIcon() {
-    return this.showKeyboard ? 'keyboard_hide' : 'keyboard';
-  }
 
   constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
     iconRegistry.addSvgIcon('icon_sun', sanitizer.bypassSecurityTrustResourceUrl('assets/school/sun.svg'));
@@ -95,30 +96,34 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
 
   init(): void {
     this.autoplay.stop();
-    this.status = 'active';
+    this.canPrimeSubmit = false;
     this.score = 0;
     this.scoreMessage = '';
-    this.items = [];
+
+    this.primeStatus = 'active';
+    this.primeItems = [];
+    this.extraStatus = undefined;
+    this.extraItems = undefined;
 
     const inputValue = '';
-    while (this.items.length < 10) {
+    while (this.primeItems.length < 10) {
       const type = randomInteger(0, 2);
       const inputIndex = INPUTS[randomInteger(0, INPUTS.length)];
-      const inputName = 'mathExpression' + this.items.length;
+      const inputName = 'mathExpression' + this.primeItems.length;
       if (type === 0) {
         // Create Addition.
         const sum = randomInteger(0, 101);
         const a = randomInteger(0, sum + 1);
         const expression = createAddition(a, sum - a);
         const inputLength = expression[inputIndex].value.toString().length;
-        this.items.push({ inputName, inputValue, inputIndex, inputLength, expression });
+        this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
       } else if (type === 1) {
         // Create Subtraction.
         const a = randomInteger(0, 101);
         const b = randomInteger(0, a + 1);
         const expression = createSubtraction(a, b);
         const inputLength = expression[inputIndex].value.toString().length;
-        this.items.push({ inputName, inputValue, inputIndex, inputLength, expression });
+        this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
       }
     }
   }
@@ -139,36 +144,36 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    this.nextItemRequestFocus(0);
-  }
-
   onRefresh() {
     this.init();
-    // Give angular a chance to rebuild the form.
-    setTimeout(() => {
-      this.nextItemRequestFocus(0);
-    }, 100);
   }
 
-  canSubmit() {
-    if (this.status !== 'active') {
+  getPrimeSubmitStatus() {
+    if (this.primeStatus !== 'active') {
       return false;
     }
 
-    for (const item of this.items) {
-      if (!item.inputValue) {
+    for (const item of this.primeItems) {
+      if (!item.inputValue || isNaN(+item.inputValue)) {
         return false;
       }
     }
     return true;
   }
 
-  get submitButtonLabel() {
-    switch (this.status) {
-      case 'active': return this.canSubmit() ? 'Проверим?' : '?';
+  get primeSubmitLabel() {
+    switch (this.primeStatus) {
+      case 'active': return this.canPrimeSubmit ? 'Проверим?' : '?';
       case 'validation': return 'Проверяем...';
       case 'done': return 'Оценка: ';
+    }
+  }
+
+  get extraSubmitLabel() {
+    switch (this.extraStatus) {
+      case 'active': return '?';
+      case 'validation': return 'Проверяю...';
+      case 'done': return '!';
     }
   }
 
@@ -178,17 +183,15 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
 
   setScore() {
     let count = 0;
-    for (const item of this.items) {
+    for (const item of this.primeItems) {
       if (item.isValid) {
         count++;
       }
     }
 
-    this.score = count / this.items.length;
+    this.score = count / this.primeItems.length;
     if (this.score >= 1) {
       this.todayVictories++;
-
-      this.victoryAnimation = (this.todayVictories > 0 && this.todayVictories <= 5);
 
       try {
         const today = getDate('YYYY-MM-DD');
@@ -197,33 +200,83 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
         console.warn('localStorage error:', error);
       }
     }
-    return getScoreMessage(this.score);
   }
 
-  onSubmit(form: NgForm) {
+  onPrimeChecked() {
+    this.primeStatus = 'done';
+    this.victoryAnimation = false;
+    this.scoreMessage = '';
+    this.setScore();
+  }
+
+  onPrimeEnded() {
+    // activate extra
+    const extra = this.primeItems
+      .filter((value) => !value.isValid)
+      .map((value) => ({ ...value, isChecked: false, inputValue: '', inputName: value.inputName + 'Extra' }));
+    if (extra.length > 0) {
+      this.extraItems = extra;
+      this.extraStatus = 'active';
+    } else {
+      this.victoryAnimation = true;
+    }
+  }
+
+  onExtraSubmit(form: NgForm) {
+    // console.log('Submitting correction:', form.value);
+
+    this.extraStatus = 'validation';
+    const items = this.extraItems;
+    let index = 0;
+    this.autoplay.timeout = 200;
+    this.autoplay.play(() => {
+      while (index < items.length) {
+        const item = items[index++];
+        // skip over checked or empty items
+        if (!item.isChecked && item.inputValue) {
+          if (item.expression[item.inputIndex].value === +item.inputValue) {
+            item.isValid = item.isChecked = item.isReadonly = true;
+          } else {
+            item.inputValue = '';
+          }
+          break;
+        }
+      }
+      if (index >= items.length) {
+        if (!items.find(item => !item.isChecked)) {
+          this.extraStatus = 'done';
+          this.requestMenuButtonFocus();
+        } else {
+          this.extraStatus = 'active';
+        }
+        return false;
+      }
+      return true;
+    });
+  }
+
+  onPrimeSubmit(form: NgForm) {
     // console.log('Submitting:', form.value);
-    if (!this.canSubmit()) {
+    if (!this.getPrimeSubmitStatus()) {
       console.warn('Cannot submit:', form.value);
       return;
     }
 
-    this.status = 'validation';
+    this.primeStatus = 'validation';
 
-    const items = this.items;
+    const items = this.primeItems;
     let index = 0;
 
     this.autoplay.timeout = 250;
     this.autoplay.play(() => {
       if (index < items.length) {
-        const item = items[index];
+        const item = items[index++];
         item.isChecked = true;
         item.isValid = (item.expression[item.inputIndex].value === +item.inputValue);
       }
-      const next = ++index < this.items.length;
-      if (!next) {
-        this.status = 'done';
-        const message = this.setScore();
-        this.scoreMessage = '';
+      if (index >= items.length) {
+        this.onPrimeChecked();
+        const message = getScoreMessage(this.score);
 
         this.autoplay.timeout = 100;
         this.autoplay.play(() => {
@@ -235,45 +288,37 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
           }
 
           if (this.scoreMessage === message) {
-            // restart victory animation
-            if (!this.victoryAnimation && this.score >= 1) {
-              this.victoryAnimation = true;
-            }
+            this.onPrimeEnded();
             return false;
           }
           return true;
         });
+        return false;
       }
-      return next;
+      return true;
     });
   }
 
-  onInputEnter(index: number) {
-    if (index >= 0 && index < this.items.length) {
-      const value = this.items[index].inputValue;
-      if (value && !isNaN(+value)) {
-        return this.nextItemRequestFocus(index + 1);
+  onPrimeItemChange(index: number) {
+    const item = this.primeItems[index];
+    if (item) {
+      const inputValue = digitsOnly(item.inputValue).substring(0, item.inputLength);
+      if (inputValue !== item.inputValue) {
+        this.canPrimeSubmit = false;
+        setTimeout(() => {
+          item.inputValue = inputValue;
+          this.canPrimeSubmit = this.getPrimeSubmitStatus();
+        }, 100);
+      } else {
+        this.canPrimeSubmit = this.getPrimeSubmitStatus();
       }
     }
-    return true;
   }
 
-  onInputFocus(event: FocusEvent, host: HTMLElement, index: number) {
-    this.inputIndex = index;
-    const target = event.target as HTMLElement;
-    if (host && target) {
-      const rc0 = host.getBoundingClientRect();
-      const rc1 = target.getBoundingClientRect();
-
-      this.keyboardTransform = `translate(${rc1.left - rc0.left}px, ${rc1.bottom - rc0.top}px)`;
-    }
-  }
-
-  onInputChange(index: number, value: string) {
-    const item = this.items[index];
+  onExtraItemChange(index: number) {
+    const item = this.extraItems[index];
     if (item) {
-      const pattern = /[^0-9]/g;
-      const inputValue = value.replace(pattern, '').substring(0, item.inputLength);
+      const inputValue = digitsOnly(item.inputValue).substring(0, item.inputLength);
       if (inputValue !== item.inputValue) {
         setTimeout(() => {
           item.inputValue = inputValue;
@@ -282,39 +327,12 @@ export class MentalMathComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onInputNext(n: number) {
-    if (this.inputIndex >= 0 && this.inputIndex < this.items.length) {
-      const item = this.items[this.inputIndex];
-      if (item.inputValue.length < item.inputLength) {
-        item.inputValue = item.inputValue + n;
-      }
-    }
-  }
-
-  onInputBack() {
-    if (this.inputIndex >= 0 && this.inputIndex < this.items.length) {
-      const item = this.items[this.inputIndex];
-      const length = item.inputValue.length;
-      if (length > 0) {
-        item.inputValue = item.inputValue.substring(0, length - 1);
-      }
-    }
-  }
-
-  nextItemRequestFocus(index: number): boolean {
-    const inputs = this.inputList.toArray();
-    const length = inputs.length;
-    for (let i = 0; i < length; i++) {
-      const elem = inputs[(index + i) % length].nativeElement;
+  requestMenuButtonFocus() {
+    setTimeout(() => {
+      const elem = this.menuButtonRef?.nativeElement;
       if (elem) {
-        if (!elem.value) {
-          setTimeout(() => {
-            elem.focus();
-          });
-          return true;
-        }
+        elem.focus();
       }
-    }
-    return false;
+    });
   }
 }

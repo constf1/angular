@@ -1,72 +1,27 @@
+<ng-template #formPrimeSubmitButton>
+  <button [disabled]="!(primeStatus === 'active' && canPrimeSubmit)" id="onPrimeSubmitButton" mat-icon-button color="primary"
+    aria-label="submission button" type="submit">
+    <mat-icon>face</mat-icon>
+  </button>
+</ng-template>
+
 <app-squared-paper>
   <div style="position: absolute; right:0; top:0">
-    <mat-icon class="squared-paper-trophy" *ngIf="todayVictories > 0" svgIcon="icon_sun"
-      [class.step1]="todayVictories === 1"
-      [class.step2]="todayVictories === 2"
-      [class.step3]="todayVictories === 3"
-      [class.step4]="todayVictories === 4"
-      [class.step5]="todayVictories >= 5"
-      [class.animate]="victoryAnimation"
-      ></mat-icon>
+    <mat-icon class="mental-math-trophy" *ngIf="todayVictories > 0" svgIcon="icon_sun"
+      (click)="victoryAnimation = !victoryAnimation" [class.step1]="todayVictories === 1"
+      [class.step2]="todayVictories === 2" [class.step3]="todayVictories === 3" [class.step4]="todayVictories === 4"
+      [class.step5]="todayVictories >= 5" [class.animate]="victoryAnimation">
+    </mat-icon>
   </div>
-  <div class="squared-paper-topic">{{topic}}</div>
-  <form class="squared-paper-form" (ngSubmit)="onSubmit(form)" #form="ngForm">
-    <div class="squared-paper-form-main" #main>
-      <div class="squared-paper-form-item" *ngFor="let item of items; index as i">
-        <div class="squared-paper-col-3">
-          <div class="squared-paper-form-check" *ngIf="item.isChecked && item.isValid">&#10003;</div>
-        </div>
-        <div class="squared-paper-col-12">
-          <div class="squared-paper-form-entry">
-            <label [for]="item.inputName" *ngIf="item.inputIndex !== 'first'">
-              <span [title]="item.expression.first.name">{{item.expression.first.value}}</span>
-              <span [title]="item.expression.operator.name">{{item.expression.operator.notation}}</span>
-              <ng-container *ngIf="item.inputIndex !== 'second'">
-                <span [title]="item.expression.second.name">{{item.expression.second.value}}</span>
-                <span title="equals">=</span>
-              </ng-container>
-            </label>
-            <input #itemInputs type="text" placeholder="?" autocomplete="off" [id]="item.inputName"
-              [name]="item.inputName" [class.invalid]="item.isChecked && !item.isValid" [readonly]="status !== 'active'"
-              [attr.maxlength]="item.inputLength" (ngModelChange)="onInputChange(i, item.inputValue = $event)"
-              [ngModel]="item.inputValue" (keyup.Enter)="onInputEnter(i)" (focus)="onInputFocus($event, main, i)">
-            <label class="squared-paper-pl" [for]="item.inputName" *ngIf="item.inputIndex !== 'result'">
-              <ng-container *ngIf="item.inputIndex !== 'second'">
-                <span [title]="item.expression.operator.name">{{item.expression.operator.notation}}</span>
-                <span [title]="item.expression.second.name">{{item.expression.second.value}}</span>
-              </ng-container>
-              <span title="equals">=</span>
-              <span [title]="item.expression.result.name">{{item.expression.result.value}}</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div *ngIf="keyboardTransform && status === 'active'" class="squared-paper-form-keyboard"
-        [style.transform]="keyboardTransform">
-        <div class="squared-paper-form-keyboard-icon" (click)="showKeyboard = !showKeyboard">
-          <mat-icon>{{toggleKeyboardIcon}}</mat-icon>
-        </div>
-        <div *ngIf="showKeyboard" class="squared-paper-form-keyboard-dial">
-          <button type="button" mat-button (click)="onInputNext(1)">1</button>
-          <button type="button" mat-button (click)="onInputNext(2)">2</button>
-          <button type="button" mat-button (click)="onInputNext(3)">3</button>
-          <button type="button" mat-button (click)="onInputNext(4)">4</button>
-          <button type="button" mat-button (click)="onInputNext(5)">5</button>
-          <button type="button" mat-button (click)="onInputNext(6)">6</button>
-          <button type="button" mat-button (click)="onInputNext(7)">7</button>
-          <button type="button" mat-button (click)="onInputNext(8)">8</button>
-          <button type="button" mat-button (click)="onInputNext(9)">9</button>
-          <button type="button" mat-button (click)="onInputNext(0)">0</button>
-          <button type="button" mat-button (click)="onInputBack()">&larr;</button>
-          <button type="button" mat-button (click)="showKeyboard = onInputEnter(inputIndex)">OK</button>
-        </div>
-      </div>
-    </div>
-    <div class="squared-paper-form-submit-button">
-      <ng-container *ngIf="status === 'done'">
-        <button id="onSubmitButton" mat-icon-button color="warn" aria-label="refresh button" type="button"
-          [matMenuTriggerFor]="menu" appFocus>
+  <!-- main form -->
+  <form #formPrime="ngForm" (ngSubmit)="onPrimeSubmit(formPrime)">
+    <div class="mental-math-topic">{{primeMessage}}</div>
+    <app-math-input-group [items]="primeItems" [active]="primeStatus === 'active'" (itemChange)="onPrimeItemChange($event)">
+    </app-math-input-group>
+    <div class="mental-math-submit">
+      <ng-container *ngIf="primeStatus === 'done'; else formPrimeSubmitButton">
+        <button #menuButton id="onPrimeSubmitButton" mat-icon-button color="warn" aria-label="refresh button"
+          type="button" [matMenuTriggerFor]="menu" appFocus>
           <mat-icon>face</mat-icon>
         </button>
         <mat-menu #menu="matMenu" yPosition="above">
@@ -76,16 +31,25 @@
           </button>
         </mat-menu>
       </ng-container>
-      <ng-container *ngIf="status !== 'done'">
-        <button [disabled]="!canSubmit()" id="onSubmitButton" mat-icon-button color="primary"
-          aria-label="submission button" type="submit">
-          <mat-icon>face</mat-icon>
-        </button>
-      </ng-container>
+      <label for="onPrimeSubmitButton">{{primeSubmitLabel}}</label>
+      <span *ngIf="primeStatus === 'done'" class="mental-math-teacher">{{scoreMessage}}</span>
     </div>
-    <div class="squared-paper-form-submit-message">
-      <label for="onSubmitButton" style="vertical-align: top;">{{submitButtonLabel}}</label>
-      <span *ngIf="status === 'done'" class="squared-paper-teacher">{{scoreMessage}}</span>
+  </form>
+
+
+  <!-- mistake correction form -->
+  <form *ngIf="extraItems" #formExtra="ngForm" (ngSubmit)="onExtraSubmit(formExtra)">
+    <div class="mental-math-topic">{{extraMessage}}</div>
+    <app-math-input-group [items]="extraItems" [active]="extraStatus === 'active'" (itemChange)="onExtraItemChange($event)">
+    </app-math-input-group>
+
+    <div class="mental-math-submit">
+      <button id="onExtraSubmitButton" mat-icon-button color="primary" aria-label="submission button" type="submit"
+        [disabled]="extraStatus !== 'active'">
+        <mat-icon>child_care</mat-icon>
+      </button>
+      <label
+        [attr.for]="extraStatus === 'done' ? 'onPrimeSubmitButton' : 'onExtraSubmitButton'">{{extraSubmitLabel}}</label>
     </div>
   </form>
 </app-squared-paper>
