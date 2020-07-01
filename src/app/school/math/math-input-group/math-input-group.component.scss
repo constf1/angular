@@ -1,0 +1,116 @@
+@import 'src/app/school/squared-paper/squared-paper';
+$X: $squared-paper-square-side;
+
+.math-input-group {
+  position: relative;
+  margin-right: 4 * $X;
+
+  input {
+    font: inherit;
+    letter-spacing: inherit;
+    padding: 0 0;
+    border: none;
+    background-color: transparent;
+
+    margin-left: -0.25 * $X;
+    margin-right: 0.25 * $X;
+    padding-left: 0.25 * $X;
+
+    &[maxlength="1"] {
+      width: (1 - 0.25) * $X;
+    }
+
+    &[maxlength="2"] {
+      width: (2 - 0.25) * $X;
+    }
+
+    &[maxlength="3"] {
+      width: (3 - 0.25) * $X;
+    }
+
+    &[maxlength="4"] {
+      width: (4 - 0.25) * $X;
+    }
+
+    &[maxlength="5"] {
+      width: (5 - 0.25) * $X;
+    }
+  }
+
+  input:focus {
+    letter-spacing: normal;
+    outline: #0000ff dashed thin;
+    background-color: #fed;
+  }
+
+  input.invalid {
+    text-decoration: solid #f00 line-through;
+  }
+
+  label {
+    cursor: pointer;
+
+    &:hover {
+      text-shadow: 1px 1px 2px #eba;
+    }
+  }
+
+  .math-input-group-item {
+    display: inline-block;
+    width: 50%; // 15 * $X;
+    margin-bottom: $X;
+  }
+
+  .math-input-group-col-20 {
+    display: inline-block;
+    width: 20%; // 3 * $X;
+  }
+
+  .math-input-group-col-80 {
+    display: inline-block;
+    width: 80%; // 12 * $X;
+  }
+
+  .math-input-group-item-pref {
+    margin-left: $X;
+    color: red;
+    font-weight: 600;
+  }
+
+  .math-input-group-item-pref,
+  .math-input-group-item-main {
+    letter-spacing: 0.5 * $X;
+    padding-left: 0.25 * $X;
+  }
+
+  .math-input-group-keyboard {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .math-input-group-keyboard-icon {
+    cursor: pointer;
+    height: $X;
+    color: #bbf;
+    transition: color 0.6s ease-in-out;
+
+    &:hover {
+      color: #008;
+    }
+  }
+
+  .math-input-group-keyboard-dial {
+    position: relative;
+    border: 1px #bbf solid;
+    border-radius: 4px;
+    padding: 2px;
+    top: -$X;
+    left: $X;
+    width: 192px;
+    color: #008;
+    background-color: #ddf;
+    box-shadow: 2px 2px 4px #888;
+  }
+}

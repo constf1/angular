@@ -1,0 +1,41 @@
+<div class="math-input-group" #main>
+  <div class="math-input-group-item" *ngFor="let item of items; index as i">
+    <div class="math-input-group-col-20">
+      <div class="math-input-group-item-pref" *ngIf="item.isChecked && item.isValid">&#10003;</div>
+    </div>
+    <div class="math-input-group-col-80">
+      <div class="math-input-group-item-main">
+        <label [for]="item.inputName" *ngIf="item.inputIndex !== 'first'">
+          <span [title]="item.expression.first.name">{{item.expression.first.value}}</span>
+          <span [title]="item.expression.operator.name">{{item.expression.operator.notation}}</span>
+          <ng-container *ngIf="item.inputIndex !== 'second'">
+            <span [title]="item.expression.second.name">{{item.expression.second.value}}</span>
+            <span title="equals">=</span>
+          </ng-container>
+        </label>
+        <input #itemInputs type="text" placeholder="?" autocomplete="off" [id]="item.inputName" [name]="item.inputName"
+          [class.invalid]="item.isChecked && !item.isValid" [readonly]="!active || item.isReadonly"
+          [attr.maxlength]="item.inputLength" [ngModel]="item.inputValue"
+          (ngModelChange)="item.inputValue = $event; itemChange.emit(i)" (keyup.Enter)="onInputEnter(i)"
+          (focus)="onInputFocus($event, main, i)">
+        <label [for]="item.inputName" *ngIf="item.inputIndex !== 'result'">
+          <ng-container *ngIf="item.inputIndex !== 'second'">
+            <span [title]="item.expression.operator.name">{{item.expression.operator.notation}}</span>
+            <span [title]="item.expression.second.name">{{item.expression.second.value}}</span>
+          </ng-container>
+          <span title="equals">=</span>
+          <span [title]="item.expression.result.name">{{item.expression.result.value}}</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="active && keyboardTransform" class="math-input-group-keyboard" [style.transform]="keyboardTransform">
+    <div class="math-input-group-keyboard-icon" (click)="showKeyboard = !showKeyboard">
+      <mat-icon>{{toggleKeyboardIcon}}</mat-icon>
+    </div>
+    <div *ngIf="showKeyboard" class="math-input-group-keyboard-dial">
+      <app-numpad [buttonNames]="buttons" (selectionChange)="onInputNext($event)"></app-numpad>
+    </div>
+  </div>
+</div>
