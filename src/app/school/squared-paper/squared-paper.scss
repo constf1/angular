@@ -1,0 +1,6 @@
+// standard squared paper: 170mm X 205mm or 34 X 41 squares
+$squared-paper-square-side: 24px;
+$squared-paper-square-half: 0.5 * $squared-paper-square-side; // letter-spacing
+$squared-paper-square-quarter: 0.25 * $squared-paper-square-side; // small text-indent
+$squared-paper-font-size: 5 * $squared-paper-square-side / 6;
+$squared-paper-background-color: #f5f5f5;

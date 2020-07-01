@@ -1,9 +1,4 @@
-// standard squared paper: 170mm X 205mm or 34 X 41 squares
-$squared-paper-square-side: 24px;
-$squared-paper-square-half: 0.5 * $squared-paper-square-side; // letter-spacing
-$squared-paper-square-quarter: 0.25 * $squared-paper-square-side; // small text-indent
-$squared-paper-font-size: 5 * $squared-paper-square-side / 6;
-$squared-paper-background-color: #f5f5f5;
+@import './squared-paper';
 
 .squared-paper {
   position: relative;
@@ -140,14 +135,6 @@ $squared-paper-background-color: #f5f5f5;
 
 .squared-paper-mt-4 {
   margin-top: 4 * $squared-paper-square-side;
-}
-
-.squared-paper-teacher {
-  font-family: 'Pacifico', cursive;
-  font-weight: 400;
-  font-size: 32px;
-  color: #f00;
-  letter-spacing: normal;
 }
 
 .squared-paper-spacing {
