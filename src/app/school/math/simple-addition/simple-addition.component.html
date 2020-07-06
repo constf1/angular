@@ -1,0 +1,30 @@
+<app-squared-paper [rowNum]="rowNum" colNum="18">
+  <svg [ngClass]="animationName" appContentSvg>
+    <g transform="translate(2 2)">
+      <g stroke-width="0.1">
+        <path id="augendPath" [attr.d]="augendPath" fill="#00f1" stroke="#008e" />
+        <path id="addendPath" [attr.d]="addendPath" fill="#f001" stroke="#800e" />
+      </g>
+      <path id="sumPath" [attr.d]="sumPath" fill="none" stroke="#080e" stroke-width="0.2" stroke-dasharray="40"
+        stroke-dashoffset="40" />
+      <g fill="none" stroke="#000b" stroke-width="0.05">
+        <path id="sumTensPath" [attr.d]="sumTensPath" />
+        <path id="sumOnesPath" [attr.d]="sumOnesPath" />
+      </g>
+    </g>
+  </svg>
+
+  <div *ngIf="augendTransform" class="simple-addition-box simple-addition-augend" [style.transform]="augendTransform"
+    (click)="setAnimation('simple-addition-animate-augend')">{{augendText}}</div>
+  <div *ngIf="addendTransform" class="simple-addition-box simple-addition-addend" [style.transform]="addendTransform"
+    (click)="setAnimation('simple-addition-animate-addend')">{{addendText}}</div>
+  <div *ngIf="sumTransform" class="simple-addition-box simple-addition-sum" [style.transform]="sumTransform"
+    (click)="setAnimation('simple-addition-animate-sum')">{{sumText}}
+  </div>
+  <div *ngIf="sumOnesTransform" class="simple-addition-box simple-addition-info" [style.transform]="sumOnesTransform"
+    (click)="setAnimation('simple-addition-animate-sum-ones')">единицы
+  </div>
+  <div *ngIf="sumTensTransform" class="simple-addition-box simple-addition-info" [style.transform]="sumTensTransform"
+    (click)="setAnimation('simple-addition-animate-sum-tens')">десятки
+  </div>
+</app-squared-paper>

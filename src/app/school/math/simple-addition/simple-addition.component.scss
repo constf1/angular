@@ -1,0 +1,86 @@
+@import 'src/app/school/squared-paper/squared-paper';
+$X: $squared-paper-square-side;
+
+.simple-addition-box {
+  position: absolute;
+  left: -$X / 2;
+  top: 0;
+  background-color: #2222;
+  border-radius: $X / 2;
+  min-width: $X;
+  text-align: center;
+  cursor: pointer;
+
+  transition: box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: 2px 2px 4px #0008;
+  }
+}
+
+.simple-addition-augend {
+  color: #008e;
+  background-color: #0082;
+}
+
+.simple-addition-addend {
+  color: #800e;
+  background-color: #8002;
+}
+
+.simple-addition-sum {
+  min-width: 2 * $X;
+  color: #222e;
+  background-color: #2222;
+  letter-spacing: $X / 2;
+  padding-left: $X / 2;
+  left: -$X / 4;
+  text-align: right;
+}
+
+.simple-addition-info {
+  padding-left: $X / 4;
+  padding-right: $X / 4;
+}
+
+@keyframes animationTerm {
+  0% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    fill-opacity: 0;
+  }
+
+  100% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes animationTermRestart {
+  0% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    fill-opacity: 0;
+  }
+
+  100% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 0;
+  }
+}
+
+.simple-addition-animate-augend #augendPath,
+.simple-addition-animate-addend #addendPath,
+.simple-addition-animate-sum #sumPath,
+.simple-addition-animate-sum-tens #sumTensPath,
+.simple-addition-animate-sum-ones #sumOnesPath {
+  animation: animationTerm 4s linear 1;
+}
+
+.simple-addition-animate-augend.simple-addition-animation-restart #augendPath,
+.simple-addition-animate-addend.simple-addition-animation-restart #addendPath,
+.simple-addition-animate-sum.simple-addition-animation-restart #sumPath,
+.simple-addition-animate-sum-tens.simple-addition-animation-restart #sumTensPath,
+.simple-addition-animate-sum-ones.simple-addition-animation-restart #sumOnesPath {
+  animation-name: animationTermRestart;
+}
