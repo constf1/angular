@@ -17,16 +17,6 @@ export interface Path {
 export class SquaredPaperComponent implements OnInit {
   @Input() rowNum = 41;
   @Input() colNum = 34;
-  @Input() paths: Path[] = [
-    {
-      d: `M${(this.colNum - 4) * SQUARE_SIDE} 0v${this.height}`,
-      style: {
-        fill: 'none',
-        stroke: '#f00',
-        strokeWidth: '2px'
-      }
-    }
-  ];
 
   get width() {
     return this.colNum * SQUARE_SIDE;
