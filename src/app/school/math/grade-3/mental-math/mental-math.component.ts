@@ -1,7 +1,11 @@
+// tslint:disable: variable-name
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+
 import { MatIconRegistry } from '@angular/material/icon';
+// import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatDialog } from '@angular/material/dialog';
 
 import { randomInteger } from 'src/app/common/math-utils';
 import { Autoplay } from 'src/app/common/autoplay';
@@ -10,6 +14,7 @@ import { getDate } from 'src/app/common/date-utils';
 
 import { createAddition, createSubtraction } from '../../math-models';
 import { InputItem } from '../../math-input-group/math-input-group.component';
+import { MathExpressionDialogComponent } from '../../math-expression-dialog/math-expression-dialog.component';
 
 function getScoreMessage(score: number): string {
   if (score === 1) {
@@ -69,6 +74,7 @@ type FormStatus = 'active' | 'validation' | 'done';
   styleUrls: ['./mental-math.component.scss']
 })
 export class MentalMathComponent implements OnInit {
+  // readonly scale = `scale(${SQUARE_SIDE})`;
   // 'Вычисли, переставляя, где удобно, слагаемые или заменяя соседние слагаемые их суммой.'
   primeMessage = 'Найди значение каждого выражения.';
   extraMessage = 'Работа над ошибками:'; // correction of mistakes
@@ -89,8 +95,9 @@ export class MentalMathComponent implements OnInit {
 
   todayVictories = 0;
   victoryAnimation = false;
+  victoryClass: string;
 
-  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private _dialog: MatDialog) {
     iconRegistry.addSvgIcon('icon_sun', sanitizer.bypassSecurityTrustResourceUrl('assets/school/sun.svg'));
   }
 
@@ -139,6 +146,7 @@ export class MentalMathComponent implements OnInit {
         const todayVictories = data[today];
         if (typeof todayVictories === 'number' && todayVictories > this.todayVictories) {
           this.todayVictories = todayVictories;
+          this.victoryClass = 'step' + Math.min(5, this.todayVictories);
         }
       }
     }
@@ -181,7 +189,7 @@ export class MentalMathComponent implements OnInit {
     return this.score >= 1 ? 'Ещё раз?' : 'Переиграть!';
   }
 
-  setScore() {
+  getScore() {
     let count = 0;
     for (const item of this.primeItems) {
       if (item.isValid) {
@@ -189,9 +197,28 @@ export class MentalMathComponent implements OnInit {
       }
     }
 
-    this.score = count / this.primeItems.length;
-    if (this.score >= 1) {
+    return count / this.primeItems.length;
+  }
+
+  onPrimeChecked() {
+    this.primeStatus = 'done';
+    this.victoryAnimation = false;
+    this.scoreMessage = '';
+    this.score = this.getScore();
+  }
+
+  onPrimeEnded() {
+    // activate extra
+    const extra = this.primeItems
+      .filter((value) => !value.isValid)
+      .map((value) => ({ ...value, isChecked: false, inputValue: '', inputName: value.inputName + 'Extra', hasNote: true }));
+    if (extra.length > 0) {
+      this.extraItems = extra;
+      this.extraStatus = 'active';
+    } else {
       this.todayVictories++;
+      this.victoryClass = 'step' + Math.min(5, this.todayVictories);
+      this.victoryAnimation = true;
 
       try {
         const today = getDate('YYYY-MM-DD');
@@ -199,26 +226,6 @@ export class MentalMathComponent implements OnInit {
       } catch (error) {
         console.warn('localStorage error:', error);
       }
-    }
-  }
-
-  onPrimeChecked() {
-    this.primeStatus = 'done';
-    this.victoryAnimation = false;
-    this.scoreMessage = '';
-    this.setScore();
-  }
-
-  onPrimeEnded() {
-    // activate extra
-    const extra = this.primeItems
-      .filter((value) => !value.isValid)
-      .map((value) => ({ ...value, isChecked: false, inputValue: '', inputName: value.inputName + 'Extra' }));
-    if (extra.length > 0) {
-      this.extraItems = extra;
-      this.extraStatus = 'active';
-    } else {
-      this.victoryAnimation = true;
     }
   }
 
@@ -236,6 +243,7 @@ export class MentalMathComponent implements OnInit {
         if (!item.isChecked && item.inputValue) {
           if (item.expression[item.inputIndex].value === +item.inputValue) {
             item.isValid = item.isChecked = item.isReadonly = true;
+            item.hasNote = false;
           } else {
             item.inputValue = '';
           }
@@ -334,5 +342,12 @@ export class MentalMathComponent implements OnInit {
         elem.focus();
       }
     });
+  }
+
+  requestNoteFor(index: number) {
+    const item = this.extraItems[index];
+    if (item) {
+      this._dialog.open(MathExpressionDialogComponent, { data: { ...item } });
+    }
   }
 }

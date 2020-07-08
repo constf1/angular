@@ -1,22 +1,29 @@
 <ng-template #formPrimeSubmitButton>
-  <button [disabled]="!(primeStatus === 'active' && canPrimeSubmit)" id="onPrimeSubmitButton" mat-icon-button color="primary"
-    aria-label="submission button" type="submit">
+  <button [disabled]="!(primeStatus === 'active' && canPrimeSubmit)" id="onPrimeSubmitButton" mat-icon-button
+    color="primary" aria-label="submission button" type="submit">
     <mat-icon>face</mat-icon>
   </button>
 </ng-template>
 
 <app-squared-paper>
+  <!-- standard squared paper: 170mm X 205mm or 34 X 41 squares -->
+  <svg appContentSvg>
+    <!-- 4 squares margin -->
+    <line x1="30" x2="30" y1="0" y2="41" stroke-width="0.1" stroke="#f00" fill="none" />
+    <!-- debug lines -->
+    <!-- <line x1="15" x2="15" y1="0" y2="41" stroke-width="0.02" stroke="#0ef" fill="none" />
+    <line x1="0" x2="34" y1="20.5" y2="20.5" stroke-width="1" stroke="#ff04" fill="none" /> -->
+  </svg>
   <div style="position: absolute; right:0; top:0">
-    <mat-icon class="mental-math-trophy" *ngIf="todayVictories > 0" svgIcon="icon_sun"
-      (click)="victoryAnimation = !victoryAnimation" [class.step1]="todayVictories === 1"
-      [class.step2]="todayVictories === 2" [class.step3]="todayVictories === 3" [class.step4]="todayVictories === 4"
-      [class.step5]="todayVictories >= 5" [class.animate]="victoryAnimation">
+    <mat-icon class="mental-math-trophy" *ngIf="todayVictories > 0" svgIcon="icon_sun" [ngClass]="victoryClass"
+      [class.animate]="victoryAnimation" (click)="victoryAnimation = !victoryAnimation">
     </mat-icon>
   </div>
   <!-- main form -->
   <form #formPrime="ngForm" (ngSubmit)="onPrimeSubmit(formPrime)">
     <div class="mental-math-topic">{{primeMessage}}</div>
-    <app-math-input-group [items]="primeItems" [active]="primeStatus === 'active'" (itemChange)="onPrimeItemChange($event)">
+    <app-math-input-group [items]="primeItems" [active]="primeStatus === 'active'"
+      (itemChange)="onPrimeItemChange($event)">
     </app-math-input-group>
     <div class="mental-math-submit">
       <ng-container *ngIf="primeStatus === 'done'; else formPrimeSubmitButton">
@@ -40,7 +47,8 @@
   <!-- mistake correction form -->
   <form *ngIf="extraItems" #formExtra="ngForm" (ngSubmit)="onExtraSubmit(formExtra)">
     <div class="mental-math-topic">{{extraMessage}}</div>
-    <app-math-input-group [items]="extraItems" [active]="extraStatus === 'active'" (itemChange)="onExtraItemChange($event)">
+    <app-math-input-group [items]="extraItems" [active]="extraStatus === 'active'"
+      (itemChange)="onExtraItemChange($event)" (noteRequest)="requestNoteFor($event)">
     </app-math-input-group>
 
     <div class="mental-math-submit">
