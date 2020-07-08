@@ -39,7 +39,7 @@ $X: $squared-paper-square-side;
 
   input:focus {
     letter-spacing: normal;
-    outline: #0000ff dashed thin;
+    outline: #00f dashed thin;
     background-color: #fed;
   }
 
@@ -51,7 +51,7 @@ $X: $squared-paper-square-side;
     cursor: pointer;
 
     &:hover {
-      text-shadow: 1px 1px 2px #eba;
+      text-shadow: 1px 1px 2px #cba;
     }
   }
 
@@ -71,10 +71,16 @@ $X: $squared-paper-square-side;
     width: 80%; // 12 * $X;
   }
 
+  .math-input-group-mark {
+    color: #f00;
+  }
+
+  .math-input-group-note {
+    color: #008;
+  }
+
   .math-input-group-item-pref {
     margin-left: $X;
-    color: red;
-    font-weight: 600;
   }
 
   .math-input-group-item-pref,

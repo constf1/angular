@@ -13,17 +13,17 @@ import {
 } from '@angular/core';
 
 import { MathExpression } from '../math-models';
-import { NgForm } from '@angular/forms';
 
 export interface InputItem {
+  expression: MathExpression;
+  hasNote?: boolean;
   inputName: string;
   inputValue: string;
   inputIndex: 'first' | 'second' | 'result';
   inputLength: number;
-  isValid?: boolean;
   isChecked?: boolean;
   isReadonly?: boolean;
-  expression: MathExpression;
+  isValid?: boolean;
 }
 
 const BUTTON_BACK = '←'; // left arrow (&larr;)
@@ -35,10 +35,10 @@ const BUTTON_NEXT = 'OK';
   styleUrls: ['./math-input-group.component.scss']
 })
 export class MathInputGroupComponent implements OnInit, AfterViewInit, OnChanges {
-  @Input() items: InputItem[];
   @Input() active = true;
-  @Output() formSubmit = new EventEmitter<NgForm>();
+  @Input() items: InputItem[];
   @Output() itemChange = new EventEmitter<number>();
+  @Output() noteRequest = new EventEmitter<number>();
 
   @ViewChildren('itemInputs') inputList: QueryList<ElementRef<HTMLInputElement>>;
 

@@ -1,7 +1,11 @@
 <div class="math-input-group" #main>
   <div class="math-input-group-item" *ngFor="let item of items; index as i">
     <div class="math-input-group-col-20">
-      <div class="math-input-group-item-pref" *ngIf="item.isChecked && item.isValid">&#10003;</div>
+      <!-- <div class="math-input-group-item-pref" *ngIf="item.isChecked && item.isValid">&#10003;</div> -->
+      <span class="math-input-group-item-pref">
+        <span class="math-input-group-mark" *ngIf="item.isChecked && item.isValid">✔</span>
+        <label class="math-input-group-note" *ngIf="item.hasNote" (click)="noteRequest.emit(i)">&lowast;</label>
+      </span>
     </div>
     <div class="math-input-group-col-80">
       <div class="math-input-group-item-main">
