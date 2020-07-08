@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>{{title}}</h2>
+<mat-dialog-content>
+  <p>{{content}}</p>
+  <app-simple-addition *ngIf="hiddenTerm >= 0" [augend]="augend" [addend]="addend" [hiddenTerm]="hiddenTerm"></app-simple-addition>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <!-- <button mat-button mat-dialog-close>Cancel</button> -->
+  <button mat-button mat-dialog-close cdkFocusInitial>Понятно!</button>
+</mat-dialog-actions>
