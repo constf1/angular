@@ -27,6 +27,9 @@ import { FreecellHistoryComponent } from './freecell-history/freecell-history.co
 import { FreecellDemoComponent } from './freecell-demo/freecell-demo.component';
 import { FreecellPlaygroundComponent } from './freecell-playground/freecell-playground.component';
 
+export const MODULE_NAME = 'freecell-demo';
+export const MODULE_VERSION = '0.2.2';
+
 /**
  * Routes:
  */
