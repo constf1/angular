@@ -10,12 +10,18 @@ import { SquaredPaperComponent } from './squared-paper/squared-paper.component';
 import { MentalMathComponent } from './math/grade-3/mental-math/mental-math.component';
 import { NumpadComponent } from './math/numpad/numpad.component';
 import { MathInputGroupComponent } from './math/math-input-group/math-input-group.component';
+import { SimpleAdditionComponent } from './math/simple-addition/simple-addition.component';
+import { MathExpressionDialogComponent } from './math/math-expression-dialog/math-expression-dialog.component';
+
+export const MODULE_NAME = 'school-demo';
+export const MODULE_VERSION = '0.0.3';
 
 /**
  * Routes:
  */
 const routes: Routes = [
   { path: 'mental-math', component: MentalMathComponent },
+  { path: 'simple-math', component: SimpleAdditionComponent },
   { path: '', component: MentalMathComponent },
 ];
 
@@ -24,7 +30,9 @@ const routes: Routes = [
     SquaredPaperComponent,
     MentalMathComponent,
     NumpadComponent,
-    MathInputGroupComponent
+    MathInputGroupComponent,
+    SimpleAdditionComponent,
+    MathExpressionDialogComponent
   ],
   imports: [
     RouterModule.forChild(routes),
