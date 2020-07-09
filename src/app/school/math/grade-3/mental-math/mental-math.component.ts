@@ -4,7 +4,6 @@ import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 
 import { MatIconRegistry } from '@angular/material/icon';
-// import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatDialog } from '@angular/material/dialog';
 
 import { randomInteger } from 'src/app/common/math-utils';
@@ -12,7 +11,13 @@ import { Autoplay } from 'src/app/common/autoplay';
 import { commonPrefix } from 'src/app/common/string-utils';
 import { getDate } from 'src/app/common/date-utils';
 
-import { createAddition, createSubtraction } from '../../math-models';
+import {
+  createRandomAddition,
+  createRandomDivision,
+  createRandomMultiplication,
+  createRandomSubtraction,
+  MathExpression
+} from '../../math-models';
 import { InputItem } from '../../math-input-group/math-input-group.component';
 import { MathExpressionDialogComponent } from '../../math-expression-dialog/math-expression-dialog.component';
 
@@ -42,12 +47,13 @@ function getScoreMessage(score: number): string {
     return '3-';
   } else if (score > 0.3) {
     return '2';
-  } else if (score > 0.2) {
+  } else if (score >= 0.2) {
     return '2-';
   } else {
     const messages = [
       '', '', '', '',
-      'плохо.', 'отвратительно.', 'ужасно.'
+      'Плохо.', 'Отвратительно.', 'Ужасно.', 'Ужас!', 'Безобразно!',
+      'Ой как плохо!', 'Некрасиво.', 'Я в шоке!', 'Жуть!', 'Взгляни как нехорошо.'
     ];
     const message = messages[randomInteger(0, messages.length)];
     return '1 ' + message;
@@ -112,27 +118,28 @@ export class MentalMathComponent implements OnInit {
     this.extraStatus = undefined;
     this.extraItems = undefined;
 
-    const inputValue = '';
+    const MAX_VALUE = 100;
+
     while (this.primeItems.length < 10) {
-      const type = randomInteger(0, 2);
-      const inputIndex = INPUTS[randomInteger(0, INPUTS.length)];
-      const inputName = 'mathExpression' + this.primeItems.length;
+      const type = randomInteger(0, 4);
       if (type === 0) {
-        // Create Addition.
-        const sum = randomInteger(0, 101);
-        const a = randomInteger(0, sum + 1);
-        const expression = createAddition(a, sum - a);
-        const inputLength = expression[inputIndex].value.toString().length;
-        this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
+        this._addPrimeItem(createRandomAddition(MAX_VALUE));
       } else if (type === 1) {
-        // Create Subtraction.
-        const a = randomInteger(0, 101);
-        const b = randomInteger(0, a + 1);
-        const expression = createSubtraction(a, b);
-        const inputLength = expression[inputIndex].value.toString().length;
-        this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
+        this._addPrimeItem(createRandomSubtraction(MAX_VALUE));
+      } else if (type === 2) {
+        this._addPrimeItem(createRandomMultiplication(MAX_VALUE));
+      } else if (type === 3) {
+        this._addPrimeItem(createRandomDivision(MAX_VALUE));
       }
     }
+  }
+
+  private _addPrimeItem(expression: MathExpression) {
+    const inputName = 'mathExpression' + this.primeItems.length;
+    const inputValue = '';
+    const inputIndex = INPUTS[randomInteger(0, INPUTS.length)];
+    const inputLength = expression[inputIndex].value.toString().length;
+    this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
   }
 
   ngOnInit(): void {
