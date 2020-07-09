@@ -1,0 +1,72 @@
+@import 'src/app/school/squared-paper/squared-paper';
+$X: $squared-paper-square-side;
+
+.simple-multiplication-box {
+  position: absolute;
+  left: -$X / 2;
+  top: -$X / 2;
+  background-color: #2222;
+  border-radius: $X / 2;
+  min-width: $X;
+  text-align: center;
+  cursor: pointer;
+
+  transition: box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: 2px 2px 4px #0008;
+  }
+}
+
+.simple-multiplication-product {
+  color: #444e;
+  background-color: #2222;
+}
+
+.simple-multiplication-multiplier {
+  color: #808e;
+  background-color: #8082;
+}
+
+.simple-multiplication-multiplicand {
+  color: #d13e;
+  background-color: #d132;
+}
+
+@keyframes animationTerm {
+  0% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    fill-opacity: 0;
+  }
+
+  100% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes animationTermRestart {
+  0% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    fill-opacity: 0;
+  }
+
+  100% {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 0;
+  }
+}
+
+.simple-multiplication-animate-multiplier #multiplierPath,
+.simple-multiplication-animate-multiplicand #multiplicandPath,
+.simple-multiplication-animate-product #productPath {
+  animation: animationTerm 4s linear 1;
+}
+
+.simple-multiplication-animate-multiplier.simple-multiplication-animation-restart #multiplierPath,
+.simple-multiplication-animate-multiplicand.simple-multiplication-animation-restart #multiplicandPath,
+.simple-multiplication-animate-product.simple-multiplication-animation-restart #productPath {
+  animation-name: animationTermRestart;
+}

@@ -1,0 +1,18 @@
+<app-squared-paper [rowNum]="rowNum" [colNum]="colNum">
+  <svg [ngClass]="animationName" appContentSvg>
+    <g transform="translate(2 2)">
+      <path id="productPath" [attr.d]="productPath" fill="#0f04" stroke="#444e" stroke-width="0.1" />
+      <path id="multiplierPath" [attr.d]="multiplierPath" fill="none" stroke="#444e" stroke-width="0.1" />
+      <path id="multiplicandPath" [attr.d]="multiplicandPath" fill="none" stroke="#444e" stroke-width="0.1" />
+    </g>
+  </svg>
+  <div *ngIf="multiplierText" class="simple-multiplication-box simple-multiplication-multiplier"
+    [style.transform]="multiplierTransform" (click)="setAnimation('simple-multiplication-animate-multiplier')">
+    {{multiplierText}}</div>
+  <div *ngIf="multiplicandText" class="simple-multiplication-box simple-multiplication-multiplicand"
+    [style.transform]="multiplicandTransform" (click)="setAnimation('simple-multiplication-animate-multiplicand')">
+    {{multiplicandText}}</div>
+  <div *ngIf="productText" class="simple-multiplication-box simple-multiplication-product"
+    [style.transform]="productTransform" (click)="setAnimation('simple-multiplication-animate-product')">{{productText}}
+  </div>
+</app-squared-paper>
