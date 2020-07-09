@@ -1,6 +1,8 @@
 // An expression is a finite combination of symbols that is well-formed according to rules that
 // depend on the context.
 
+import { randomInteger } from 'src/app/common/math-utils';
+
 /**
  * Mathematical symbols can designate numbers (constants), variables, operations, functions,
  * brackets, punctuation, and grouping to help determine order of operations, and other aspects of
@@ -63,6 +65,12 @@ export function createAddition(first: number, second: number): MathExpression {
   });
 }
 
+export function createRandomAddition(maxValue: number): MathExpression {
+  const sum = randomInteger(0, maxValue + 1);
+  const a = randomInteger(0, sum + 1);
+  return createAddition(a, sum - a);
+}
+
 /**
  * subtraction: (minuend) − (subtrahend) = (difference)
  * @param first minuend
@@ -88,6 +96,12 @@ export function createSubtraction(first: number, second: number): MathExpression
       value: first - second
     }
   });
+}
+
+export function createRandomSubtraction(maxValue: number): MathExpression {
+  const a = randomInteger(0, maxValue + 1);
+  const b = randomInteger(0, a + 1);
+  return createSubtraction(a, b);
 }
 
 /**
@@ -118,6 +132,14 @@ export function createDivision(first: number, second: number): MathExpression {
   });
 }
 
+export function createRandomDivision(maxValue: number): MathExpression {
+  const quotient = Math.floor(Math.sqrt(maxValue));
+  const a = randomInteger(1, quotient + 1);
+  const b = randomInteger(1, quotient + 1);
+  return createDivision(a * b, b);
+}
+
+
 /**
  * multiplication: (multiplier) * (multiplicand) = (product)
  * @param first multiplier
@@ -128,7 +150,7 @@ export function createMultiplication(first: number, second: number): MathExpress
     name: 'multiplication',
     operator: {
       name: 'multiply',
-      notation: '*'
+      notation: '·' // using middle dot instead of '*'
     },
     first: {
       name: 'multiplier',
@@ -143,4 +165,24 @@ export function createMultiplication(first: number, second: number): MathExpress
       value: first * second
     }
   });
+}
+
+export function createRandomMultiplication(maxValue: number): MathExpression {
+  const multiplier = Math.floor(Math.sqrt(maxValue));
+  const a = randomInteger(1, multiplier + 1);
+  const b = randomInteger(1, multiplier + 1);
+  return createMultiplication(a, b);
+}
+
+export type MathExpressionTerm = 'first' | 'second' | 'result';
+
+export function asString(expr: MathExpression, hiddenTerm?: MathExpressionTerm): string {
+  if (hiddenTerm === 'first') {
+    return `? ${expr.operator.notation} ${expr.second.value} = ${expr.result.value}`;
+  } else if (hiddenTerm === 'second') {
+    return `${expr.first.value} ${expr.operator.notation} ? = ${expr.result.value}`;
+  } else if (hiddenTerm === 'result') {
+    return `${expr.first.value} ${expr.operator.notation} ${expr.second.value} = ?`;
+  }
+  return `${expr.first.value} ${expr.operator.notation} ${expr.second.value} = ${expr.result.value}`;
 }
