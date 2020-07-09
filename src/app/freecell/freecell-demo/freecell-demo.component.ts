@@ -4,7 +4,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
 import { FreecellSettingsService } from '../services/freecell-settings.service';
-import { MODULE_NAME, MODULE_VERSION } from '../freecell.module';
+import { name, version } from '../freecell.json';
 
 const DARK_THEME = 'app-dark-theme';
 
@@ -14,7 +14,7 @@ const DARK_THEME = 'app-dark-theme';
   styleUrls: ['./freecell-demo.component.scss']
 })
 export class FreecellDemoComponent extends UnsubscribableComponent implements OnInit {
-  readonly info = `${MODULE_NAME} ver.${MODULE_VERSION}`;
+  readonly info = `${name} ver.${version}`;
 
   constructor(public settings: FreecellSettingsService, router: Router, route: ActivatedRoute, overlayContainer: OverlayContainer) {
     super();
