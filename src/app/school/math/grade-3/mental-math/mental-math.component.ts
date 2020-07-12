@@ -1,12 +1,13 @@
 // tslint:disable: variable-name
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 
 import { MatIconRegistry } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 
-import { randomInteger } from 'src/app/common/math-utils';
+import { randomItem } from 'src/app/common/array-utils';
 import { Autoplay } from 'src/app/common/autoplay';
 import { commonPrefix } from 'src/app/common/string-utils';
 import { getDate } from 'src/app/common/date-utils';
@@ -16,7 +17,9 @@ import {
   createRandomDivision,
   createRandomMultiplication,
   createRandomSubtraction,
-  MathExpression
+  MathExpression,
+  MathExpressionTerm,
+  asString
 } from '../../math-models';
 import { InputItem } from '../../math-input-group/math-input-group.component';
 import { MathExpressionDialogComponent } from '../../math-expression-dialog/math-expression-dialog.component';
@@ -29,7 +32,7 @@ function getScoreMessage(score: number): string {
       'Умничка!!!', 'Хвалю!', 'Браво!', 'Талант!', 'Превосходно!',
       'Так держать!', 'Замечательно!', 'Чудесно!'
     ];
-    const message = messages[randomInteger(0, messages.length)];
+    const message = randomItem(messages);
     return '5+ ' + message;
   } else if (score >= 0.98) {
     return '5+';
@@ -55,7 +58,7 @@ function getScoreMessage(score: number): string {
       'Плохо.', 'Отвратительно.', 'Ужасно.', 'Ужас!', 'Безобразно!',
       'Ой как плохо!', 'Некрасиво.', 'Я в шоке!', 'Жуть!', 'Взгляни как нехорошо.'
     ];
-    const message = messages[randomInteger(0, messages.length)];
+    const message = randomItem(messages);
     return '1 ' + message;
   }
 }
@@ -79,8 +82,7 @@ type FormStatus = 'active' | 'validation' | 'done';
   templateUrl: './mental-math.component.html',
   styleUrls: ['./mental-math.component.scss']
 })
-export class MentalMathComponent implements OnInit {
-  // readonly scale = `scale(${SQUARE_SIDE})`;
+export class MentalMathComponent implements OnInit, OnDestroy {
   // 'Вычисли, переставляя, где удобно, слагаемые или заменяя соседние слагаемые их суммой.'
   primeMessage = 'Найди значение каждого выражения.';
   extraMessage = 'Работа над ошибками:'; // correction of mistakes
@@ -103,8 +105,23 @@ export class MentalMathComponent implements OnInit {
   victoryAnimation = false;
   victoryClass: string;
 
-  constructor(iconRegistry: MatIconRegistry, sanitizer: DomSanitizer, private _dialog: MatDialog) {
+  expressionTypes = ['a', 's', 'm', 'd']; // Addittion, Subtraction, Multiplication, Division
+
+  constructor(
+    route: ActivatedRoute,
+    iconRegistry: MatIconRegistry,
+    sanitizer: DomSanitizer,
+    private _dialog: MatDialog) {
     iconRegistry.addSvgIcon('icon_sun', sanitizer.bypassSecurityTrustResourceUrl('assets/school/sun.svg'));
+
+    const mode: string = route?.snapshot.queryParams.mode;
+    if (mode) {
+      const regex = /([asmdASMD][0-9]*)/g;
+      const expressionTypes = mode.match(regex);
+      if (expressionTypes?.length > 0) {
+        this.expressionTypes = expressionTypes;
+      }
+    }
   }
 
   init(): void {
@@ -118,28 +135,41 @@ export class MentalMathComponent implements OnInit {
     this.extraStatus = undefined;
     this.extraItems = undefined;
 
+    const MIN_VALUE = 10;
     const MAX_VALUE = 100;
 
-    while (this.primeItems.length < 10) {
-      const type = randomInteger(0, 4);
-      if (type === 0) {
-        this._addPrimeItem(createRandomAddition(MAX_VALUE));
-      } else if (type === 1) {
-        this._addPrimeItem(createRandomSubtraction(MAX_VALUE));
-      } else if (type === 2) {
-        this._addPrimeItem(createRandomMultiplication(MAX_VALUE));
-      } else if (type === 3) {
-        this._addPrimeItem(createRandomDivision(MAX_VALUE));
+    for (let i = 0; i < 100 && this.primeItems.length < 10; i++) {
+      const type = randomItem(this.expressionTypes);
+      let n = +type.substring(1);
+      if (!n) {
+        n = MAX_VALUE;
+      } else {
+        n = Math.max(Math.min(n, MAX_VALUE), MIN_VALUE);
+      }
+
+      switch (type[0]) {
+        case 'a': this._addPrimeItem(createRandomAddition(n)); break;
+        case 's': this._addPrimeItem(createRandomSubtraction(n)); break;
+        case 'm': this._addPrimeItem(createRandomMultiplication(10, n)); break;
+        case 'd': this._addPrimeItem(createRandomDivision(10, n)); break;
+
+        case 'A': this._addPrimeItem(createRandomAddition(n), 'result'); break;
+        case 'S': this._addPrimeItem(createRandomSubtraction(n), 'result'); break;
+        case 'M': this._addPrimeItem(createRandomMultiplication(10, n), 'result'); break;
+        case 'D': this._addPrimeItem(createRandomDivision(10, n), 'result'); break;
       }
     }
   }
 
-  private _addPrimeItem(expression: MathExpression) {
-    const inputName = 'mathExpression' + this.primeItems.length;
-    const inputValue = '';
-    const inputIndex = INPUTS[randomInteger(0, INPUTS.length)];
-    const inputLength = expression[inputIndex].value.toString().length;
-    this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
+  private _addPrimeItem(expression: MathExpression, hiddenTerm?: MathExpressionTerm) {
+    const str = asString(expression);
+    if (!this.primeItems.find(item => asString(item.expression) === str)) {
+      const inputName = 'mathExpression' + this.primeItems.length;
+      const inputValue = '';
+      const inputIndex = hiddenTerm || randomItem(INPUTS);
+      const inputLength = expression[inputIndex].value.toString().length;
+      this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
+    }
   }
 
   ngOnInit(): void {
@@ -157,6 +187,10 @@ export class MentalMathComponent implements OnInit {
         }
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.autoplay.stop();
   }
 
   onRefresh() {
