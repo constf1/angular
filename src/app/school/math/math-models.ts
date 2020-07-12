@@ -66,9 +66,11 @@ export function createAddition(first: number, second: number): MathExpression {
 }
 
 export function createRandomAddition(maxValue: number): MathExpression {
-  const sum = randomInteger(0, maxValue + 1);
-  const a = randomInteger(0, sum + 1);
-  return createAddition(a, sum - a);
+  const a = randomInteger(0, maxValue + 1);
+  const b = randomInteger(0, maxValue + 1);
+  return a + b > maxValue
+    ? (a > b ? createAddition(a - b, b) : createAddition(a, b - a))
+    : createAddition(a, b);
 }
 
 /**
@@ -100,8 +102,8 @@ export function createSubtraction(first: number, second: number): MathExpression
 
 export function createRandomSubtraction(maxValue: number): MathExpression {
   const a = randomInteger(0, maxValue + 1);
-  const b = randomInteger(0, a + 1);
-  return createSubtraction(a, b);
+  const b = randomInteger(0, maxValue + 1);
+  return a > b ? createSubtraction(a, b) : createSubtraction(b, a);
 }
 
 /**
@@ -132,11 +134,10 @@ export function createDivision(first: number, second: number): MathExpression {
   });
 }
 
-export function createRandomDivision(maxValue: number): MathExpression {
-  const quotient = Math.floor(Math.sqrt(maxValue));
-  const a = randomInteger(1, quotient + 1);
-  const b = randomInteger(1, quotient + 1);
-  return createDivision(a * b, b);
+export function createRandomDivision(maxValue: number, maxQuotient: number): MathExpression {
+  const b = randomInteger(1, maxValue + 1);
+  const a = randomInteger(1, Math.min(maxValue, Math.floor(maxQuotient / b)) + 1);
+  return createDivision(a * b, Math.random() < 0.5 ? a : b);
 }
 
 
@@ -167,11 +168,10 @@ export function createMultiplication(first: number, second: number): MathExpress
   });
 }
 
-export function createRandomMultiplication(maxValue: number): MathExpression {
-  const multiplier = Math.floor(Math.sqrt(maxValue));
-  const a = randomInteger(1, multiplier + 1);
-  const b = randomInteger(1, multiplier + 1);
-  return createMultiplication(a, b);
+export function createRandomMultiplication(maxValue: number, maxProduct: number): MathExpression {
+  const b = randomInteger(1, maxValue + 1);
+  const a = randomInteger(1, Math.min(maxValue, Math.floor(maxProduct / b)) + 1);
+  return Math.random() < 0.5 ? createMultiplication(a, b) : createMultiplication(b, a);
 }
 
 export type MathExpressionTerm = 'first' | 'second' | 'result';
