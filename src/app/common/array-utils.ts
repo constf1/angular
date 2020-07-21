@@ -2,8 +2,6 @@
  * Miscellaneous array utilities.
  */
 
-import { randomInteger } from './math-utils';
-
 export function clear<T>(arr: T[][]) {
   for (const a of arr) {
     a.length = 0;
@@ -57,5 +55,5 @@ export function reverseCountEquials<T>(arr1: Readonly<T[]>, arr2: Readonly<T[]>,
 }
 
 export function randomItem<T>(arr: Readonly<T[]>): T {
-  return arr[randomInteger(0, arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)];
 }
