@@ -18,3 +18,7 @@ export function padLeft(str: string, width: number, prefix: string = ' ') {
   }
   return str;
 }
+
+export function randomChar(str: string): string {
+  return str.charAt(Math.floor(Math.random() * str.length));
+}
