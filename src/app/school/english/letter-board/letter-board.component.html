@@ -1,0 +1,15 @@
+<app-squared-paper [colNum]="colNum" [rowNum]="rowNum">
+  <svg appContentSvg>
+    <g transform="translate(1 1)">
+      <path class="letter-board-frame" [attr.d]="pathFrame" [class.letter-board-frame-active]="showFrame" />
+      <g class="letter-board-selections">
+        <path *ngFor="let item of selections.items" [attr.d]="item.path" />
+      </g>
+    </g>
+  </svg>
+  <div class="letter-board">
+    <div *ngFor="let row of letters; index as y">
+      <span *ngFor="let r of row; index as x" (click)="select(x, y)">{{r}}</span>
+    </div>
+  </div>
+</app-squared-paper>

@@ -1,0 +1,84 @@
+@import 'src/app/school/squared-paper/squared-paper';
+$X: $squared-paper-square-side;
+
+.letter-board {
+  margin-left: 1 * $X;
+  margin-top: 1 * $X;
+
+  span {
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    width: $X;
+    min-width: $X;
+    max-width: $X;
+
+    &:hover {
+      box-shadow: 2px 2px 4px #0008;
+      outline: 2px outset #0088;
+      color: #008;
+    }
+  }
+}
+
+.letter-board-selections {
+  path {
+    stroke: #444e;
+    stroke-width: 0.1px;
+
+    &:nth-of-type(10n+1) {
+      fill: #f004;
+    }
+
+    &:nth-of-type(10n+2) {
+      fill: #0f04;
+    }
+
+    &:nth-of-type(10n+3) {
+      fill: #00f4;
+    }
+
+    &:nth-of-type(10n+4) {
+      fill: #ff04;
+    }
+
+    &:nth-of-type(10n+5) {
+      fill: #0ff4;
+    }
+
+    &:nth-of-type(10n+6) {
+      fill: #f0f4;
+    }
+
+    &:nth-of-type(10n+7) {
+      fill: #8004;
+    }
+
+    &:nth-of-type(10n+8) {
+      fill: #0804;
+    }
+
+    &:nth-of-type(10n+9) {
+      fill: #0084;
+    }
+
+    &:nth-of-type(10n) {
+      fill: #8084;
+    }
+
+    &:nth-last-of-type(1) {
+      fill: #eeee;
+      stroke: #d0d8;
+    }
+  }
+}
+
+path.letter-board-frame {
+  stroke: none;
+  fill: #0000;
+  transition: fill 2s linear;
+
+  &.letter-board-frame-active {
+    fill: #0808;
+  }
+}
