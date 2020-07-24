@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 
@@ -14,12 +15,15 @@ import { SimpleAdditionComponent } from './math/simple-addition/simple-addition.
 import { MathExpressionDialogComponent } from './math/math-expression-dialog/math-expression-dialog.component';
 import { SimpleMultiplicationComponent } from './math/simple-multiplication/simple-multiplication.component';
 
+import { WordSearchGameComponent } from './english/word-search-game/word-search-game.component';
+import { LetterBoardComponent } from './english/letter-board/letter-board.component';
+
 /**
  * Routes:
  */
 const routes: Routes = [
   { path: 'mental-math', component: MentalMathComponent },
-  { path: 'simple-math', component: SimpleAdditionComponent },
+  { path: 'word-puzzle', component: WordSearchGameComponent },
   { path: '', component: MentalMathComponent },
 ];
 
@@ -31,12 +35,15 @@ const routes: Routes = [
     MathInputGroupComponent,
     SimpleAdditionComponent,
     MathExpressionDialogComponent,
-    SimpleMultiplicationComponent
+    SimpleMultiplicationComponent,
+    WordSearchGameComponent,
+    LetterBoardComponent
   ],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
     FormsModule,
+    HttpClientModule,
     MaterialModule,
     CoreModule
   ],

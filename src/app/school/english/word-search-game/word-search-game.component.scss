@@ -1,0 +1,95 @@
+@import 'src/app/school/squared-paper/squared-paper';
+$X: $squared-paper-square-side;
+$S: $squared-paper-font-size;
+$R: 0.25 * $X;
+
+.word-search-game-title {
+  padding-left: 3 * $X;
+  padding-top: 12px;
+}
+
+.word-search-game-info {
+  padding-left: $X;
+}
+
+.word-search-game {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: flex-start;
+}
+
+.word-search-game-board {
+  padding-left: $X;
+  // padding-right: $X;
+  padding-bottom: $X;
+}
+
+.word-search-game-plan {
+  display: flex;
+  flex-direction: row;
+
+  margin-left: $X;
+  margin-bottom: $X;
+  padding-top: 2 * $X;
+
+  border: 1px solid #ddf;
+  border-top: none;
+  border-radius: 0 0 $R $R;
+
+  background-color: #eef;
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+    font-size: $S;
+  }
+
+  li {
+    cursor: pointer;
+    min-height: $X;
+    max-height: $X;
+    height: $X;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding-left: 1em;
+    padding-right: 1em;
+
+    background-color: #99f2;
+  }
+}
+
+.word-search-game-questions {
+  margin: 0;
+  li:hover {
+    color: #63b;
+    background-color: #99f4;
+    // text-decoration: 1px #673ab7 dotted underline;
+  }
+
+  li:last-of-type {
+    border-radius: 0 0 0 $R;
+  }
+}
+
+.word-search-game-answers {
+  min-width: 10em;
+  margin: 0 0 (-$X) 0;
+
+  li {
+    transition: all 2s cubic-bezier(.5, -0.5, .25, 1.5);
+
+    &.word-search-game-answer-last {
+      border-radius: 0 0 $R 0;
+    }
+
+    &.word-search-game-answer-next {
+      letter-spacing: 0.25 * $X;
+      // font-size: larger;
+      padding-left: 0;
+      background-color: #ffffff00;
+    }
+  }
+}

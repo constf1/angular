@@ -1,0 +1,43 @@
+<!-- <ng-template #doneIcon> -->
+<!-- <mat-icon color="accent">emoji_events</mat-icon> -->
+<!-- matBadge="10" matBadgeColor="warn" -->
+<!-- </ng-template> -->
+
+<h2 class="word-search-game-title">
+  Word Search Puzzle
+  <mat-icon *ngIf="isDone" color="accent" style="vertical-align: text-top; transform: translate(-10px, -10px)">emoji_events</mat-icon>
+</h2>
+<p class="word-search-game-info">
+  <mat-icon color="primary">info</mat-icon>
+  {{mission}}
+</p>
+<div *ngIf="letters" class="word-search-game">
+  <div class="word-search-game-board">
+    <app-letter-board [showFrame]="isDone" [letters]="letters" (selectionChange)="onSelectionChange($event)">
+    </app-letter-board>
+  </div>
+  <div class="word-search-game-plan">
+    <ul class="word-search-game-questions">
+      <li *ngFor="let q of questions;trackBy:trackByIndex" matRipple (click)="playQuizAudio(audio)">
+        <audio #audio>
+          <source [src]="getAudioSource(q.value, 'ogg')" type="audio/ogg">
+          <source [src]="getAudioSource(q.value, 'mp3')" type="audio/mpeg">
+        </audio>
+        <mat-icon color="primary">volume_up</mat-icon>
+        <!-- <button mat-icon-button color="primary" (click)="playQuizAudio(audio)"> -->
+        <!-- </button> -->
+        <span>{{q.value}}</span>
+      </li>
+    </ul>
+    <ul class="word-search-game-answers">
+      <li *ngFor="let a of answers;trackBy:trackByIndex;last as isNext" matRipple
+        [class.word-search-game-answer-next]="isNext" [class.word-search-game-answer-last]="a.isLast"
+        [style.transform]="a.transform" (click)="a.select()">
+        <!-- <button mat-icon-button *ngIf="isLast && a.value">
+          <mat-icon>clear</mat-icon>
+        </button> -->
+        <span>{{a.value}}</span>
+      </li>
+    </ul>
+  </div>
+</div>
