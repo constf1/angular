@@ -1,12 +1,13 @@
-import { Component, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 export const SQUARE_SIDE = 24;
 export const FONT_SIZE = 5 * SQUARE_SIDE / 6;
 
-export interface Path {
-  d: string;
-  style?: { [klass: string]: any; };
+export function transform(x: number, y: number) {
+  return `translate(${x * SQUARE_SIDE}px, ${y * SQUARE_SIDE}px)`;
 }
+
+export const EMPTY_PATH = 'M0 0z';
 
 @Component({
   selector: 'app-squared-paper',

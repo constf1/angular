@@ -1,13 +1,12 @@
 import { Component, OnInit, Input, SimpleChanges, OnChanges } from '@angular/core';
-import { SQUARE_SIDE } from '../../squared-paper/squared-paper.component';
+import { EMPTY_PATH, transform } from '../../squared-paper/squared-paper.component';
 
-const EMPTY_PATH = 'M0 0z';
 // margin
 const DX = 2;
 const DY = 2;
 
 function translate(x: number, y: number) {
-  return `translate(${(DX + x) * SQUARE_SIDE}px, ${(DY + y) * SQUARE_SIDE}px)`;
+  return transform(x + DX, y + DY);
 }
 
 function toTerm(value: number | string): number {
