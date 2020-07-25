@@ -38,7 +38,8 @@ $R: 0.25 * $X;
   border-top: none;
   border-radius: 0 0 $R $R;
 
-  background-color: #eef;
+  // background-color: #eef;
+  background: linear-gradient(#eef, #eae);
 
   ul {
     list-style-type: none;
@@ -54,8 +55,8 @@ $R: 0.25 * $X;
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 2 * $R;
+    padding-right: 0;
 
     background-color: #99f2;
   }
@@ -63,6 +64,8 @@ $R: 0.25 * $X;
 
 .word-search-game-questions {
   margin: 0;
+  min-width: 5 * $X - 1px; // - left border
+
   li:hover {
     color: #63b;
     background-color: #99f4;
@@ -75,7 +78,7 @@ $R: 0.25 * $X;
 }
 
 .word-search-game-answers {
-  min-width: 10em;
+  min-width: 7 * $X - 1px; // - right border
   margin: 0 0 (-$X) 0;
 
   li {
@@ -86,9 +89,9 @@ $R: 0.25 * $X;
     }
 
     &.word-search-game-answer-next {
-      letter-spacing: 0.25 * $X;
-      // font-size: larger;
+      letter-spacing: 0.2 * $X;
       padding-left: 0;
+      padding-right: 0;
       background-color: #ffffff00;
     }
   }

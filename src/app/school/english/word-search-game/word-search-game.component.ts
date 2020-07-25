@@ -25,8 +25,9 @@ interface GameItem {
 }
 
 interface GameQuestion extends GameItem {
-  answer: string;
-  isAnswered?: boolean;
+  answerIndex: number;
+  answerValue: string;
+  // isAnswered?: boolean;
 }
 
 interface GameAnswer extends GameItem {
@@ -104,29 +105,35 @@ export class WordSearchGameComponent implements OnInit {
         this.questions = Object.keys(data.answers).map((a, i) => {
           const qs = data.answers[a];
           const v = typeof qs === 'string' ? qs : qs[0];
-          return { index: i, value: v, answer: a };
+          return { index: i, value: v, answerValue: a, answerIndex: -1 };
         });
 
         this.answers = [];
-        this._nextAnswer();
-
         this.name = game;
       });
     }
   }
 
-  private _nextAnswer() {
-    const index = this.answers.length;
-    this.answers.push({ index, value: '', transform: transformToTop(index), select: () => {} });
+  private _nextAnswer(list: SelectionList) {
+    while (this.answers.length < list.items.length) {
+      const index = this.answers.length;
+      const select = () => {
+        list.clearActive();
+        this.onSelectionChange(list);
+      };
+      this.answers.push({ index, value: '', transform: transformToTop(index), select });
+    }
   }
 
   onSelectionChange(list: SelectionList) {
+    this._nextAnswer(list);
+
     const a = this.answers[this.answers.length - 1];
     a.value = list.active.letters;
 
-    const q = this.questions.find(it => !it.isAnswered && it.answer === a.value);
+    const q = this.questions.find(item => item.answerIndex < 0 && item.answerValue === a.value);
     if (q) {
-      q.isAnswered = true;
+      q.answerIndex = a.index;
       a.isLast = (q.index + 1 === this.questions.length);
       a.transform = transformToAnswer(q.index, a.index);
       a.select = () => {
@@ -135,7 +142,7 @@ export class WordSearchGameComponent implements OnInit {
       };
 
       list.next();
-      this._nextAnswer();
+      this._nextAnswer(list);
     }
   }
 
@@ -147,7 +154,7 @@ export class WordSearchGameComponent implements OnInit {
     return index;
   }
 
-  playQuizAudio(elem: HTMLAudioElement) {
+  playQuizAudio(elem: HTMLAudioElement, question: GameQuestion) {
     if (elem) {
       // if (elem.playbackRate < 1) {
       //   elem.playbackRate = 1;
@@ -156,6 +163,10 @@ export class WordSearchGameComponent implements OnInit {
       // }
       elem.load();
       elem.play();
+    }
+
+    if (question.answerIndex >= 0) {
+      this.answers[question.answerIndex].select();
     }
   }
 }
