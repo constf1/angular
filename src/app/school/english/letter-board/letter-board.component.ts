@@ -3,7 +3,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 const DX = 1;
 const DY = 1;
-const EMPTY_PATH = 'M0 0z'; // or 'none'
+// const EMPTY_PATH = 'M0 0z'; // or 'none'
 
 export interface Segment {
   x1: number;
@@ -13,49 +13,8 @@ export interface Segment {
 }
 
 export interface Selection {
-  letters: string;
   segment?: Segment;
-  path: string;
-}
-
-export class SelectionList {
-  items: Selection[];
-
-  get active(): Selection {
-    return this.items[this.items.length - 1];
-  }
-
-  constructor() {
-    this.reset();
-  }
-
-  next() {
-    this.items.push({ letters: '', path: EMPTY_PATH});
-  }
-
-  clearActive() {
-    const item = this.active;
-    item.letters = '';
-    item.path = EMPTY_PATH;
-    item.segment = null;
-  }
-
-  reset() {
-    this.items = [];
-    this.next();
-  }
-
-  select(index: number) {
-    const item = this.items[index];
-    if (item) {
-      const active = this.active;
-      active.letters = item.letters;
-      active.path = item.path;
-      active.segment = item.segment;
-    } else {
-      this.clearActive();
-    }
-  }
+  path?: string;
 }
 
 // function isInOrder(a: number, b: number, c: number): boolean {
@@ -177,13 +136,17 @@ export class LetterBoardComponent implements OnInit {
   colNum: number;
   rowNum: number;
   pathFrame: string;
-  selections = new SelectionList();
-  @Output() selectionChange = new EventEmitter<SelectionList>();
 
   private _letters: string[][];
 
   @Input() set letters(value: string[][]) {
-    this._init(value || []);
+    this._letters = value;
+    const cy = value.length;
+    const cx = cy > 0 ? value[0].length : 0;
+
+    this.colNum = 2 * DX + cx;
+    this.rowNum = 2 * DY + cy;
+    this.pathFrame = frameToPath(cx, cy);
   }
 
   get letters() {
@@ -191,45 +154,32 @@ export class LetterBoardComponent implements OnInit {
   }
 
   @Input() showFrame = true;
+  @Input() activeSelection = -1;
+  @Input() selectionList: Selection[] = [];
+
+  @Output() selectionChange = new EventEmitter<Selection>();
 
   constructor() {
-    this._init([]);
+    this.letters = [];
   }
 
   ngOnInit(): void {
   }
 
-  select(x: number, y: number) {
-    const item = this.selections.active;
-    if (item.segment &&
-      item.segment.x1 === x && item.segment.x2 === x &&
-      item.segment.y1 === y && item.segment.y2 === y) {
-      this.selections.clearActive();
-    } else {
-      item.segment = select(x, y, item.segment);
-      item.path = segmentToPath(item.segment);
-
-      const { x1, y1, x2, y2 } = item.segment;
-      item.letters = this.letters[y1][x1];
-
-      const dx = x2 - x1;
-      const dy = y2 - y1;
-      const count = Math.max(Math.abs(dx), Math.abs(dy));
-      for (let i = 1; i <= count; i++) {
-        item.letters += this.letters[y1 + dy * i / count][x1 + dx * i / count];
+  onSelect(x: number, y: number) {
+    const item = this.selectionList[this.activeSelection];
+    if (item) {
+      if (item.segment &&
+        item.segment.x1 === x && item.segment.x2 === x &&
+        item.segment.y1 === y && item.segment.y2 === y) {
+        // Clear selection
+        item.segment = undefined;
+        item.path = undefined;
+      } else {
+        item.segment = select(x, y, item.segment);
+        item.path = segmentToPath(item.segment);
       }
+      this.selectionChange.emit(item);
     }
-    this.selectionChange.emit(this.selections);
-  }
-
-  private _init(letters: string[][]) {
-    this._letters = letters;
-    const cy = letters.length;
-    const cx = cy > 0 ? letters[0].length : 0;
-
-    this.colNum = 2 * DX + cx;
-    this.rowNum = 2 * DY + cy;
-    this.pathFrame = frameToPath(cx, cy);
-    this.selections.reset();
   }
 }
