@@ -15,8 +15,8 @@ import { SimpleAdditionComponent } from './math/simple-addition/simple-addition.
 import { MathExpressionDialogComponent } from './math/math-expression-dialog/math-expression-dialog.component';
 import { SimpleMultiplicationComponent } from './math/simple-multiplication/simple-multiplication.component';
 
-import { WordSearchGameComponent } from './english/word-search-game/word-search-game.component';
 import { LetterBoardComponent } from './english/letter-board/letter-board.component';
+import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
 
 /**
  * Routes:
@@ -37,7 +37,8 @@ const routes: Routes = [
     MathExpressionDialogComponent,
     SimpleMultiplicationComponent,
     WordSearchGameComponent,
-    LetterBoardComponent
+    LetterBoardComponent,
+    WordSearchGameSvgComponent
   ],
   imports: [
     RouterModule.forChild(routes),
