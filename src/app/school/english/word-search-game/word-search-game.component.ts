@@ -225,7 +225,7 @@ export class WordSearchGameComponent implements OnInit {
           const qs = data.answers[a];
           const v = typeof qs === 'string' ? qs : qs[0];
           const audio = new Audio();
-          audio.src = baseUrl + 'audio/mp3/' + v + '.mp3';
+          audio.src = baseUrl + 'audio/' + v + '.mp3';
 
           return {
             index: i,
