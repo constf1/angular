@@ -1,6 +1,5 @@
 {
-  "version": 1,
-  "gameSvg": "game.svg",
+  "hasSvg": true,
   "blank": ".",
   "letters": "abcdefghijklmnopqrstuvwxyz",
   "mission": "Find the animals.",
