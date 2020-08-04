@@ -3,7 +3,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 const DX = 1;
 const DY = 1;
-// const EMPTY_PATH = 'M0 0z'; // or 'none'
+// const EMPTY_PATH = 'M0 0z';
 
 export interface Segment {
   x1: number;

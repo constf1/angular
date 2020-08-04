@@ -3,7 +3,7 @@
     <g transform="translate(1 1)">
       <path class="letter-board-frame" [attr.d]="pathFrame" [class.letter-board-frame-active]="showFrame" />
       <g class="letter-board-selections">
-        <path *ngFor="let item of selectionList" [attr.d]="item.path || 'none'" />
+        <path *ngFor="let item of selectionList" [attr.d]="item.path || 'M0 0z'" />
       </g>
     </g>
   </svg>
