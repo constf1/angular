@@ -16,7 +16,7 @@ $R: 0.25 * $X;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   align-content: flex-start;
 }
 
@@ -80,6 +80,7 @@ $R: 0.25 * $X;
 .word-search-game-answers {
   min-width: 7 * $X - 1px; // - right border
   margin: 0 0 (-$X) 0;
+  font-size: $S;
 
   li {
     transition: all 2s cubic-bezier(.5, -0.5, .25, 1.5);
@@ -93,6 +94,40 @@ $R: 0.25 * $X;
       padding-left: 0;
       padding-right: 0;
       background-color: #ffffff00;
+    }
+  }
+}
+
+.word-search-game.word-search-game-svg {
+  position: relative;
+
+  .word-search-game-board {
+    padding: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    // &:hover {
+    //   box-shadow: 4px 4px 6px #0008;
+    // }
+  }
+
+  .word-search-game-answers > div {
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-align: center;
+    transition: all 2s cubic-bezier(.5, -0.5, .25, 1.5);
+
+    letter-spacing: 0px;
+    background-color: #eef;
+    border-radius: 0.5 * $X;
+
+    &.word-search-game-answer-next {
+      letter-spacing: 0.2 * $X;
+      background-color: #0002;
+      border-radius: 0px;
     }
   }
 }

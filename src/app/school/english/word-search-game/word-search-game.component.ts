@@ -1,14 +1,72 @@
 // tslint:disable: variable-name
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input, Output, EventEmitter, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 import { randomItem } from 'src/app/common/array-utils';
 import { randomChar } from 'src/app/common/string-utils';
 
-import { SelectionList } from '../letter-board/letter-board.component';
+import { Selection } from '../letter-board/letter-board.component';
 
-const ASSETS_URL = 'assets/school/english/word-search-game/';
+export const ASSETS_URL = 'assets/school/english/word-search-game/';
+export const SVG_QUERY = 'word-search-game-svg';
+
+function toSize(viewBox: string) {
+  let width = 1024;
+  let height = 768;
+
+  if (viewBox) {
+    const numbers = viewBox.split(/[\s,]+/gm).map(n => +n);
+    const w = numbers[2] - numbers[0];
+    const h = numbers[3] - numbers[1];
+    if (w > 0) {
+      width = w;
+    }
+    if (h > 0) {
+      height = h;
+    }
+  }
+  return { width, height };
+}
+
+@Component({
+  selector: 'app-word-search-game-svg',
+  template: `<div #main [style.width.px]="width" [style.height.px]="height" style="position: relative;"><ng-content></ng-content></div>`,
+})
+export class WordSearchGameSvgComponent implements AfterViewInit {
+  @ViewChild('main', { read: ElementRef }) mainRef: ElementRef<HTMLElement>;
+  @Input() game: SVGElement;
+  @Output() itemChange = new EventEmitter<string>();
+
+  width = 0;
+  height = 0;
+
+  constructor(private _r2: Renderer2) { }
+
+  ngAfterViewInit(): void {
+    const game = this.game;
+    if (game) {
+      const main = this.mainRef.nativeElement;
+      if (main) {
+
+        setTimeout(() => {
+          const size = toSize(game.getAttribute('viewBox'));
+          this.width = size.width;
+          this.height = size.height;
+
+          game.querySelectorAll<SVGPathElement>(`g.${SVG_QUERY}-questions > path`).forEach(elem => {
+            const tag = elem.id.substring(elem.tagName.length);
+            elem.onclick = () => this.itemChange.emit(tag);
+          });
+
+          this._r2.appendChild(main, game);
+        });
+      }
+    }
+  }
+}
 
 interface GameData {
   blank?: string;
@@ -17,6 +75,7 @@ interface GameData {
   mission: string;
   puzzles: string[];
   answers: { [key: string]: string | string[] };
+  hasSvg?: boolean;
 }
 
 interface GameItem {
@@ -27,12 +86,11 @@ interface GameItem {
 interface GameQuestion extends GameItem {
   answerIndex: number;
   answerValue: string;
-  // isAnswered?: boolean;
+  audio: HTMLAudioElement;
 }
 
-interface GameAnswer extends GameItem {
+interface GameAnswer extends GameItem, Selection {
   transform: string;
-  select: () => void;
   isLast?: boolean;
 }
 
@@ -65,6 +123,54 @@ function createLetterBoard(puzzle: string, remapper: (letter: string) => string,
     .map(line => line.split('').map(remapper));
 }
 
+interface GameItemLayout {
+  translate?: string;
+  width?: string;
+  height?: string;
+}
+
+interface GameLayout {
+  board: GameItemLayout;
+  prompt: GameItemLayout;
+  answers: {
+    [key: string]: GameItemLayout;
+  };
+}
+
+function queryItemLayout(svg: SVGElement, selector: string): GameItemLayout {
+  const layout: GameItemLayout = {};
+  const elem = svg.querySelector<SVGElement>(selector);
+  if (elem) {
+    const x = elem.getAttribute('x');
+    const y = elem.getAttribute('y');
+    const w = elem.getAttribute('width');
+    const h = elem.getAttribute('height');
+
+    layout.translate = `translate(${x || '0'}px, ${y || '0'}px)`;
+    layout.width = w ? w + 'px' : 'inherit';
+    layout.height = h ? h + 'px' : 'inherit';
+  }
+  return layout;
+}
+
+function queryAnswerLayouts(svg: SVGElement, selector: string, questions: GameQuestion[]) {
+  const layouts = {};
+  for (const q of questions) {
+    layouts[q.answerValue] = queryItemLayout(svg, selector + q.value);
+  }
+  return layouts;
+}
+
+function queryGameLayout(svg: SVGElement, questions: GameQuestion[]): GameLayout {
+  const layout: GameLayout = {
+    board: queryItemLayout(svg, `rect.${SVG_QUERY}-board`),
+    prompt: queryItemLayout(svg, `rect.${SVG_QUERY}-prompt`),
+    answers: queryAnswerLayouts(svg, `rect#${SVG_QUERY}-answer`, questions)
+  };
+  return layout;
+}
+
+
 @Component({
   selector: 'app-word-search-game',
   templateUrl: './word-search-game.component.html',
@@ -79,18 +185,31 @@ export class WordSearchGameComponent implements OnInit {
   questions: GameQuestion[];
   answers: GameAnswer[];
 
+  hasSvg?: boolean;
+  gameSvg?: SVGElement;
+  gameSVGLayout?: GameLayout;
+
   get isDone(): boolean {
     return this.questions && this.answers && this.answers.length > this.questions.length;
   }
 
-  constructor(private _route: ActivatedRoute, private _http: HttpClient) {
+  get activeAnswerIndex(): number {
+    return this.answers ? this.answers.length - 1 : -1;
+  }
+
+  constructor(
+    private _route: ActivatedRoute,
+    private _http: HttpClient,
+    private _iconRegistry: MatIconRegistry,
+    private _sanitizer: DomSanitizer) {
   }
 
   ngOnInit(): void {
     const params = this._route.snapshot.queryParams;
     const game = params.game;
     if (game) {
-      this._http.get<GameData>(`${ASSETS_URL}${game}/data.json`).subscribe(data => {
+      const baseUrl = ASSETS_URL + game + '/';
+      this._http.get<GameData>(baseUrl + 'data.json').subscribe(data => {
         this.mission = data.mission;
 
         const index = +params.index;
@@ -105,68 +224,99 @@ export class WordSearchGameComponent implements OnInit {
         this.questions = Object.keys(data.answers).map((a, i) => {
           const qs = data.answers[a];
           const v = typeof qs === 'string' ? qs : qs[0];
-          return { index: i, value: v, answerValue: a, answerIndex: -1 };
+          const audio = new Audio();
+          audio.src = baseUrl + 'audio/mp3/' + v + '.mp3';
+
+          return {
+            index: i,
+            value: v,
+            answerValue: a,
+            answerIndex: -1,
+            audio
+          };
         });
 
         this.answers = [];
+        this._nextAnswer();
         this.name = game;
+
+        if (data.hasSvg) {
+          this.hasSvg = true;
+          const url = this._sanitizer.bypassSecurityTrustResourceUrl(baseUrl + 'data.svg');
+          this._iconRegistry.getSvgIconFromUrl(url)
+            .subscribe(gameSvg => {
+              this.gameSvg = gameSvg;
+              this.gameSVGLayout = queryGameLayout(gameSvg, this.questions);
+            });
+        }
       });
     }
   }
 
-  private _nextAnswer(list: SelectionList) {
-    while (this.answers.length < list.items.length) {
-      const index = this.answers.length;
-      const select = () => {
-        list.clearActive();
-        this.onSelectionChange(list);
-      };
-      this.answers.push({ index, value: '', transform: transformToTop(index), select });
+  private _nextAnswer() {
+    const index = this.answers.length;
+    this.answers.push({ index, value: '', transform: transformToTop(index) });
+  }
+
+  onAnswerClick(answer: GameAnswer) {
+    const active  = this.answers[this.activeAnswerIndex];
+    if (answer === active) {
+      // Clear
+      active.segment = undefined;
+      active.path = undefined;
+      active.value = '';
+    } else {
+      // Copy
+      active.segment = answer.segment;
+      active.path = answer.path;
+      active.value = answer.value;
     }
   }
 
-  onSelectionChange(list: SelectionList) {
-    this._nextAnswer(list);
-
-    const a = this.answers[this.answers.length - 1];
-    a.value = list.active.letters;
-
-    const q = this.questions.find(item => item.answerIndex < 0 && item.answerValue === a.value);
+  onQuestionClick(tag: string) {
+    const q = this.questions.find(it => it.value === tag);
     if (q) {
-      q.answerIndex = a.index;
-      a.isLast = (q.index + 1 === this.questions.length);
-      a.transform = transformToAnswer(q.index, a.index);
-      a.select = () => {
-        list.select(a.index);
-        this.onSelectionChange(list);
-      };
+      q.audio.load();
+      q.audio.play();
 
-      list.next();
-      this._nextAnswer(list);
+      const index = q.answerIndex >= 0 ? q.answerIndex : this.activeAnswerIndex;
+      if (index >= 0) {
+        this.onAnswerClick(this.answers[index]);
+      }
     }
   }
 
-  getAudioSource(quiz: string, extension: string): string {
-    return `${ASSETS_URL}${this.name}/audio/${extension}/${quiz}.${extension}`;
+  onSelectionChange(answer: GameAnswer) {
+    if (answer.segment) {
+      const { x1, y1, x2, y2 } = answer.segment;
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const count = Math.max(Math.abs(dx), Math.abs(dy));
+
+      answer.value = this.letters[y1][x1];
+      for (let i = 1; i <= count; i++) {
+        answer.value += this.letters[y1 + dy * i / count][x1 + dx * i / count];
+      }
+
+      const question = this.questions.find(item => item.answerIndex < 0 && item.answerValue === answer.value);
+      if (question) {
+        question.answerIndex = answer.index;
+        answer.isLast = (question.index + 1 === this.questions.length);
+        answer.transform = transformToAnswer(question.index, answer.index);
+        this._nextAnswer();
+      }
+    } else {
+      answer.value = '';
+    }
   }
 
   trackByIndex(index: number): number {
     return index;
   }
 
-  playQuizAudio(elem: HTMLAudioElement, question: GameQuestion) {
-    if (elem) {
-      // if (elem.playbackRate < 1) {
-      //   elem.playbackRate = 1;
-      // } else {
-      //   elem.playbackRate = 0.5;
-      // }
-      elem.load();
-      elem.play();
-    }
-
-    if (question.answerIndex >= 0) {
-      this.answers[question.answerIndex].select();
-    }
+  getSvgAnswerLayout(answer: GameAnswer) {
+    return answer.index === this.activeAnswerIndex
+      ? this.gameSVGLayout.prompt
+      : this.gameSVGLayout.answers[answer.value];
   }
 }

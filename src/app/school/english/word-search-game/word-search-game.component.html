@@ -1,41 +1,49 @@
-<!-- <ng-template #doneIcon> -->
-<!-- <mat-icon color="accent">emoji_events</mat-icon> -->
-<!-- matBadge="10" matBadgeColor="warn" -->
-<!-- </ng-template> -->
+<ng-template #templateLoadSvg>
+  <div>Loading...</div>
+</ng-template>
+
+<ng-template #templateGameSvg>
+  <div *ngIf="gameSvg; else templateLoadSvg" class="word-search-game-answers">
+    <div *ngFor="let a of answers;trackBy:trackByIndex;last as isNext" matRipple
+      [class.word-search-game-answer-next]="isNext" [style.transform]="getSvgAnswerLayout(a).translate"
+      [style.width]="getSvgAnswerLayout(a).width" [style.height]="getSvgAnswerLayout(a).height"
+      [style.line-height]="getSvgAnswerLayout(a).height" (click)="onAnswerClick(a)">
+      <span>{{a.value}}</span>
+    </div>
+  </div>
+</ng-template>
 
 <h2 class="word-search-game-title">
   Word Search Puzzle
-  <mat-icon *ngIf="isDone" color="accent" style="vertical-align: text-top; transform: translate(-10px, -10px)">emoji_events</mat-icon>
+  <mat-icon *ngIf="isDone" color="accent" style="vertical-align: text-top; transform: translate(-10px, -10px)">
+    emoji_events</mat-icon>
 </h2>
 <p class="word-search-game-info">
   <mat-icon color="primary">info</mat-icon>
   {{mission}}
 </p>
-<div *ngIf="letters" class="word-search-game">
-  <div class="word-search-game-board">
-    <app-letter-board [showFrame]="isDone" [letters]="letters" (selectionChange)="onSelectionChange($event)">
+
+<div *ngIf="letters" class="word-search-game" [class.word-search-game-svg]="!!gameSvg">
+  <app-word-search-game-svg *ngIf="gameSvg" [game]="gameSvg" (itemChange)="onQuestionClick($event)">
+  </app-word-search-game-svg>
+
+  <div class="word-search-game-board" [style.transform]="gameSVGLayout?.board.translate">
+    <app-letter-board [showFrame]="isDone" [letters]="letters" [selectionList]="answers"
+      [activeSelection]="activeAnswerIndex" (selectionChange)="onSelectionChange($event)">
     </app-letter-board>
   </div>
-  <div class="word-search-game-plan">
+
+  <div *ngIf="!hasSvg; else templateGameSvg" class="word-search-game-plan">
     <ul class="word-search-game-questions">
-      <li *ngFor="let q of questions;trackBy:trackByIndex" matRipple (click)="playQuizAudio(audio, q)">
-        <audio #audio>
-          <source [src]="getAudioSource(q.value, 'ogg')" type="audio/ogg">
-          <source [src]="getAudioSource(q.value, 'mp3')" type="audio/mpeg">
-        </audio>
+      <li *ngFor="let q of questions;trackBy:trackByIndex" matRipple (click)="onQuestionClick(q.value)">
         <mat-icon color="primary">volume_up</mat-icon>
-        <!-- <button mat-icon-button color="primary" (click)="playQuizAudio(audio)"> -->
-        <!-- </button> -->
         <span>{{q.value}}</span>
       </li>
     </ul>
     <ul class="word-search-game-answers">
       <li *ngFor="let a of answers;trackBy:trackByIndex;last as isNext" matRipple
         [class.word-search-game-answer-next]="isNext" [class.word-search-game-answer-last]="a.isLast"
-        [style.transform]="a.transform" (click)="a.select()">
-        <!-- <button mat-icon-button *ngIf="isLast && a.value">
-          <mat-icon>clear</mat-icon>
-        </button> -->
+        [style.transform]="a.transform" (click)="onAnswerClick(a)">
         <span>{{a.value}}</span>
       </li>
     </ul>
