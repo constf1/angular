@@ -24,7 +24,7 @@
 </p>
 
 <div *ngIf="letters" class="word-search-game" [class.word-search-game-svg]="!!gameSvg">
-  <app-word-search-game-svg *ngIf="gameSvg" [game]="gameSvg" (itemChange)="onQuestionClick($event)">
+  <app-word-search-game-svg *ngIf="gameSvg" [class.word-search-game-svg-done]="isDone" [game]="gameSvg" (itemChange)="onQuestionClick($event)">
   </app-word-search-game-svg>
 
   <div class="word-search-game-board" [style.transform]="gameSVGLayout?.board.translate">
