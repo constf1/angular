@@ -57,3 +57,15 @@ export function reverseCountEquials<T>(arr1: Readonly<T[]>, arr2: Readonly<T[]>,
 export function randomItem<T>(arr: Readonly<T[]>): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
+/* Randomize array in-place using Durstenfeld shuffle algorithm */
+export function shuffle<T>(arr: Array<T>): Array<T> {
+  for (let i = arr.length; --i > 0; ) {
+    const j = Math.floor((i + 1) * Math.random());
+    const t = arr[i];
+    arr[i] = arr[j];
+    arr[j] = t;
+  }
+  return arr;
+}
+
