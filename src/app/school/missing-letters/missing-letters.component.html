@@ -1,0 +1,20 @@
+<div class="missing-letters-frame">
+  <div class="missing-letters-board" #board>
+    <app-simple-diff *ngFor="let a of answers" style="margin-right: 1em;"
+      [pastValue]="a.userAnswer" [nextValue]="a.realAnswer"></app-simple-diff>
+    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered">
+      <span>{{quizPrefix}}</span>
+      <span class="missing-letters-answer">{{quizUserAnswer}}</span>
+      <span>{{quizSuffix}}</span>
+      <!-- <span style="margin-right: 1em;visibility: hidden;">,</span> -->
+    </span>
+  </div>
+  <div class="missing-letters-front">
+    <button *ngIf="state === 'ready'" (click)="onStart()">START</button>
+    <ng-container *ngIf="state === 'active'">
+      <button *ngFor="let q of questions;trackBy:trackByIndex" [disabled]="isAnswered"
+        (click)="onAnswer(q, board)">{{q || '_'}}</button>
+    </ng-container>
+    <button *ngIf="state === 'done'" (click)="onRestart()">RESTART</button>
+  </div>
+</div>
