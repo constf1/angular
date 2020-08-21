@@ -17,6 +17,8 @@ import { SimpleMultiplicationComponent } from './math/simple-multiplication/simp
 
 import { LetterBoardComponent } from './english/letter-board/letter-board.component';
 import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
+import { MissingLettersComponent } from './missing-letters/missing-letters.component';
+import { SimpleDiffComponent } from './simple-diff/simple-diff.component';
 
 /**
  * Routes:
@@ -24,6 +26,7 @@ import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/w
 const routes: Routes = [
   { path: 'mental-math', component: MentalMathComponent },
   { path: 'word-puzzle', component: WordSearchGameComponent },
+  { path: 'missing-letters', component: MissingLettersComponent },
   { path: '', component: MentalMathComponent },
 ];
 
@@ -38,7 +41,9 @@ const routes: Routes = [
     SimpleMultiplicationComponent,
     WordSearchGameComponent,
     LetterBoardComponent,
-    WordSearchGameSvgComponent
+    WordSearchGameSvgComponent,
+    MissingLettersComponent,
+    SimpleDiffComponent
   ],
   imports: [
     RouterModule.forChild(routes),
