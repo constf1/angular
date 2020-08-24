@@ -26,6 +26,28 @@
   }
 }
 
+@keyframes keyframes-breath {
+  0% {
+    transform: scale(1, 1);
+  }
+
+  15% {
+    transform: scale(1, 1.05) translateY(-5px);
+  }
+
+  50% {
+    transform: scale(1, 1);
+  }
+
+  85% {
+    transform: scale(1, 1.075) translateY(-8px);
+  }
+
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
 // @keyframes keyframes-vortex-out {
 //   0% {
 //     transform: rotate(0deg) scale(1);
@@ -55,11 +77,15 @@ div.missing-letters-frame {
     height: 468px;
     // background-color: #0005;
     color: #eee;
-    font-size: 24px;
-    line-height: 48px;
-    padding: 12px;
+    // font-size: 24px;
+    line-height: 2em;
+    padding: 0.5em;
     overflow-y: auto;
     overflow-x: hidden;
+
+    > :not(:last-child)::after {
+      content: ", ";
+    }
   }
 
   span.missing-letters-answer {
@@ -73,6 +99,24 @@ div.missing-letters-frame {
       animation: keyframes-heartbeat 2s linear infinite;
       padding-left: 0.075em;
       padding-right: 0.075em;
+    }
+  }
+
+  div.missing-letters-audio {
+    position: absolute;
+    cursor: pointer;
+    left: 30px;
+    top: 525px;
+    width: 200px;
+    height: 228px;
+
+    background-color: transparent;
+    background-image: url('../../../assets/school/phonograph.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    &.active {
+      animation: keyframes-breath 1s linear 0.2s infinite;
     }
   }
 
@@ -167,6 +211,47 @@ div.missing-letters-frame {
       //   left: 634px;
       //   top: 496px;
       // }
+    }
+  }
+
+  div.missing-letters-popup {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2222;
+
+    div.missing-letters-popup-bubble {
+      animation: keyframes-fade-in 1s ease 1;
+      // display: flex;
+      // justify-content: center;
+      // align-content: center;
+      // align-items: center;
+      position: relative;
+      left: 135px;
+      top: 5px;
+      width: 339px;
+      height: 253px;
+      background-color: transparent;
+      background-image: url('../../../assets/school/speech-bubble.png');
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+
+      &>div {
+        position: relative;
+        left: 20px;
+        top: 52px;
+        width: 284px;
+        height: 116px;
+        font-size: 32px;
+        line-height: 1.1em;
+        color: #700000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        // text-align: center;
+      }
     }
   }
 }

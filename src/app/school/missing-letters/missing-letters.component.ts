@@ -1,14 +1,10 @@
 // tslint:disable: variable-name
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Answer, ChatBot } from './chat-bot';
 
 interface GameData {
   [key: string]: string;
-}
-
-interface Answer {
-  userAnswer: string;
-  realAnswer: string;
 }
 
 const ASSETS_URL = 'assets/school/missing-letters/';
@@ -30,23 +26,36 @@ export class MissingLettersComponent implements OnInit {
   questions: string[] = [];
   isAnswered: boolean;
 
+  chatBot = new ChatBot();
+
   gameData: GameData;
+
   audio = new Audio();
+  audioPlaybackRate = 1;
+  isAudioEnabled = true;
+  isAudioPlaying = false;
 
   state: 'loading' | 'ready' | 'active' | 'done' = 'loading';
+
+  fontSize = 24;
+  readonly fontSizeMin = 12;
+  readonly fontSizeMax = 40;
 
   constructor(private _http: HttpClient) { }
 
   ngOnInit(): void {
-    const gameName = 'ru-grade-1';
-    const baseUrl = ASSETS_URL + gameName + '/';
-    this._http.get<GameData>(baseUrl + 'data.json').subscribe(data => {
+    this.audio.onended = () => this.isAudioPlaying = false;
+    this.audio.onerror = () => this.isAudioPlaying = false;
+
+    const gameName = 'ru-grade-1-1';
+    this._http.get<GameData>(ASSETS_URL + gameName + '.json').subscribe(data => {
       this.gameData = data;
       this.state = 'ready';
     });
   }
 
   onStart() {
+    // this.chatBot.onStart(this.answers);
     this.answers = [];
     this.quizes = Object.keys(this.gameData);
     this.state = 'active';
@@ -66,10 +75,11 @@ export class MissingLettersComponent implements OnInit {
       this.setQuiz(word);
       qs.splice(i, 1);
 
-      this.playAudio(word);
+      this.setAudio(word);
       return true;
     }
     this.state = 'done';
+    this.chatBot.onEnd(this.answers);
     return false;
   }
 
@@ -122,12 +132,24 @@ export class MissingLettersComponent implements OnInit {
     this.quizUserAnswer = '_';
   }
 
-  playAudio(word: string) {
+  setAudio(word: string) {
     const uri = this.gameData[word];
     if (uri) {
       this.audio.src = ASSETS_URL + 'audio/' + uri + '.mp3';
+      // First time play normally.
+      this.audioPlaybackRate = 1;
+      this.playAudio();
+    }
+  }
+
+  playAudio() {
+    if (this.isAudioEnabled && this.audio.src) {
       this.audio.load();
+      this.audio.playbackRate = this.audioPlaybackRate;
       this.audio.play();
+      this.isAudioPlaying = true;
+      // Apply playback slow down effect.
+      this.audioPlaybackRate = Math.max(this.audioPlaybackRate * 0.95, 0.5);
     }
   }
 
@@ -135,9 +157,9 @@ export class MissingLettersComponent implements OnInit {
     this.isAnswered = true;
     this.quizUserAnswer = value;
 
-    const s = this.quizes.length > 0 ? ',' : '.';
-    const a = this.quizPrefix + this.quizUserAnswer + this.quizSuffix + s;
-    const b = this.quizPrefix + this.quizRealAnswer + this.quizSuffix + s;
+    const a = this.quizPrefix + this.quizUserAnswer + this.quizSuffix;
+    const b = this.quizPrefix + this.quizRealAnswer + this.quizSuffix;
+
     setTimeout(() => {
       this.answers.push({ userAnswer: a, realAnswer: b });
       this.nextQuiz();

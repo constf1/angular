@@ -1,13 +1,15 @@
 <div class="missing-letters-frame">
-  <div class="missing-letters-board" #board>
-    <app-simple-diff *ngFor="let a of answers" style="margin-right: 1em;"
-      [pastValue]="a.userAnswer" [nextValue]="a.realAnswer"></app-simple-diff>
-    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered">
+  <div class="missing-letters-board" [style.font-size.px]="fontSize" #board>
+    <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer"
+      [nextValue]="a.realAnswer"></app-simple-diff>
+    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered" style="margin-right: 0.25em">
       <span>{{quizPrefix}}</span>
       <span class="missing-letters-answer">{{quizUserAnswer}}</span>
       <span>{{quizSuffix}}</span>
-      <!-- <span style="margin-right: 1em;visibility: hidden;">,</span> -->
+      <!-- <span style="visibility: hidden;color: #0000">,</span> -->
     </span>
+  </div>
+  <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="playAudio()">
   </div>
   <div class="missing-letters-front">
     <button *ngIf="state === 'ready'" (click)="onStart()">START</button>
@@ -16,5 +18,25 @@
         (click)="onAnswer(q, board)">{{q || '_'}}</button>
     </ng-container>
     <button *ngIf="state === 'done'" (click)="onRestart()">RESTART</button>
+  </div>
+  <button mat-fab color="warn" style="position: absolute; left: 872px; top: 220px"
+    (click)="isAudioEnabled = !isAudioEnabled">
+    <mat-icon>{{isAudioEnabled ? 'volume_up' : 'volume_off'}}</mat-icon>
+  </button>
+  <button mat-fab color="primary" [disabled]="fontSizeMin >= fontSize"
+    style="position: absolute; left: 960px; top: 132px"
+    (click)="fontSize = fontSize - (fontSizeMin >= fontSize ? 0 : 1)">
+    <mat-icon>zoom_out</mat-icon>
+  </button>
+  <button mat-fab color="primary" [disabled]="fontSize >= fontSizeMax"
+    style="position: absolute; left: 954px; top: 204px"
+    (click)="fontSize = fontSize + (fontSize >= fontSizeMax ? 0 : 1)">
+    <mat-icon>zoom_in</mat-icon>
+  </button>
+
+  <div class="missing-letters-popup" *ngIf="chatBot.currentItem as item" (click)="chatBot.next()">
+    <div class="missing-letters-popup-bubble">
+      <div [innerHTML]="item.message"></div>
+    </div>
   </div>
 </div>
