@@ -41,7 +41,15 @@ export class SimpleDiffComponent implements OnChanges {
       this.prefix = prefix;
       this.suffix = suffix;
       this.remove = a.substring(start, a.length - end);
-      this.insert = b.substring(start, b.length - end);
+      this.insert = b.substring(start, b.length - end)
+      // replaces all spaces with their unicode literal
+        .replace(/\s+/g, '\u00A0');
+
+      // if (this.insert && /^\s+$/.test(this.insert)) {
+      //   // U+23B5 Bottom Square Bracket (⎵)
+      //   // this.insert = '↔';
+      //   this.insert = '⎵'; // &blank; (␣) or &#9141;
+      // }
     }
   }
 }
