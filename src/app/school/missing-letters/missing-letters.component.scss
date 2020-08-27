@@ -71,10 +71,11 @@ div.missing-letters-frame {
 
   div.missing-letters-board {
     position: absolute;
-    left: 228px;
-    top: 26px;
-    width: 578px;
-    height: 468px;
+    left: 226px;
+    top: 28px;
+    width: calc(604px - 1em);
+    height: calc(484px - 1em);
+    // border: 1px solid magenta;
     // background-color: #0005;
     color: #eee;
     // font-size: 24px;
@@ -83,8 +84,15 @@ div.missing-letters-frame {
     overflow-y: auto;
     overflow-x: hidden;
 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    align-content: flex-start;
+
     > :not(:last-child)::after {
-      content: ", ";
+      content: ",";
+      margin-right: 0.4em;
     }
   }
 
@@ -250,7 +258,7 @@ div.missing-letters-frame {
         display: flex;
         align-items: center;
         justify-content: center;
-        // text-align: center;
+        text-align: center;
       }
     }
   }

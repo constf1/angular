@@ -2,7 +2,7 @@
   <div class="missing-letters-board" [style.font-size.px]="fontSize" #board>
     <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer"
       [nextValue]="a.realAnswer"></app-simple-diff>
-    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered" style="margin-right: 0.25em">
+    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered" style="padding-right: 0.3em">
       <span>{{quizPrefix}}</span>
       <span class="missing-letters-answer">{{quizUserAnswer}}</span>
       <span>{{quizSuffix}}</span>

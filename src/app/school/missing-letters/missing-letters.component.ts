@@ -1,6 +1,7 @@
 // tslint:disable: variable-name
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { Answer, ChatBot } from './chat-bot';
 
 interface GameData {
@@ -41,17 +42,21 @@ export class MissingLettersComponent implements OnInit {
   readonly fontSizeMin = 12;
   readonly fontSizeMax = 40;
 
-  constructor(private _http: HttpClient) { }
+  constructor(private _http: HttpClient, private _route: ActivatedRoute) { }
 
   ngOnInit(): void {
     this.audio.onended = () => this.isAudioPlaying = false;
     this.audio.onerror = () => this.isAudioPlaying = false;
+    this.audio.onplay = () => this.isAudioPlaying = true;
 
-    const gameName = 'ru-grade-1-1';
-    this._http.get<GameData>(ASSETS_URL + gameName + '.json').subscribe(data => {
-      this.gameData = data;
-      this.state = 'ready';
-    });
+    const params = this._route.snapshot.queryParams;
+    const gameName = (params.game as string || '').replace(/[^a-z\-_\.0-9]+/gmi, '');
+    if (gameName) {
+      this._http.get<GameData>(ASSETS_URL + gameName + '.json').subscribe(data => {
+        this.gameData = data;
+        this.state = 'ready';
+      });
+    }
   }
 
   onStart() {
@@ -147,7 +152,7 @@ export class MissingLettersComponent implements OnInit {
       this.audio.load();
       this.audio.playbackRate = this.audioPlaybackRate;
       this.audio.play();
-      this.isAudioPlaying = true;
+      // this.isAudioPlaying = true;
       // Apply playback slow down effect.
       this.audioPlaybackRate = Math.max(this.audioPlaybackRate * 0.95, 0.5);
     }
