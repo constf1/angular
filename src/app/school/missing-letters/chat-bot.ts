@@ -1,37 +1,186 @@
 import { randomItem } from 'src/app/common/array-utils';
 
-// Excellent
-export const MESSAGES_A = [
-  'Здорово!', 'Прекрасно!', 'Отлично!', 'Молодец!', 'Умница!',
-  'Умничка!!!', 'Хвалю!', 'Браво!', 'Талант!', 'Превосходно!',
-  'Так держать!', 'Замечательно!', 'Чудесно!', 'Знаток!', 'Толково!'
-] as const;
+const MESSAGES = {
+  // Excellent
+  A: [
+      'Браво!',
+      'Замечательно!',
+      'Здорово!',
+      'Знаток!',
+      'Молодец!',
+      'Отлично!',
+      'Превосходно!',
+      'Прекрасно!',
+      'Так держать!',
+      'Талант!',
+      'Толково!',
+      'Умница!',
+      'Умничка!!!',
+      'Хвалю!',
+      'Чудесно!',
+  ],
+  // Good
+  B: [
+    'Думаю, могло быть лучше.',
+    'Могло быть лучше.',
+    'Неплохая попытка, но...',
+    'Неплохо.',
+    'Хорошо, но...',
+  ],
 
-// Good
-export const MESSAGES_B = [
-  'Хорошо.', 'Не плохо.', 'Могло быть лучше.', 'Неплохая попытка, но...', 'Думаю, могло быть лучше.'
-] as const;
+  // Fair (Almost bad)
+  C: [
+    'На троечку.',
+    'Не ахти!',
+    'Не совсем то, что хотелось бы...',
+    'Ниже среднего.',
+    'Средне.',
+    'Честно говоря, не очень.',
+    'Что-то не очень.',
+  ],
 
-// Fair (Almost bad)
-export const MESSAGES_C = [
-  'Средне.', 'Что-то не очень.', 'Честно говоря, не очень.', 'Не ахти!', 'На троечку.', 'Не совсем то, что хотелось бы...', 'Ниже среднего.'
-] as const;
+  // Bad
+  D: [
+    'А вот это никуда не годится.',
+    'Нет, это никуда не годится.',
+    'Ну, это никуда не годится.',
+    'Плохо.',
+  ],
 
-// Bad
-export const MESSAGES_D = [
-  'Плохо.', 'Ну, это никуда не годится.', 'А вот это никуда не годится.', 'Нет, это никуда не годится.'
-] as const;
+  // Very bad
+  E: [
+    'Курам на смех!',
+    'Ну очень плохо.',
+    'Очень плохо.',
+    'Плохо! Плохо! Плохо!',
+    'Скверно!',
+    'Хватит, это никуда не годится!',
+  ],
 
-// Very bad
-export const MESSAGES_E = [
-  'Очень плохо.', 'Ну очень плохо.', 'Плохо! Плохо! Плохо!', 'Хватит, это никуда не годится!', 'Курам на смех!', 'Скверно!'
-] as const;
+  // Fail miserably
+  F: [
+    'Отвратительно.',
+    'Ужасно.',
+    'Ужас!',
+    'Безобразно!',
+    'Ой как плохо!',
+    'Некрасиво.',
+    'Я в шоке!',
+    'Жуть!',
+    'Взгляни как плохо.'
+  ],
 
-// Fail miserably
-export const MESSAGES_F = [
-  'Отвратительно.', 'Ужасно.', 'Ужас!', 'Безобразно!',
-  'Ой как плохо!', 'Некрасиво.', 'Я в шоке!', 'Жуть!', 'Взгляни как плохо.'
-] as const;
+  COMPLIMENTS: [
+    'Великолепно!',
+    'Грандиозно!',
+    'Еще лучше, чем прежде!',
+    'Здорово!',
+    'Именно этого мы давно ждали!',
+    'Как в сказке!',
+    'Классно!',
+    'Красота!',
+    'Мои поздравления!',
+    'Научи меня делать так же!',
+    'Незабываемо!',
+    'Неподражаемо!',
+    'Несравненно!',
+    'Отлично!',
+    'Очень приятно общаться с таким умным ребёнком.',
+    'Поздравляю!',
+    'Поразительно!',
+    'Потрясающе!',
+    'Прекрасно!',
+    'Прекрасное начало!',
+    'Работать с тобой просто радость!',
+    'С каждым днем у тебя получается всё лучше!',
+    'Так держать!',
+    'Талантливо!',
+    'Твой мозг поработал на славу.',
+    'Ты на верном пути!',
+    'Ты просто чудо!',
+    'У тебя получилось!',
+    'Удивительно!',
+    'Ух!!!',
+    'Фантастика!',
+    'Это замечательно!',
+    'Это как раз то, что нужно!',
+    'Это трогает меня до глубины души!',
+    'Я верю в тебя.',
+    'Я горжусь тем, что тебе это удалось!',
+    'Я знала, что ты можешь сделать это.',
+    'Я тобой горжусь!',
+  ],
+
+  NO_MISTAKES: [
+    'Без ошибок!',
+    'В этот раз без ошибок ;-)',
+    'Всё правильно, ошибок нет!',
+    'Ни одной ошибки!',
+    'Ошибок нет!',
+  ],
+
+  // Just one mistake.
+  ONE_MISTAKE: [
+    'Всего лишь одна ошибка.',
+    'Всего одна ошибочка!',
+    'Есть маленькая ошибочка...',
+    'Надо исправить одну ошибку.',
+    'Но есть ошибка.',
+    'Ну, с кем не бывает... Одна ошибка.',
+    'Одна ошибка.',
+    'Ошибка.',
+    'Просто маленькая ошибка, и всё.',
+    'Только одна ошибка!',
+    'У нас вышла ошибочка!',
+  ],
+
+  // 2, 3 or 4 mistakes.
+  COUNTABLE_MISTAKES: [
+    '$ ошибки.',
+    'У тебя $ ошибки.',
+    'Целых $ ошибки.',
+  ],
+
+  // 5 and more mistakes.
+  UNCOUNTABLE_MISTAKES: [
+    'Много ошибок!',
+    'Очень много ошибок!',
+    'Ошибки, ошибки, кругом одни ошибки.',
+  ],
+
+  MISTAKE_EMPHASIS: [
+    'Грамотно писать:',
+    'Давай вместе повторим:',
+    'Запомни:',
+    'Запомни и пиши правильно:',
+    'Мы пишем:',
+    'Надо запомнить:',
+    'Повторяй за мной:',
+    'Правильно писать:',
+    'Следует писать:',
+    // 'Согласно правилам:',
+    // 'По правилам:',
+    // 'Выучи',
+    // 'Держи в памяти',
+    // 'Заруби себе на носу',
+    // 'Заучи',
+    // 'Намотай себе на ус',
+    // 'Помни',
+    // 'Правильно',
+    // 'Прими во внимание',
+    // 'Сохрани в памяти',
+    // 'Уясни',
+  ],
+
+  REMEMBER_EMPHASIS: [
+    'Запомни, пожалуйста, и больше не путай.',
+    'Запомни, пожалуйста, и не забывай больше никогда!',
+    'Запомни, пожалуйста.',
+    'Пожалуйста, запомни и не делай таких ошибок!',
+    'Пожалуйста, запомни!',
+    'Ты только всё, пожалуйста, запомни.',
+  ],
+};
 
 /**
  * Returns score message.
@@ -39,17 +188,17 @@ export const MESSAGES_F = [
  */
 export function getScoreMessage(score: number): string {
   if (score === 1) {
-    return randomItem(MESSAGES_A);
+    return randomItem(MESSAGES.A);
   } else if (score > 0.9) {
-    return randomItem(MESSAGES_B);
+    return randomItem(MESSAGES.B);
   } else if (score > 0.8) {
-    return randomItem(MESSAGES_C);
+    return randomItem(MESSAGES.C);
   } else if (score > 0.7) {
-    return randomItem(MESSAGES_D);
+    return randomItem(MESSAGES.D);
   } else if (score > 0.6) {
-    return randomItem(MESSAGES_E);
+    return randomItem(MESSAGES.E);
   } else {
-    return randomItem(MESSAGES_F);
+    return randomItem(MESSAGES.F);
   }
 }
 
@@ -102,25 +251,34 @@ export class ChatBot {
   }
 
   onEnd(answers: Answer[]) {
-    const errors = countErrors(answers);
-    const count = answers.length;
+    const errorCount = countErrors(answers);
+    const answerCount = answers.length;
 
-    this.addTeacher(getScoreMessage((count - errors) / count));
-    this.markErrors(answers);
+    this.addTeacher(getScoreMessage((answerCount - errorCount) / answerCount));
+
+    if (errorCount === 0) {
+      this.addTeacher(randomItem(MESSAGES.NO_MISTAKES));
+      this.addTeacher(randomItem(MESSAGES.COMPLIMENTS));
+    } else if (errorCount === 1) {
+      this.addTeacher(randomItem(MESSAGES.ONE_MISTAKE));
+    } else if (errorCount >= 2 && errorCount <= 4) {
+      this.addTeacher(randomItem(MESSAGES.COUNTABLE_MISTAKES).replace('$', '' + errorCount));
+    } else {
+      this.addTeacher(randomItem(MESSAGES.UNCOUNTABLE_MISTAKES));
+    }
+
+    if (errorCount > 0) {
+      this.markErrors(answers);
+    }
   }
 
   markErrors(answers: Answer[]) {
-    const messages = [
-      'Запомни', 'Мы пишем', 'Правильно', 'Грамотно писать', 'Заучи',
-      'Заруби себе на носу', 'Сохрани в памяти', 'Намотай себе на ус', 'Выучи', 'Держи в памяти',
-      'Помни', 'Прими во внимание', 'Уясни', 'Правильно писать', 'Надо запомнить', 'По правилам',
-      'Согласно правилам', 'Следует писать'
-    ];
+    this.addTeacher(randomItem(MESSAGES.MISTAKE_EMPHASIS));
     for (const a of answers) {
       if (a.userAnswer !== a.realAnswer) {
-        const prefix = randomItem(messages);
-        this.addTeacher(`${prefix}: <mark>${a.realAnswer}</mark>!`);
+        this.addTeacher(`<mark>${a.realAnswer}</mark>`);
       }
     }
+    this.addTeacher(randomItem(MESSAGES.REMEMBER_EMPHASIS));
   }
 }
