@@ -1,9 +1,7 @@
-<div class="simple-diff-frame">
-  <span>{{prefix}}</span>
-  <span [class.simple-diff-error]="!hideChange">{{difference}}</span>
-  <span>{{suffix}}</span>
-  <div *ngIf="replacement && !hideChange" class="simple-diff-block">
+<span class="simple-diff-frame">
+  <span *ngIf="insert && !hideChange" class="simple-diff-block">
     <span style="visibility:hidden">{{prefix}}</span>
-    <span style="display:inline-block" [class.simple-diff-insert]="!difference">{{replacement}}</span>
-  </div>
-</div>
+    <span style="display:inline-block" [class.simple-diff-insert]="!remove">{{insert}}</span>
+  </span>
+  {{prefix}}<span [class.simple-diff-error]="!hideChange">{{remove}}</span>{{suffix}}
+</span>

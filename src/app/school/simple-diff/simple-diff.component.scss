@@ -22,7 +22,7 @@
   }
 }
 
-div.simple-diff-frame {
+span.simple-diff-frame {
   display: inline-block;
   position: relative;
 
@@ -47,7 +47,8 @@ div.simple-diff-frame {
     text-decoration: red solid line-through;
   }
 
-  div.simple-diff-block {
+  span.simple-diff-block {
+    display: inline-block;
     position: absolute;
     left: 0;
     top: -0.85em;

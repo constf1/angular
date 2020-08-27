@@ -13,11 +13,11 @@ export class SimpleDiffComponent implements OnChanges {
 
   prefix: string;
   suffix: string;
-  difference: string;
-  replacement: string;
+  remove: string;
+  insert: string;
 
   clear() {
-    this.prefix = this.suffix = this.difference = this.replacement = '';
+    this.prefix = this.suffix = this.remove = this.insert = '';
   }
 
   constructor() {
@@ -40,8 +40,8 @@ export class SimpleDiffComponent implements OnChanges {
 
       this.prefix = prefix;
       this.suffix = suffix;
-      this.difference = a.substring(start, a.length - end);
-      this.replacement = b.substring(start, b.length - end);
+      this.remove = a.substring(start, a.length - end);
+      this.insert = b.substring(start, b.length - end);
     }
   }
 }
