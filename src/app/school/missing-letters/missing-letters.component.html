@@ -2,11 +2,11 @@
   <div class="missing-letters-board" [style.font-size.px]="fontSize" #board>
     <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer"
       [nextValue]="a.realAnswer"></app-simple-diff>
-    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered" style="padding-right: 0.3em">
+    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered">
       <span>{{quizPrefix}}</span>
       <span class="missing-letters-answer">{{quizUserAnswer}}</span>
       <span>{{quizSuffix}}</span>
-      <!-- <span style="visibility: hidden;color: #0000">,</span> -->
+      <!-- <span style="visibility: hidden;color: #0000;padding-right: 0.4em">,</span> -->
     </span>
   </div>
   <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="playAudio()">
@@ -35,8 +35,8 @@
   </button>
 
   <div class="missing-letters-popup" *ngIf="chatBot.currentItem as item" (click)="chatBot.next()">
-    <div class="missing-letters-popup-bubble">
-      <div [innerHTML]="item.message"></div>
+    <div [class]="item.who === 'teacher' ? 'missing-letters-teacher' : 'missing-letters-student'">
+      <div class="missing-letters-message" [innerHTML]="item.message"></div>
     </div>
   </div>
 </div>

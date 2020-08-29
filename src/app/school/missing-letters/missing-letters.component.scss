@@ -26,6 +26,16 @@
   }
 }
 
+@keyframes keyframes-fade-in-alt {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: initial;
+  }
+}
+
 @keyframes keyframes-breath {
   0% {
     transform: scale(1, 1);
@@ -90,9 +100,14 @@ div.missing-letters-frame {
     align-items: flex-start;
     align-content: flex-start;
 
-    > :not(:last-child)::after {
+    // > :not(:last-child)::after {
+    > ::after {
       content: ",";
       margin-right: 0.4em;
+    }
+    > :last-child::after {
+      visibility: hidden;
+      color: #0000;
     }
   }
 
@@ -189,36 +204,6 @@ div.missing-letters-frame {
         opacity: 0.6;
         background: radial-gradient(#888 0%, #555 100%);
       }
-
-      // &:nth-of-type(6n+1) {
-      //   left: 146px;
-      //   top: 496px;
-      // }
-
-      // &:nth-of-type(6n+2) {
-      //   left: 762px;
-      //   top: 496px;
-      // }
-
-      // &:nth-of-type(6n+3) {
-      //   left: 210px;
-      //   top: 592px;
-      // }
-
-      // &:nth-of-type(6n+4) {
-      //   left: 698px;
-      //   top: 592px;
-      // }
-
-      // &:nth-of-type(6n+5) {
-      //   left: 274px;
-      //   top: 496px;
-      // }
-
-      // &:nth-of-type(6n) {
-      //   left: 634px;
-      //   top: 496px;
-      // }
     }
   }
 
@@ -230,35 +215,61 @@ div.missing-letters-frame {
     height: 100%;
     background-color: #2222;
 
-    div.missing-letters-popup-bubble {
-      animation: keyframes-fade-in 1s ease 1;
-      // display: flex;
-      // justify-content: center;
-      // align-content: center;
-      // align-items: center;
+    div.missing-letters-message {
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    div.missing-letters-teacher,
+    div.missing-letters-student {
+      position: relative;
+      background-color: transparent;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      animation-iteration-count: 1;
+      animation-timing-function: ease;
+      animation-duration: 1s;
+    }
+
+    div.missing-letters-teacher {
+      animation-name: keyframes-fade-in;
       left: 135px;
       top: 5px;
       width: 339px;
       height: 253px;
-      background-color: transparent;
       background-image: url('../../../assets/school/speech-bubble.png');
-      background-repeat: no-repeat;
-      background-size: 100% 100%;
 
-      &>div {
-        position: relative;
+      div.missing-letters-message {
         left: 20px;
-        top: 52px;
+        top: 48px;
         width: 284px;
-        height: 116px;
+        height: 120px;
         font-size: 32px;
         line-height: 1.1em;
         color: #700000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
+      }
+    }
+
+    div.missing-letters-student {
+      animation-name: keyframes-fade-in-alt;
+      left: 582px;
+      top: 334px;
+      width: 289px;
+      height: 175px;
+      background-image: url('../../../assets/school/speech-bubble-small.png');
+
+      div.missing-letters-message {
+        left: 14px;
+        top: 22px;
+        width: 222px;
+        height: 122px;
+        font-size: 32px;
+        line-height: 1.1em;
+        color: #000070;
       }
     }
   }

@@ -119,6 +119,18 @@ const MESSAGES = {
     'Ошибок нет!',
   ],
 
+  NO_MISTAKES_REPLY: [
+    'Ах!',
+    'Вот это да!',
+    'Здорово.',
+    'Мне даже не верится.',
+    'Не может быть!',
+    'Ура!',
+    'Ух ты!',
+    'Чудесно!',
+    'Класс!',
+  ],
+
   // Just one mistake.
   ONE_MISTAKE: [
     'Всего лишь одна ошибка.',
@@ -132,6 +144,19 @@ const MESSAGES = {
     'Просто маленькая ошибка, и всё.',
     'Только одна ошибка!',
     'У нас вышла ошибочка!',
+  ],
+  ONE_MISTAKE_REPLAY: [
+    'Одна ошибка?',
+    'Всего одна!',
+    'Только одна!',
+    'Я исправлю!',
+    'Я... я её исправлю!',
+  ],
+
+  MISTAKES_REPLAY: [
+    'Я всё исправлю.',
+    'Я исправлю!',
+    'Я... я всё исправлю!',
   ],
 
   // 2, 3 or 4 mistakes.
@@ -151,10 +176,11 @@ const MESSAGES = {
   MISTAKE_EMPHASIS: [
     'Грамотно писать:',
     'Давай вместе повторим:',
-    'Запомни:',
     'Запомни и пиши правильно:',
+    'Запомни:',
     'Мы пишем:',
     'Надо запомнить:',
+    'Пишем грамотно:',
     'Повторяй за мной:',
     'Правильно писать:',
     'Следует писать:',
@@ -242,6 +268,10 @@ export class ChatBot {
     this.items.push({ who: 'teacher', message});
   }
 
+  addStudent(message: string) {
+    this.items.push({ who: 'student', message});
+  }
+
   onStart(answers: Answer[]) {
 
   }
@@ -259,12 +289,16 @@ export class ChatBot {
     if (errorCount === 0) {
       this.addTeacher(randomItem(MESSAGES.NO_MISTAKES));
       this.addTeacher(randomItem(MESSAGES.COMPLIMENTS));
+      this.addStudent(randomItem(MESSAGES.NO_MISTAKES_REPLY));
     } else if (errorCount === 1) {
       this.addTeacher(randomItem(MESSAGES.ONE_MISTAKE));
+      this.addStudent(randomItem(MESSAGES.ONE_MISTAKE_REPLAY));
     } else if (errorCount >= 2 && errorCount <= 4) {
       this.addTeacher(randomItem(MESSAGES.COUNTABLE_MISTAKES).replace('$', '' + errorCount));
+      this.addStudent(randomItem(MESSAGES.MISTAKES_REPLAY));
     } else {
       this.addTeacher(randomItem(MESSAGES.UNCOUNTABLE_MISTAKES));
+      this.addStudent(randomItem(MESSAGES.MISTAKES_REPLAY));
     }
 
     if (errorCount > 0) {
@@ -277,6 +311,7 @@ export class ChatBot {
     for (const a of answers) {
       if (a.userAnswer !== a.realAnswer) {
         this.addTeacher(`<mark>${a.realAnswer}</mark>`);
+        this.addStudent(`<strong>${a.realAnswer}</strong>`);
       }
     }
     this.addTeacher(randomItem(MESSAGES.REMEMBER_EMPHASIS));
