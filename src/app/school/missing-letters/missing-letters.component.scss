@@ -102,8 +102,8 @@ div.missing-letters-frame {
 
     // > :not(:last-child)::after {
     > ::after {
-      content: ",";
-      margin-right: 0.4em;
+      content: ",\00a0";
+      // margin-right: 0.4em;
     }
     > :last-child::after {
       visibility: hidden;
@@ -245,9 +245,9 @@ div.missing-letters-frame {
 
       div.missing-letters-message {
         left: 20px;
-        top: 48px;
+        top: 38px;
         width: 284px;
-        height: 120px;
+        height: 140px;
         font-size: 32px;
         line-height: 1.1em;
         color: #700000;
