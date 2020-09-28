@@ -1,0 +1,121 @@
+<mat-sidenav-container>
+  <mat-sidenav #drawer>
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="drawer.close()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <span class="flex-space-filler-1"></span>
+      <span>SVG Path Editor</span>
+      <span class="flex-space-filler-1"></span>
+      <mat-slide-toggle color="primary" [checked]="drawer.mode === 'side'"
+        (change)="drawer.mode = $event.checked ? 'side' : 'over'"></mat-slide-toggle>
+    </mat-toolbar>
+    <mat-action-list>
+      <div mat-subheader>Actions:</div>
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-icon>image_aspect_ratio</mat-icon>Viewbox
+          </mat-expansion-panel-header>
+          <p>The position and dimension, in user space, of an SVG viewport.</p>
+          <mat-form-field>
+            <mat-label>x:</mat-label>
+            <input matInput type="number" name="inputX" [(ngModel)]="x">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>y:</mat-label>
+            <input matInput type="number" name="inputY" [(ngModel)]="y">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>width:</mat-label>
+            <input matInput type="number" name="inputW" [(ngModel)]="width">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>height:</mat-label>
+            <input matInput type="number" name="inputH" [(ngModel)]="height">
+          </mat-form-field>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-icon>image</mat-icon>Background
+          </mat-expansion-panel-header>
+          <label>Upload image:
+            <input type="file" [multiple]="false" (change)="loadImage($event)" placeholder="file..." />
+          </label>
+          <mat-form-field>
+            <mat-label>width (%):</mat-label>
+            <input matInput type="number" name="inputZ" min="1" step="1" [(ngModel)]="imageWidth">
+          </mat-form-field>
+        </mat-expansion-panel>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-icon>design_services</mat-icon>Path
+          </mat-expansion-panel-header>
+
+          <mat-form-field>
+            <mat-label>Color</mat-label>
+            <input matInput name="inputS" type="color" placeholder="color" [disabled]="!isPathStroke"
+              [(ngModel)]="pathStrokeColor">
+          </mat-form-field>
+          <mat-slide-toggle [(ngModel)]="isPathStroke">Stroke</mat-slide-toggle>
+
+          <mat-form-field>
+            <mat-label>Color</mat-label>
+            <input matInput name="inputF" type="color" placeholder="color" [disabled]="!isPathFill"
+              [(ngModel)]="pathFillColor">
+          </mat-form-field>
+          <mat-slide-toggle [(ngModel)]="isPathFill">Fill</mat-slide-toggle>
+
+          <mat-form-field style="width: 100%;">
+            <mat-label>SVG path data:</mat-label>
+            <textarea matInput name="inputD" matTextareaAutosize matAutosizeMinRows="4"
+              placeholder="Place any SVG path data here" [(ngModel)]="pathDataInput"></textarea>
+          </mat-form-field>
+
+          <button mat-stroked-button color="primary" (click)="convertInput(false)">To absolute</button>
+          <button mat-stroked-button color="primary" (click)="convertInput(true)">To relative</button>
+        </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-icon>assignment</mat-icon>Commands
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <mat-action-list>
+              <!-- <mat-list-item role="listitem" *ngFor="let t of pathTokens">{{t[0]}}</mat-list-item> -->
+              Some deferred content will be here.
+            </mat-action-list>
+          </ng-template>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </mat-action-list>
+    <span class="flex-space-filler-1"></span>
+    <mat-divider></mat-divider>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div style="display: inline-block;border: 1px solid #ffaa22" [style.width.px]="width"
+      [style.height.px]="height">
+      <svg [attr.viewBox]="viewBox">
+        <image *ngIf="imageData" [attr.width]="imageWidth + '%'" x="0" y="0" [attr.href]="imageData"></image>
+        <path opacity="0.9" stroke-width="1" [attr.stroke]="isPathStroke ? pathStrokeColor : 'none'"
+          [attr.fill]="isPathFill ? pathFillColor : 'none'" [attr.d]="pathModel.toString()">
+        </path>
+        <g opacity="0.5" stroke-width="0.8" stroke="lightgrey" fill="none">
+          <path [attr.d]="pathModel.getControlHandles()"></path>
+          <path stroke-dasharray="2" [attr.d]="pathModel.getReflectedControlHandles()"></path>
+        </g>
+        <g opacity="0.5" stroke="black" fill="#ff0">
+          <circle *ngFor="let point of pathModel.points;trackBy:trackByIndex" r="5" [attr.cx]="point.x"
+            [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, point)"></circle>
+        </g>
+      </svg>
+      <button *ngIf="!drawer.opened" class="sidenav-open-button" (click)="drawer.open()" mat-icon-button color="primary"
+        style="position: absolute; left: 0; top: 0">
+        <mat-icon>double_arrow</mat-icon>
+      </button>
+    </div>
+    <!-- <ng-content></ng-content> -->
+  </mat-sidenav-content>
+</mat-sidenav-container>

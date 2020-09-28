@@ -19,6 +19,10 @@ const appRoutes: Routes = [
     path: 'school-demo',
     loadChildren: () => import('./school/school.module').then(m => m.SchoolModule)
   },
+  {
+    path: 'svg-path-editor',
+    loadChildren: () => import('./svg-path-editor/svg-path-editor.module').then(m => m.SvgPathEditorModule)
+  },
 
   { path: '', redirectTo: '/freecell-demo', pathMatch: 'full' },
   { path: '**', redirectTo: '/freecell-demo' }
