@@ -11,10 +11,9 @@ export const ORIGIN: Point = {
   get y() { return 0; }, set y(value: number) {}
 };
 
-export function toPoint(x: number, y: number, offset: Point) {
-  x += offset.x;
-  y += offset.y;
-  return { x, y };
+function translate(point: Point, offset: Point) {
+  point.x += offset.x;
+  point.y += offset.y;
 }
 
 function toString(offset: Point, ...points: Point[]) {
@@ -34,8 +33,8 @@ export class MoveNode {
   readonly command: string = 'M';
   protected _endPoint: Point;
 
-  constructor(x: number, y: number, public prev?: MoveNode, relative?: boolean) {
-    this._endPoint = toPoint(x, y, relative ? this.startPoint : ORIGIN);
+  constructor(x: number, y: number, public prev?: MoveNode) {
+    this._endPoint = { x, y };
   }
 
   get endPoint(): Point {
@@ -48,6 +47,10 @@ export class MoveNode {
 
   paramsToString(offset: Point) {
     return toString(offset, this.endPoint);
+  }
+
+  translate(offset: Point) {
+    translate(this._endPoint, offset);
   }
 
   /**
@@ -65,8 +68,8 @@ export class MoveNode {
 
 export class LineNode extends MoveNode {
   readonly command: string = 'L';
-  constructor(x: number, y: number, prev?: MoveNode, relative?: boolean) {
-    super(x, y, prev, relative);
+  constructor(x: number, y: number, prev?: MoveNode) {
+    super(x, y, prev);
   }
 }
 
@@ -82,8 +85,8 @@ export class HLinePoint implements Point {
 
 export class HLineNode extends MoveNode {
   readonly command: string = 'H';
-  constructor(x: number, prev?: MoveNode, relative?: boolean) {
-    super(x, 0, prev, relative);
+  constructor(x: number, prev?: MoveNode) {
+    super(x, 0, prev);
     this._endPoint = new HLinePoint(this.endPoint.x, this);
   }
 
@@ -104,8 +107,8 @@ export class VLinePoint implements Point {
 
 export class VLineNode extends MoveNode {
   readonly command: string = 'V';
-  constructor(y: number, prev?: MoveNode, relative?: boolean) {
-    super(0, y, prev, relative);
+  constructor(y: number, prev?: MoveNode) {
+    super(0, y, prev);
     this._endPoint = new VLinePoint(this.endPoint.y, this);
   }
 
@@ -155,13 +158,18 @@ export class QCurveNode extends MoveNode {
   readonly command: string = 'Q';
   protected _controlPoint: Point;
 
-  constructor(x1: number, y1: number, x: number, y: number, prev?: MoveNode, relative?: boolean) {
-    super(x, y, prev, relative);
-    this._controlPoint = toPoint(x1, y1, relative ? this.startPoint : ORIGIN);
+  constructor(x1: number, y1: number, x: number, y: number, prev?: MoveNode) {
+    super(x, y, prev);
+    this._controlPoint = { x: x1, y: y1 };
   }
 
   get controlPoint() {
     return this._controlPoint;
+  }
+
+  translate(offset: Point) {
+    translate(this._endPoint, offset);
+    translate(this._controlPoint, offset);
   }
 
   paramsToString(offset: Point) {
@@ -176,13 +184,19 @@ export class CurveNode extends QCurveNode {
     x1: number, y1: number,
     x2: number, y2: number,
     x: number, y: number,
-    prev?: MoveNode, relative?: boolean) {
-    super(x2, y2, x, y, prev, relative);
-    this._firstControlPoint = toPoint(x1, y1, relative ? this.startPoint : ORIGIN);
+    prev?: MoveNode) {
+    super(x2, y2, x, y, prev);
+    this._firstControlPoint = { x: x1, y: y1 };
   }
 
   get firstControlPoint() {
     return this._firstControlPoint;
+  }
+
+  translate(offset: Point) {
+    translate(this._endPoint, offset);
+    translate(this._controlPoint, offset);
+    translate(this._firstControlPoint, offset);
   }
 
   paramsToString(offset: Point) {
@@ -236,8 +250,8 @@ export class SmoothCurveNode extends CurveNode {
   constructor(
     x2: number, y2: number,
     x: number, y: number,
-    prev?: MoveNode, relative?: boolean) {
-    super(0, 0, x2, y2, x, y, prev, relative);
+    prev?: MoveNode) {
+    super(0, 0, x2, y2, x, y, prev);
     this._firstControlPoint = new ReflectedControlPoint(this, 'C');
   }
 
@@ -248,10 +262,8 @@ export class SmoothCurveNode extends CurveNode {
 
 export class SmoothQCurveNode extends QCurveNode {
   readonly command: string = 'T';
-  constructor(
-    x: number, y: number,
-    prev?: MoveNode, relative?: boolean) {
-    super(0, 0, x, y, prev, relative);
+  constructor(x: number, y: number, prev?: MoveNode) {
+    super(0, 0, x, y, prev);
     this._controlPoint = new ReflectedControlPoint(this, 'Q');
   }
 
@@ -267,8 +279,8 @@ export class EllipticalArcNode extends MoveNode {
     public angle: number,
     public largeArcFlag: boolean, public sweepFlag: boolean,
     x: number, y: number,
-    prev?: MoveNode, relative?: boolean) {
-    super(x, y, prev, relative);
+    prev?: MoveNode) {
+    super(x, y, prev);
   }
 
   // Specification: https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
@@ -340,7 +352,7 @@ const RE_UNSIGNED = /(([0-9]+(\.[0-9]*)?)|\.[0-9]+)/;
 
 interface NodeMaker {
   rexps: Readonly<RegExp[]>;
-  build: (args: string[], prev?: MoveNode, isRelative?: boolean) => MoveNode;
+  build: (args: string[], prev?: MoveNode) => MoveNode;
 }
 
 /**
@@ -352,7 +364,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   //  m dx dy
   M: {
     rexps: [RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) => new MoveNode(+args[0], +args[1], prev, isRelative)
+    build: (args, prev?) => new MoveNode(+args[0], +args[1], prev)
   },
 
   // Line To:
@@ -360,7 +372,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // l dx dy
   L: {
     rexps: [RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) => new LineNode(+args[0], +args[1], prev, isRelative)
+    build: (args, prev?) => new LineNode(+args[0], +args[1], prev)
   },
 
   // Horizontal Line To:
@@ -368,7 +380,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // h dx
   H: {
     rexps: [RE_SIGNED],
-    build: (args, prev?, isRelative?) => new HLineNode(+args[0], prev, isRelative)
+    build: (args, prev?) => new HLineNode(+args[0], prev)
   },
 
   // Vertical Line To:
@@ -376,13 +388,13 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // v dy
   V: {
     rexps: [RE_SIGNED],
-    build: (args, prev?, isRelative?) => new VLineNode(+args[0], prev, isRelative)
+    build: (args, prev?) => new VLineNode(+args[0], prev)
   },
 
   // Close Path.
   Z: {
     rexps: [],
-    build: (args, prev?, isRelative?) => new ClosePathNode(prev)
+    build: (args, prev?) => new ClosePathNode(prev)
   },
 
   // Bézier curves:
@@ -392,7 +404,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // c dx1 dy1, dx2 dy2, dx dy
   C: {
     rexps: [RE_SIGNED, RE_SIGNED, RE_SIGNED, RE_SIGNED, RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) => new CurveNode(+args[0], +args[1], +args[2], +args[3], +args[4], +args[5], prev, isRelative)
+    build: (args, prev?) => new CurveNode(+args[0], +args[1], +args[2], +args[3], +args[4], +args[5], prev)
   },
 
   // Shortcut Curve To:
@@ -400,7 +412,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // s dx2 dy2, dx dy
   S: {
     rexps: [RE_SIGNED, RE_SIGNED, RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) => new SmoothCurveNode(+args[0], +args[1], +args[2], +args[3], prev, isRelative)
+    build: (args, prev?) => new SmoothCurveNode(+args[0], +args[1], +args[2], +args[3], prev)
   },
 
   // Quadratic Curve To:
@@ -408,7 +420,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // q dx1 dy1, dx dy
   Q: {
     rexps: [RE_SIGNED, RE_SIGNED, RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) => new QCurveNode(+args[0], +args[1], +args[2], +args[3], prev, isRelative)
+    build: (args, prev?) => new QCurveNode(+args[0], +args[1], +args[2], +args[3], prev)
   },
 
   // Shortcut Quadratic Curve To:
@@ -416,7 +428,7 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // t dx dy
   T: {
     rexps: [RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) => new SmoothQCurveNode(+args[0], +args[1], prev, isRelative)
+    build: (args, prev?) => new SmoothQCurveNode(+args[0], +args[1], prev)
   },
 
 
@@ -425,8 +437,8 @@ const NODE_MAKER: {[key: string]: NodeMaker} = {
   // a rx ry x-axis-rotation large-arc-flag sweep-flag dx dy
   A: {
     rexps: [RE_UNSIGNED, RE_UNSIGNED, RE_SIGNED, RE_FLAG, RE_FLAG, RE_SIGNED, RE_SIGNED],
-    build: (args, prev?, isRelative?) =>
-      new EllipticalArcNode(+args[0], +args[1], +args[2], args[3] === '1', args[4] === '1', +args[5], +args[6], prev, isRelative)
+    build: (args, prev?) =>
+      new EllipticalArcNode(+args[0], +args[1], +args[2], args[3] === '1', args[4] === '1', +args[5], +args[6], prev)
   }
 };
 
@@ -443,10 +455,6 @@ class Reader {
 
   get data() {
     return this._data;
-  }
-
-  constructor(data: string = '') {
-    this.data = data;
   }
 
   moveTo(start: number) {
@@ -487,15 +495,21 @@ export class PathModel {
     const nodes = this.nodes;
     // Split by command.
     const split = path.split(RE_COMMAND);
+    const reader = new Reader();
 
-    for (let i = 1; i + 1 < split.length; i += 2) {
-      let command = split[i];
-      const reader = new Reader(split[i + 1]);
+    for (let i = 2; i < split.length; i += 2) {
+      let command = split[i - 1];
+      reader.data = split[i];
+
       while (true) {
         const maker = NODE_MAKER[command.toUpperCase()];
         const params = reader.readAll(maker.rexps);
         if (params !== null) {
-          nodes[nodeCount] = maker.build(params, nodes[nodeCount - 1], command.toLowerCase() === command);
+          const node = maker.build(params, nodes[nodeCount - 1]);
+          if (command.toLowerCase() === command) {
+            node.translate(node.startPoint);
+          }
+          nodes[nodeCount] = node;
           nodeCount++;
         } else {
           // console.warn('Couldn\'t properly parse this expression:', s[i], s[i + 1], reader.data);
@@ -588,6 +602,19 @@ export class PathModel {
         const p1 = node.centerPoint;
         const p = node.endPoint;
         path += `M${p.x} ${p.y}L${p1.x} ${p1.y}L${p0.x} ${p0.y}A${node.paramsToString(ORIGIN, true)}`;
+
+        const rx = node.rx;
+        const ry = node.ry;
+        const a = node.angle * Math.PI / 180;
+        const cosA = Math.cos(a);
+        const sinA = Math.sin(a);
+
+        let dx = cosA * rx;
+        let dy = sinA * rx;
+        path += `M${p1.x - dx} ${p1.y - dy}l${2 * dx} ${2 * dy}`;
+        dx = -sinA * ry;
+        dy = cosA * ry;
+        path += `M${p1.x - dx} ${p1.y - dy}l${2 * dx} ${2 * dy}`;
       }
     }
     return path;
