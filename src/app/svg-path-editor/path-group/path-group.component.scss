@@ -1,0 +1,21 @@
+.path-group {
+  display: flex;
+  flex-wrap: wrap;
+
+  span {
+    cursor: pointer;
+    display: inline-block;
+    min-width: 1.125em;
+    height: 1.125em;
+    text-align: center;
+  }
+
+  span:hover {
+    color: blue;
+  }
+
+  span.selected {
+    background-color: yellow;
+    text-transform: lowercase;
+  }
+}
