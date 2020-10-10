@@ -38,15 +38,19 @@ export class MoveNode {
   }
 
   get endPoint(): Point {
-    return this._endPoint || ORIGIN;
+    return this._endPoint;
   }
 
   get startPoint(): Point {
-    return this.prev?.endPoint || ORIGIN;
+    return this.prev?._endPoint || ORIGIN;
+  }
+
+  getControlPoints(arr: Point[]) {
+    arr.push(this._endPoint);
   }
 
   paramsToString(offset: Point) {
-    return toString(offset, this.endPoint);
+    return toString(offset, this._endPoint);
   }
 
   translate(offset: Point) {
@@ -57,12 +61,10 @@ export class MoveNode {
    * Returns an upper-case command with absolute coordinates.
    * @param convertToRelative If true returns a lower-case command with coordinates relative to the current position.
    */
-  toString(convertToRelative?: boolean) {
-    if (convertToRelative) {
-      return this.command.toLowerCase() + this.paramsToString(this.startPoint);
-    } else {
-      return this.command + this.paramsToString(ORIGIN);
-    }
+  toString(convertToRelative?: boolean): string {
+    return (convertToRelative
+     ? (this.command.toLowerCase() + this.paramsToString(this.startPoint))
+     : (this.command + this.paramsToString(ORIGIN)));
   }
 }
 
@@ -87,11 +89,11 @@ export class HLineNode extends MoveNode {
   readonly command: string = 'H';
   constructor(x: number, prev?: MoveNode) {
     super(x, 0, prev);
-    this._endPoint = new HLinePoint(this.endPoint.x, this);
+    this._endPoint = new HLinePoint(this._endPoint.x, this);
   }
 
   paramsToString(offset: Point) {
-    return ' ' + (this.endPoint.x - offset.x);
+    return ' ' + (this._endPoint.x - offset.x);
   }
 }
 
@@ -109,11 +111,11 @@ export class VLineNode extends MoveNode {
   readonly command: string = 'V';
   constructor(y: number, prev?: MoveNode) {
     super(0, y, prev);
-    this._endPoint = new VLinePoint(this.endPoint.y, this);
+    this._endPoint = new VLinePoint(this._endPoint.y, this);
   }
 
   paramsToString(offset: Point) {
-    return ' ' + (this.endPoint.y - offset.y);
+    return ' ' + (this._endPoint.y - offset.y);
   }
 }
 
@@ -152,6 +154,10 @@ export class ClosePathNode extends MoveNode {
   paramsToString(offset: Point) {
     return ' ';
   }
+
+  getControlPoints(arr: Point[]) {
+    // ClosePath has no controllable moveTo point.
+  }
 }
 
 export class QCurveNode extends MoveNode {
@@ -173,7 +179,18 @@ export class QCurveNode extends MoveNode {
   }
 
   paramsToString(offset: Point) {
-    return toString(offset, this.controlPoint, this.endPoint);
+    return toString(offset, this._controlPoint, this._endPoint);
+  }
+
+  getControlPoints(arr: Point[]) {
+    arr.push(this._controlPoint, this._endPoint);
+  }
+
+  getControlHandles(): string {
+    const p0 = this.startPoint;
+    const p1 = this.controlPoint;
+    const p = this.endPoint;
+    return `M${p0.x} ${p0.y}L${p1.x} ${p1.y}L${p.x} ${p.y}`;
   }
 }
 
@@ -200,7 +217,19 @@ export class CurveNode extends QCurveNode {
   }
 
   paramsToString(offset: Point) {
-    return toString(offset, this.firstControlPoint, this.controlPoint, this.endPoint);
+    return toString(offset, this._firstControlPoint, this._controlPoint, this._endPoint);
+  }
+
+  getControlPoints(arr: Point[]) {
+    arr.push(this._firstControlPoint, this._controlPoint, this._endPoint);
+  }
+
+  getControlHandles(): string {
+    const p0 = this.startPoint;
+    const p1 = this.firstControlPoint;
+    const p2 = this.controlPoint;
+    const p = this.endPoint;
+    return `M${p0.x} ${p0.y}L${p1.x} ${p1.y}M${p2.x} ${p2.y}L${p.x} ${p.y}`;
   }
 }
 
@@ -256,7 +285,23 @@ export class SmoothCurveNode extends CurveNode {
   }
 
   paramsToString(offset: Point) {
-    return toString(offset, this.controlPoint, this.endPoint);
+    return toString(offset, this._controlPoint, this._endPoint);
+  }
+
+  getControlPoints(arr: Point[]) {
+    arr.push(this._controlPoint, this._endPoint);
+  }
+
+  getControlHandles(): string {
+    const p2 = this.controlPoint;
+    const p = this.endPoint;
+    return `M${p2.x} ${p2.y}L${p.x} ${p.y}`;
+  }
+
+  getReflectedControlHandles(): string {
+    const p0 = this.startPoint;
+    const p1 = this.firstControlPoint;
+    return `M${p0.x} ${p0.y}L${p1.x} ${p1.y}`;
   }
 }
 
@@ -268,7 +313,22 @@ export class SmoothQCurveNode extends QCurveNode {
   }
 
   paramsToString(offset: Point) {
-    return toString(offset, this.endPoint);
+    return toString(offset, this._endPoint);
+  }
+
+  getControlPoints(arr: Point[]) {
+    arr.push(this._endPoint);
+  }
+
+  getControlHandles(): string {
+    return '';
+  }
+
+  getReflectedControlHandles(): string {
+    const p0 = this.startPoint;
+    const p1 = this.controlPoint;
+    const p = this.endPoint;
+    return `M${p0.x} ${p0.y}L${p1.x} ${p1.y}L${p.x} ${p.y}`;
   }
 }
 
@@ -342,6 +402,28 @@ export class EllipticalArcNode extends MoveNode {
     const fA = (!toggleFlags === this.largeArcFlag) ? '1' : '0';
     const fB = (!toggleFlags === this.sweepFlag) ? '1' : '0';
     return ` ${this.rx} ${this.ry} ${this.angle} ` + fA + fB + toString(offset, this.endPoint);
+  }
+
+  getReflectedControlHandles(): string {
+    const p0 = this.startPoint;
+    const p1 = this.centerPoint;
+    const p = this.endPoint;
+
+    const sa = `M${p.x} ${p.y}L${p1.x} ${p1.y}L${p0.x} ${p0.y}A${this.paramsToString(ORIGIN, true)}`;
+
+    const a = this.angle * Math.PI / 180;
+    const cosA = Math.cos(a);
+    const sinA = Math.sin(a);
+
+    let dx = cosA * this.rx;
+    let dy = sinA * this.rx;
+    const sb = `M${p1.x - dx} ${p1.y - dy}l${2 * dx} ${2 * dy}`;
+
+    dx = -sinA * this.ry;
+    dy = cosA * this.ry;
+    const sc = `M${p1.x - dx} ${p1.y - dy}l${2 * dx} ${2 * dy}`;
+
+    return sa + sb + sc;
   }
 }
 
@@ -486,13 +568,40 @@ class Reader {
   }
 }
 
+interface PathNode extends MoveNode {
+  isRelative?: boolean;
+  isSelected?: boolean;
+}
+
 export class PathModel {
-  nodes: MoveNode[] = [];
-  points: Point[] = [];
+  private _nodes: PathNode[] = [];
+  private _points: Point[] = [];
+
+  get selectedCount() {
+    let count = 0;
+    for (const node of this._nodes) {
+      if (node.isSelected) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  get firstSelection(): MoveNode | undefined {
+    for (const node of this._nodes) {
+      if (node.isSelected) {
+        return node;
+      }
+    }
+  }
+
+  get hasSelection(): boolean {
+    return !!this.firstSelection;
+  }
 
   fromString(path: string) {
     let nodeCount = 0;
-    const nodes = this.nodes;
+    const nodes = this._nodes;
     // Split by command.
     const split = path.split(RE_COMMAND);
     const reader = new Reader();
@@ -505,8 +614,9 @@ export class PathModel {
         const maker = NODE_MAKER[command.toUpperCase()];
         const params = reader.readAll(maker.rexps);
         if (params !== null) {
-          const node = maker.build(params, nodes[nodeCount - 1]);
+          const node: PathNode = maker.build(params, nodes[nodeCount - 1]);
           if (command.toLowerCase() === command) {
+            node.isRelative = true;
             node.translate(node.startPoint);
           }
           nodes[nodeCount] = node;
@@ -528,57 +638,45 @@ export class PathModel {
     }
     nodes.length = nodeCount;
 
-    this.updateControlPoints();
+    this.updateControls();
   }
 
-  toString(convertToRelative?: boolean, separator?: string) {
-    return this.nodes.map(node => node.toString(convertToRelative)).join(separator || '');
+  convertTo(relative: boolean) {
+    for (const node of this._nodes) {
+      node.isRelative = relative;
+    }
   }
 
-  updateControlPoints() {
-    this.points.length = 0;
+  toString(separator?: string) {
+    return this._nodes.map(node => node.toString(node.isRelative)).join(separator || '');
+  }
 
-    for (const node of this.nodes) {
-      // ClosePath has no controllable moveTo point.
-      if (!(node instanceof ClosePathNode)) {
-        this.points.push(node.endPoint);
+  updateControls() {
+    this._points.length = 0;
 
-        if (node instanceof QCurveNode) {
-          if (node instanceof CurveNode) {
-            const p1 = node.firstControlPoint;
-            if (!(p1 instanceof ReflectedControlPoint)) {
-              this.points.push(p1);
-            }
-          }
+    for (const node of this._nodes) {
+      node.getControlPoints(this._points);
+    }
+  }
 
-          const pc = node.controlPoint;
-          if (!(pc instanceof ReflectedControlPoint)) {
-            this.points.push(pc);
-          }
-        }
-      }
+  getControlPoints(): Point[] {
+    const node = this.firstSelection;
+    if (node) {
+      const arr: Point[] = [];
+      node.getControlPoints(arr);
+      return arr;
+    } else {
+      return this._points;
     }
   }
 
   getControlHandles() {
+    const showAll = !this.hasSelection;
     let path = '';
-    for (const node of this.nodes) {
-      if (node instanceof CurveNode) {
-        const p0 = node.startPoint;
-        const p1 = node.firstControlPoint;
-        const p2 = node.controlPoint;
-        const p = node.endPoint;
-
-        if (!(p1 instanceof ReflectedControlPoint)) {
-          path += `M${p0.x} ${p0.y}L${p1.x} ${p1.y}`;
-        }
-        path += `M${p2.x} ${p2.y}L${p.x} ${p.y}`;
-      } else if (node instanceof QCurveNode) {
-        const p0 = node.startPoint;
-        const p1 = node.controlPoint;
-        const p = node.endPoint;
-        if (!(p1 instanceof ReflectedControlPoint)) {
-          path += `M${p0.x} ${p0.y}L${p1.x} ${p1.y}L${p.x} ${p.y}`;
+    for (const node of this._nodes) {
+      if (showAll || node.isSelected) {
+        if (node instanceof QCurveNode) {
+          path += node.getControlHandles();
         }
       }
     }
@@ -586,37 +684,83 @@ export class PathModel {
   }
 
   getReflectedControlHandles() {
+    const showAll = !this.hasSelection;
     let path = '';
-    for (const node of this.nodes) {
-      if (node instanceof SmoothCurveNode) {
-        const p0 = node.startPoint;
-        const p1 = node.firstControlPoint;
-        path += `M${p0.x} ${p0.y}L${p1.x} ${p1.y}`;
-      } else if (node instanceof SmoothQCurveNode) {
-        const p0 = node.startPoint;
-        const p1 = node.controlPoint;
-        const p = node.endPoint;
-        path += `M${p0.x} ${p0.y}L${p1.x} ${p1.y}L${p.x} ${p.y}`;
-      } else if (node instanceof EllipticalArcNode) {
-        const p0 = node.startPoint;
-        const p1 = node.centerPoint;
-        const p = node.endPoint;
-        path += `M${p.x} ${p.y}L${p1.x} ${p1.y}L${p0.x} ${p0.y}A${node.paramsToString(ORIGIN, true)}`;
-
-        const rx = node.rx;
-        const ry = node.ry;
-        const a = node.angle * Math.PI / 180;
-        const cosA = Math.cos(a);
-        const sinA = Math.sin(a);
-
-        let dx = cosA * rx;
-        let dy = sinA * rx;
-        path += `M${p1.x - dx} ${p1.y - dy}l${2 * dx} ${2 * dy}`;
-        dx = -sinA * ry;
-        dy = cosA * ry;
-        path += `M${p1.x - dx} ${p1.y - dy}l${2 * dx} ${2 * dy}`;
+    for (const node of this._nodes) {
+      if (showAll || node.isSelected) {
+        if (node instanceof SmoothCurveNode || node instanceof SmoothQCurveNode || node instanceof EllipticalArcNode) {
+          path += node.getReflectedControlHandles();
+        }
       }
     }
     return path;
+  }
+
+  select(index: number, value: boolean) {
+    const node = this._nodes[index];
+    if (node) {
+      node.isSelected = value;
+    }
+  }
+
+  clearSelection() {
+    for (const node of this._nodes) {
+      node.isSelected = false;
+    }
+  }
+
+  getSelectedPath() {
+    let path = '';
+    for (const node of this._nodes) {
+      if (node.isSelected) {
+        const p0 = node.startPoint;
+        const p1 = node.endPoint;
+        if (node instanceof QCurveNode) {
+          const c1 = node.controlPoint;
+          if (node instanceof CurveNode) {
+            const c0 = node.firstControlPoint;
+            path += `M${p0.x} ${p0.y}C${c0.x} ${c0.y} ${c1.x} ${c1.y} ${p1.x} ${p1.y}`;
+          } else {
+            path += `M${p0.x} ${p0.y}Q${c1.x} ${c1.y} ${p1.x} ${p1.y}`;
+          }
+        } else if (node instanceof EllipticalArcNode) {
+          path += `M${p0.x} ${p0.y}` + node.toString();
+        } else {
+          path += `M${p0.x} ${p0.y}L${p1.x} ${p1.y}`;
+        }
+      }
+    }
+    return path;
+  }
+
+  moveSelectedNodes(offset: Point) {
+    for (const node of this._nodes) {
+      if (node.isSelected) {
+        node.translate(offset);
+      }
+    }
+  }
+
+  getGroups(): string[][]  {
+    const buf: string[][] = [];
+    let next: string[];
+    for (const node of this._nodes) {
+      if (!next || node.command === 'M') {
+        if (next) {
+          buf.push(next);
+        }
+        next = [node.command];
+      } else {
+        next.push(node.command);
+      }
+      if (node.command === 'Z') {
+        buf.push(next);
+        next = undefined;
+      }
+    }
+    if (next) {
+      buf.push(next);
+    }
+    return buf;
   }
 }

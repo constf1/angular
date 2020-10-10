@@ -6,7 +6,35 @@ import { DragListener } from 'src/app/common/drag-listener';
 import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component';
 
 import { PathModel, Point } from '../path-model';
+import { EditorSettingsService } from '../services/editor-settings.service';
 
+// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix
+//
+// | R_ |     | r1 r2 r3 r4 r5 |   | R |
+// | G_ |     | g1 g2 g3 g4 g5 |   | G |
+// | B_ |  =  | b1 b2 b3 b4 b5 | * | B |
+// | A_ |     | a1 a2 a3 a4 a5 |   | A |
+// | 1  |     | 0  0  0  0  1  |   | 1 |
+//
+// R_ = r1*R + r2*G + r3*B + r4*A + r5
+// G_ = g1*R + g2*G + g3*B + g4*A + g5
+// B_ = b1*R + b2*G + b3*B + b4*A + b5
+// A_ = a1*R + a2*G + a3*B + a4*A + a5
+
+const FE_COLOR_MATRICES = {
+  identity: '1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0',
+  red: '1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0',
+  green: '0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 1 0',
+  blue: '0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0',
+  invert: '-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0',
+};
+
+function compact(pathData: string): string {
+  // remove spaces:
+  return pathData
+    .replace(/\s*([MLHVZCSQTA])\s*/gmi, '$1')
+    .replace(/\s+(\-)/gmi, '$1');
+}
 
 interface DragData {
   point: Point;
@@ -21,73 +49,95 @@ interface DragData {
 })
 export class EditorComponent extends UnsubscribableComponent implements OnInit {
   private _dragListener = new DragListener<DragData>();
-  private _viewBox = {
-    x: 0, y: 0, width: 1024, height: 1024
-  };
-
-  private _pathDataInput = '';
 
   pathModel = new PathModel();
+  showRawPathInput = true;
 
   imageData = ''; // image as dataURL
   imageWidth = 100; // in percent
+  imageColorMatrixNames = Object.keys(FE_COLOR_MATRICES);
+  imageColorMatrixValue = this.imageColorMatrixNames[0];
 
-  isPathStroke = true;
-  pathStrokeColor = '#ff00ff';
-
-  isPathFill = false;
-  pathFillColor = '#04040f';
+  get imageColorMatrix() {
+    return FE_COLOR_MATRICES[this.imageColorMatrixValue] || FE_COLOR_MATRICES.identity;
+  }
 
   get viewBox(): string {
-    const v = this._viewBox;
-    return `${v.x} ${v.y} ${v.width} ${v.height}`;
+    const s = this.settings.state;
+    return `${s.xOffset} ${s.yOffset} ${s.width} ${s.height}`;
   }
 
-  get x(): number {
-    return this._viewBox.x;
+  constructor(public settings: EditorSettingsService, private _renderer2: Renderer2) {
+    super();
   }
 
-  set x(value: number) {
-    this._viewBox.x = +value || 0;
+  getGroups() {
+    const groups: { group: string[], startIndex: number }[] = [];
+    let startIndex = 0;
+    for (const group of this.pathModel.getGroups()) {
+      groups.push({ group, startIndex });
+      startIndex += group.length;
+    }
+    return groups;
   }
 
-  get y(): number {
-    return this._viewBox.y;
+  setShowRawPathInput(value: boolean) {
+    this.showRawPathInput = value;
+    // Clear any previously selected items. It's a design feature. NOT a bug!
+    this.pathModel.clearSelection();
   }
 
-  set y(value: number) {
-    this._viewBox.y = +value || 0;
-  }
-
-  get width(): number {
-    return this._viewBox.width;
-  }
-
-  set width(value: number) {
-    this._viewBox.width = +value || 0;
-  }
-
-  get height(): number {
-    return this._viewBox.height;
-  }
-
-  set height(value: number) {
-    this._viewBox.height = +value || 0;
-  }
-
-  get pathDataInput() {
-    return this._pathDataInput;
-  }
-
-  set pathDataInput(value: string) {
-    if (this._pathDataInput !== value) {
-      this._pathDataInput = value;
-      this.pathModel.fromString(value);
+  onSelectionChange(startIndex: number, items: boolean[]) {
+    for (let i = items.length; i-- > 0;) {
+      this.pathModel.select(startIndex + i, items[i]);
     }
   }
 
-  constructor(private _renderer2: Renderer2) {
-    super();
+  // selectNext(event: KeyboardEvent) {
+  //   if (this.selectedNode + 1 < this.pathModel.nodes.length) {
+  //     event.preventDefault();
+  //     this.selectedNode = this.selectedNode + 1;
+  //   }
+  // }
+
+  // selectPrev(event: KeyboardEvent) {
+  //   if (this.selectedNode > 0) {
+  //     event.preventDefault();
+  //     this.selectedNode = this.selectedNode - 1;
+  //   }
+  // }
+
+  // onKeydown(event) {
+  //   console.log('Key:', event);
+  // }
+
+  onDragMove() {
+    const data = this._dragListener.data;
+    const point = data.point;
+
+    const dx = Math.floor(this._dragListener.deltaX);
+    const dy = Math.floor(this._dragListener.deltaY);
+
+    const xOffset = data.startX + dx - point.x;
+    const yOffset = data.startY + dy - point.y;
+
+    if (xOffset !== 0 || yOffset !== 0) {
+      const node = this.pathModel.firstSelection;
+      if (node && node.endPoint === point) {
+        this.pathModel.moveSelectedNodes({ x: xOffset, y : yOffset });
+      } else {
+        point.x += xOffset;
+        point.y += yOffset;
+      }
+    }
+  }
+
+  onDragEnd() {
+    const data = this._dragListener.data;
+    const point = data.point;
+    if (point.x !== data.startX || point.y !== data.startY) {
+      this.settings.set({ pathDataInput: this.pathModel.toString('\n') });
+    }
   }
 
   ngOnInit(): void {
@@ -96,63 +146,10 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
         // case 'DragStart':
         //   console.log('DragStart');
         //   break;
-        case 'DragMove':
-          // console.log('DragMove', this._dragListener);
-          const data = this._dragListener.data;
-          const point = data.point;
-
-          const dx = Math.floor(this._dragListener.deltaX);
-          const dy = Math.floor(this._dragListener.deltaY);
-
-          point.x = data.startX + dx;
-          point.y = data.startY + dy;
-          break;
-        // case 'DragStop':
-        //   console.log('DragStop');
-        //   break;
+        case 'DragMove': this.onDragMove(); break;
+        case 'DragStop': this.onDragEnd(); break;
       }
     }));
-
-//     this.pathDataInput = `M540 800l250 52a28 28 0 00 28-44l-56-84 177-44a28 28 0 00 10-49
-// l-78-62 90-100a28 28 0 00-24-45l-130-1 4-96  a28 28 0 00-40-31
-// l-83 58 34-184a28 28 0 00-42-34l-88 45-52-120a28 28 0 00-54 0
-// l-55 121-87-47a28 28 0 00-41 29l 36 191-83-58a28 28 0 00-43 26
-// l 7 101-142 0 a28 28 0 00-10 49l 85 97-79 63 a28 28 0 00 16 49
-// l 189 45-55 85a28 28 0 00 38 38l 222-50v135  a28 28 0 00 56 0z`;
-    this.pathDataInput = `M205 698
-c-17-194 169-280 169-408s-24-259 127-274s177 84 174 243s218 217 164 452
-c43 15 31 74 55 97s50 71-18 97s-75 47-107 77s-129 64-154-28
-c-45 7-47-8-95-7s-59 10-108 13
-c-35 78-151 26-174 13s-94-9-124-25s-23-52-12-83s-26-87 30-107s40-29 73-60z
-m-9 30
-c-20 39-66 34-76 51s-12 23-4 64s-18 40-7 78s104 16 156 50s139 24 141-36s-70-102-90-157s-74-120-120-50z
-m103-60
-c-56-80 35-193 26-195s-63 84-59 160s86 96 111 126s59 83-4 85
-q20 22 31 40
-a150 100-8 00 217-10
-c33-30 4-182 71-192
-c-4-74 116-10 116 7s4 21 10 16s12-38-59-66
-c20-83-54-183-71-182s85 65 51 175
-q-9-4-22-3
-c-21-119-82-163-117-316
-q-12 18-37 30t-30 15
-q-55 33-90 4t-40-28
-c-5 121-100 220-104 334z
-m390 28
-c-44 17-26 115-47 172s-23 102 16 124s80 6 119-34s68-55 102-69
-q57-20 4-74
-c-30-41-15-64-32-82s-28-14-50-12
-q-88 76-112-25z
-m9-3
-c12 73 93 20 85-3s-89-65-85 3
-m-100-403
-c-5-29-46-27-77-47s-66-11-84 6s-48 34-48 50s16 25 43 45s41 39 90 11s79-30 76-65z
-m-14-29
-a51 65 2 10-86-34l24 9a23 36 0 11 37 17z
-m-120-34
-a38 56-1 10-55 38l15-11a16 28-4 11 18-17z
-m-61 65
-c81 80 122 15 173-2v5c-52 27-103 80-174 3z`;
   }
 
   controlPointMouseDown(event: MouseEvent, point: Point) {
@@ -164,8 +161,21 @@ c81 80 122 15 173-2v5c-52 27-103 80-174 3z`;
     this._dragListener.mouseStart(event, this._renderer2, { point, startX: point.x, startY: point.y });
   }
 
-  convertInput(relative?: boolean) {
-    this._pathDataInput = this.pathModel.toString(relative, '\n');
+  convertInput(relative: boolean) {
+    this.pathModel.convertTo(relative);
+    this.settings.set({ pathDataInput: this.pathModel.toString('\n') });
+  }
+
+  compactInput() {
+    this.settings.set({ pathDataInput: compact(this.settings.state.pathDataInput) });
+  }
+
+  onInputChange(pathDataInput: string) {
+    const settings = this.settings;
+    if (settings.state.pathDataInput !== pathDataInput) {
+      settings.set({ pathDataInput });
+      this.pathModel.fromString(pathDataInput);
+    }
   }
 
   loadImage(event: Event) {
@@ -177,7 +187,6 @@ c81 80 122 15 173-2v5c-52 27-103 80-174 3z`;
         reader.onload = (ev: ProgressEvent) => {
           if (typeof reader.result === 'string') {
             this.imageData = reader.result;
-            // console.log('Loaded:', reader.result.substring(0, 100));
           }
         };
         reader.readAsDataURL(file);

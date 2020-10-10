@@ -1,7 +1,7 @@
 mat-sidenav-container {
   width: 100%;
   height: 100%;
-  background-color: rgb(40, 40, 40);
+  background-color: #282828;
 
   mat-sidenav {
     min-width: 280px;
@@ -24,4 +24,36 @@ mat-sidenav-container {
 
 mat-expansion-panel {
   max-width: 26em;
+}
+
+image.hidden {
+  visibility: hidden;
+  // display: none;
+}
+
+div.path-commands {
+  margin-top: 1em;
+  padding: 0.5em;
+  max-height: 24em;
+  overflow-y: auto;
+  // line-height: 1em;
+  > span {
+    cursor: pointer;
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    border: solid 1px grey;
+    border-radius: 0.6em;
+    text-align: center;
+
+    &:hover {
+      // outline: 1px dashed #bbbb00;
+      border-color: #bbbb00;
+      color: #bbbb00;
+    }
+
+    &.selected {
+      background-color: #ffff00;
+    }
+  }
 }

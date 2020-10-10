@@ -7,7 +7,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { CoreModule } from '../core/core.module';
 import { MaterialModule } from '../material/material.module';
 
+import { EditorSettingsService } from './services/editor-settings.service';
+import { PathDataService } from './services/path-data.service';
 import { EditorComponent } from './editor/editor.component';
+import { PathGroupComponent } from './path-group/path-group.component';
 
 /**
  * Routes:
@@ -17,7 +20,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [EditorComponent],
+  declarations: [EditorComponent, PathGroupComponent],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
@@ -30,6 +33,7 @@ const routes: Routes = [
     RouterModule,
   ],
   providers: [
+    EditorSettingsService, PathDataService
   ]
 })
 export class SvgPathEditorModule { }

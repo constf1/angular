@@ -1,14 +1,15 @@
 <mat-sidenav-container>
-  <mat-sidenav #drawer>
+  <mat-sidenav [mode]="settings.state.sidenavModeSide ? 'side' : 'over'" [opened]="!settings.state.sidenavClosed"
+    (openedChange)="settings.set({ sidenavClosed: !$event })">
     <mat-toolbar color="primary">
-      <button mat-icon-button (click)="drawer.close()">
+      <button mat-icon-button (click)="settings.set({ sidenavClosed: true })">
         <mat-icon>close</mat-icon>
       </button>
       <span class="flex-space-filler-1"></span>
       <span>SVG Path Editor</span>
       <span class="flex-space-filler-1"></span>
-      <mat-slide-toggle color="primary" [checked]="drawer.mode === 'side'"
-        (change)="drawer.mode = $event.checked ? 'side' : 'over'"></mat-slide-toggle>
+      <mat-slide-toggle color="primary" [checked]="settings.state.sidenavModeSide"
+        (change)="settings.set({ sidenavModeSide: $event.checked })"></mat-slide-toggle>
     </mat-toolbar>
     <mat-action-list>
       <div mat-subheader>Actions:</div>
@@ -20,19 +21,23 @@
           <p>The position and dimension, in user space, of an SVG viewport.</p>
           <mat-form-field>
             <mat-label>x:</mat-label>
-            <input matInput type="number" name="inputX" [(ngModel)]="x">
+            <input matInput type="number" [ngModel]="settings.state.xOffset"
+              (ngModelChange)="settings.set({ xOffset: +$event })">
           </mat-form-field>
           <mat-form-field>
             <mat-label>y:</mat-label>
-            <input matInput type="number" name="inputY" [(ngModel)]="y">
+            <input matInput type="number" [ngModel]="settings.state.yOffset"
+              (ngModelChange)="settings.set({ yOffset: +$event })">
           </mat-form-field>
           <mat-form-field>
             <mat-label>width:</mat-label>
-            <input matInput type="number" name="inputW" [(ngModel)]="width">
+            <input matInput type="number" [ngModel]="settings.state.width"
+              (ngModelChange)="settings.set({ width: +$event })">
           </mat-form-field>
           <mat-form-field>
             <mat-label>height:</mat-label>
-            <input matInput type="number" name="inputH" [(ngModel)]="height">
+            <input matInput type="number" [ngModel]="settings.state.height"
+              (ngModelChange)="settings.set({ height: +$event })">
           </mat-form-field>
         </mat-expansion-panel>
 
@@ -40,14 +45,36 @@
           <mat-expansion-panel-header>
             <mat-icon>image</mat-icon>Background
           </mat-expansion-panel-header>
+          <mat-form-field>
+            <mat-label>Color</mat-label>
+            <input matInput type="color" placeholder="color" [ngModel]="settings.state.backgroundColor"
+              (ngModelChange)="settings.set({ backgroundColor: $event })">
+          </mat-form-field>
+          <br>
           <label>Upload image:
             <input type="file" [multiple]="false" (change)="loadImage($event)" placeholder="file..." />
           </label>
-          <mat-form-field>
-            <mat-label>width (%):</mat-label>
-            <input matInput type="number" name="inputZ" min="1" step="1" [(ngModel)]="imageWidth">
-          </mat-form-field>
+          <div style="padding-top: 1em;">
+            <mat-form-field>
+              <mat-label>width (%):</mat-label>
+              <input matInput type="number" name="inputZ" min="1" step="1" [(ngModel)]="imageWidth">
+            </mat-form-field>
+          </div>
+          <div style="padding-top: 1em;">
+            <mat-slide-toggle [ngModel]="settings.state.isBackgroundImageHidden"
+              (ngModelChange)="settings.set({ isBackgroundImageHidden: $event })">Hide</mat-slide-toggle>
+          </div>
+          <div style="padding-top: 1em;">
+            <mat-form-field>
+              <mat-label>Color Matrix</mat-label>
+              <mat-select [(value)]="imageColorMatrixValue">
+                <mat-option *ngFor="let matrixName of imageColorMatrixNames" [value]="matrixName">{{matrixName}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
         </mat-expansion-panel>
+
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-icon>design_services</mat-icon>Path
@@ -55,39 +82,68 @@
 
           <mat-form-field>
             <mat-label>Color</mat-label>
-            <input matInput name="inputS" type="color" placeholder="color" [disabled]="!isPathStroke"
-              [(ngModel)]="pathStrokeColor">
+            <input matInput type="color" placeholder="color" [disabled]="!settings.state.isPathStroke"
+              [ngModel]="settings.state.pathStrokeColor" (ngModelChange)="settings.set({ pathStrokeColor: $event })">
           </mat-form-field>
-          <mat-slide-toggle [(ngModel)]="isPathStroke">Stroke</mat-slide-toggle>
+          <mat-slide-toggle [ngModel]="settings.state.isPathStroke"
+            (ngModelChange)="settings.set({ isPathStroke: $event })">Stroke</mat-slide-toggle>
 
           <mat-form-field>
             <mat-label>Color</mat-label>
-            <input matInput name="inputF" type="color" placeholder="color" [disabled]="!isPathFill"
-              [(ngModel)]="pathFillColor">
+            <input matInput type="color" placeholder="color" [disabled]="!settings.state.isPathFill"
+              [ngModel]="settings.state.pathFillColor" (ngModelChange)="settings.set({ pathFillColor: $event })">
           </mat-form-field>
-          <mat-slide-toggle [(ngModel)]="isPathFill">Fill</mat-slide-toggle>
+          <mat-slide-toggle [ngModel]="settings.state.isPathFill"
+            (ngModelChange)="settings.set({ isPathFill: $event })">Fill</mat-slide-toggle>
 
-          <mat-form-field style="width: 100%;">
-            <mat-label>SVG path data:</mat-label>
-            <textarea matInput name="inputD" matTextareaAutosize matAutosizeMinRows="4"
-              placeholder="Place any SVG path data here" [(ngModel)]="pathDataInput"></textarea>
+          <mat-form-field>
+            <mat-label>Color</mat-label>
+            <input matInput type="color" placeholder="color" [disabled]="!settings.state.isControlPoints"
+              [ngModel]="settings.state.controlPointsFillColor"
+              (ngModelChange)="settings.set({ controlPointsFillColor: $event })">
           </mat-form-field>
+          <mat-slide-toggle [ngModel]="settings.state.isControlPoints"
+            (ngModelChange)="settings.set({ isControlPoints: $event })">Control Points</mat-slide-toggle>
 
-          <button mat-stroked-button color="primary" (click)="convertInput(false)">To absolute</button>
-          <button mat-stroked-button color="primary" (click)="convertInput(true)">To relative</button>
+          <div>
+            <!-- <button mat-stroked-button [disabled]="showRawPathInput" (click)="showRawPathInput = true">Raw Data</button>
+            <button mat-stroked-button [disabled]="!showRawPathInput" (click)="showRawPathInput = false">Commands</button> -->
+            <mat-slide-toggle [ngModel]="showRawPathInput" (ngModelChange)="setShowRawPathInput($event)">
+              {{showRawPathInput ? 'Raw Data' : 'Command Selector'}}</mat-slide-toggle>
+          </div>
+
+          <div *ngIf="showRawPathInput">
+            <mat-form-field style="width: 100%; margin-top: 1em; margin-bottom: 1em;">
+              <mat-label>SVG path data:</mat-label>
+              <textarea matInput matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="16"
+                placeholder="Place any SVG path data here" [ngModel]="settings.state.pathDataInput"
+                (ngModelChange)="onInputChange($event)"></textarea>
+            </mat-form-field>
+            <div>
+              <button mat-stroked-button color="primary" (click)="convertInput(false)">Absolute</button>
+              <button mat-stroked-button color="primary" (click)="convertInput(true)">Relative</button>
+              <button mat-stroked-button color="primary" (click)="compactInput()">Compact</button>
+            </div>
+          </div>
+          <div *ngIf="!showRawPathInput">
+            <app-path-group *ngFor="let group of getGroups();index as i;trackBy:trackByIndex" [items]="group.group"
+              (selectionChange)="onSelectionChange(group.startIndex, $event)"></app-path-group>
+          </div>
+          <!-- <mat-divider></mat-divider> -->
+          <!-- <mat-icon>scatter_plot</mat-icon> -->
         </mat-expansion-panel>
-
+        <!--
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-icon>assignment</mat-icon>Commands
           </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
+           <ng-template matExpansionPanelContent>
             <mat-action-list>
-              <!-- <mat-list-item role="listitem" *ngFor="let t of pathTokens">{{t[0]}}</mat-list-item> -->
               Some deferred content will be here.
             </mat-action-list>
           </ng-template>
         </mat-expansion-panel>
+-->
       </mat-accordion>
     </mat-action-list>
     <span class="flex-space-filler-1"></span>
@@ -95,27 +151,39 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <div style="display: inline-block;border: 1px solid #ffaa22" [style.width.px]="width"
-      [style.height.px]="height">
+    <div style="display: inline-block;border: 1px solid #ff22ff"
+      [style.backgroundColor]="settings.state.backgroundColor" [style.width.px]="settings.state.width"
+      [style.height.px]="settings.state.height">
       <svg [attr.viewBox]="viewBox">
-        <image *ngIf="imageData" [attr.width]="imageWidth + '%'" x="0" y="0" [attr.href]="imageData"></image>
-        <path opacity="0.9" stroke-width="1" [attr.stroke]="isPathStroke ? pathStrokeColor : 'none'"
-          [attr.fill]="isPathFill ? pathFillColor : 'none'" [attr.d]="pathModel.toString()">
+        <filter id="filterBackgroundImage">
+          <feColorMatrix in="SourceGraphic" type="matrix" [attr.values]="imageColorMatrix" />
+        </filter>
+        <image *ngIf="imageData" filter="url(#filterBackgroundImage)"
+          [class.hidden]="settings.state.isBackgroundImageHidden" [attr.width]="imageWidth + '%'" x="0" y="0"
+          [attr.href]="imageData"></image>
+        <path opacity="0.9" stroke-width="1"
+          [attr.stroke]="settings.state.isPathStroke ? settings.state.pathStrokeColor : 'none'"
+          [attr.fill]="settings.state.isPathFill ? settings.state.pathFillColor : 'none'"
+          [attr.d]="pathModel.toString()">
         </path>
-        <g opacity="0.5" stroke-width="0.8" stroke="lightgrey" fill="none">
-          <path [attr.d]="pathModel.getControlHandles()"></path>
-          <path stroke-dasharray="2" [attr.d]="pathModel.getReflectedControlHandles()"></path>
-        </g>
-        <g opacity="0.5" stroke="black" fill="#ff0">
-          <circle *ngFor="let point of pathModel.points;trackBy:trackByIndex" r="5" [attr.cx]="point.x"
-            [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, point)"></circle>
+        <path opacity="0.75" fill="none" stroke-width="2" stroke="yellow" [attr.d]="pathModel.getSelectedPath()"></path>
+        <g *ngIf="settings.state.isControlPoints">
+          <g opacity="0.5" stroke-width="0.8" stroke="lightgrey" fill="none">
+            <path [attr.d]="pathModel.getControlHandles()"></path>
+            <path stroke-dasharray="2" [attr.d]="pathModel.getReflectedControlHandles()"></path>
+            <!-- <path stroke-dasharray="3" stroke-width="2" stroke="magenta" [attr.d]="selectedPath"></path> -->
+          </g>
+          <g opacity="0.5" stroke="black" [attr.fill]="settings.state.controlPointsFillColor">
+            <circle *ngFor="let point of pathModel.getControlPoints();trackBy:trackByIndex" r="5" [attr.cx]="point.x"
+              [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, point)"></circle>
+          </g>
         </g>
       </svg>
-      <button *ngIf="!drawer.opened" class="sidenav-open-button" (click)="drawer.open()" mat-icon-button color="primary"
+      <button *ngIf="settings.state.sidenavClosed" class="sidenav-open-button"
+        (click)="settings.set({ sidenavClosed: false })" mat-icon-button color="primary"
         style="position: absolute; left: 0; top: 0">
         <mat-icon>double_arrow</mat-icon>
       </button>
     </div>
-    <!-- <ng-content></ng-content> -->
   </mat-sidenav-content>
 </mat-sidenav-container>

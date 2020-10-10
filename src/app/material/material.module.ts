@@ -1,9 +1,12 @@
 import { NgModule } from '@angular/core';
 import { LayoutModule } from '@angular/cdk/layout';
 
+
 import { MatBadgeModule } from '@angular/material/badge';
+// import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -34,8 +37,10 @@ import { CommonModule } from '@angular/common';
     LayoutModule,
 
     MatBadgeModule,
+    // MatBottomSheetModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatDividerModule,
     MatExpansionModule,
@@ -59,8 +64,10 @@ import { CommonModule } from '@angular/common';
     LayoutModule,
 
     MatBadgeModule,
+    // MatBottomSheetModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatCheckboxModule,
     MatDialogModule,
     MatDividerModule,
     MatExpansionModule,
