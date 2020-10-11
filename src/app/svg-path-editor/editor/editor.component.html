@@ -12,7 +12,7 @@
         (change)="settings.set({ sidenavModeSide: $event.checked })"></mat-slide-toggle>
     </mat-toolbar>
     <mat-action-list>
-      <div mat-subheader>Actions:</div>
+      <!-- <div mat-subheader>Actions:</div> -->
       <mat-accordion>
         <mat-expansion-panel>
           <mat-expansion-panel-header>
@@ -116,7 +116,7 @@
             <mat-form-field style="width: 100%; margin-top: 1em; margin-bottom: 1em;">
               <mat-label>SVG path data:</mat-label>
               <textarea matInput matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="16"
-                placeholder="Place any SVG path data here" [ngModel]="settings.state.pathDataInput"
+                placeholder="Place any SVG path data here" [ngModel]="pathInput"
                 (ngModelChange)="onInputChange($event)"></textarea>
             </mat-form-field>
             <div>
@@ -126,12 +126,34 @@
             </div>
           </div>
           <div *ngIf="!showRawPathInput">
-            <app-path-group *ngFor="let group of getGroups();index as i;trackBy:trackByIndex" [items]="group.group"
-              (selectionChange)="onSelectionChange(group.startIndex, $event)"></app-path-group>
+            <app-path-group *ngFor="let group of pathModel.getGroups();index as i;trackBy:trackByIndex" [items]="group">
+            </app-path-group>
           </div>
           <!-- <mat-divider></mat-divider> -->
           <!-- <mat-icon>scatter_plot</mat-icon> -->
         </mat-expansion-panel>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-icon>edit_road</mat-icon>History
+          </mat-expansion-panel-header>
+          <div style="display: flex; flex-direction: row;">
+            <button mat-stroked-button [disabled]="!history.canUndo" (click)="onUndo()">
+              <mat-icon>undo</mat-icon>Undo
+            </button>
+            <button mat-stroked-button [disabled]="!history.canRedo" (click)="onRedo()">
+              <mat-icon>redo</mat-icon>Redo
+            </button>
+            <span class="flex-space-filler-1"></span>
+            <button mat-stroked-button [disabled]="!history.hasLink" (click)="history.unlink()">
+              <mat-icon>link_off</mat-icon>Unlink
+            </button>
+          </div>
+          <!-- <mat-action-list>
+            Some deferred content will be here.
+          </mat-action-list> -->
+        </mat-expansion-panel>
+
         <!--
         <mat-expansion-panel>
           <mat-expansion-panel-header>
@@ -163,8 +185,7 @@
           [attr.href]="imageData"></image>
         <path opacity="0.9" stroke-width="1"
           [attr.stroke]="settings.state.isPathStroke ? settings.state.pathStrokeColor : 'none'"
-          [attr.fill]="settings.state.isPathFill ? settings.state.pathFillColor : 'none'"
-          [attr.d]="pathModel.toString()">
+          [attr.fill]="settings.state.isPathFill ? settings.state.pathFillColor : 'none'" [attr.d]="pathData">
         </path>
         <path opacity="0.75" fill="none" stroke-width="2" stroke="yellow" [attr.d]="pathModel.getSelectedPath()"></path>
         <g *ngIf="settings.state.isControlPoints">

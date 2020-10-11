@@ -568,7 +568,7 @@ class Reader {
   }
 }
 
-interface PathNode extends MoveNode {
+export interface PathNode extends MoveNode {
   isRelative?: boolean;
   isSelected?: boolean;
 }
@@ -645,6 +645,14 @@ export class PathModel {
     for (const node of this._nodes) {
       node.isRelative = relative;
     }
+  }
+
+  toAbsolutePath() {
+    return this._nodes.map(node => node.toString()).join('');
+  }
+
+  toRelativePath() {
+    return this._nodes.map(node => node.toString(true)).join('');
   }
 
   toString(separator?: string) {
@@ -741,26 +749,26 @@ export class PathModel {
     }
   }
 
-  getGroups(): string[][]  {
-    const buf: string[][] = [];
-    let next: string[];
+  getGroups(): PathNode[][]  {
+    const groups: PathNode[][] = [];
+    let next: PathNode[];
     for (const node of this._nodes) {
       if (!next || node.command === 'M') {
         if (next) {
-          buf.push(next);
+          groups.push(next);
         }
-        next = [node.command];
+        next = [node];
       } else {
-        next.push(node.command);
+        next.push(node);
       }
       if (node.command === 'Z') {
-        buf.push(next);
+        groups.push(next);
         next = undefined;
       }
     }
     if (next) {
-      buf.push(next);
+      groups.push(next);
     }
-    return buf;
+    return groups;
   }
 }
