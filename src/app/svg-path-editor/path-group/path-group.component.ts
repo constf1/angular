@@ -21,8 +21,6 @@ export class PathGroupComponent implements OnInit {
 
   hideItems = true;
 
-  // @Output() selectionChange = new EventEmitter<boolean[]>();
-
   constructor() { }
 
   ngOnInit(): void {
