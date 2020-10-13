@@ -87,6 +87,19 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     return compact(this.pathModel.toAbsolutePath());
   }
 
+  get isDragging() {
+    return this._dragListener.isDragging;
+  }
+
+  get dragPath() {
+    if (this._dragListener.isDragging) {
+      const data = this._dragListener.data;
+      const pt = data.point;
+      return `M${data.startX} ${data.startY}L${pt.x} ${pt.y}m-3 0h6m-3-3v6`;
+    }
+    return '';
+  }
+
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,

@@ -4,7 +4,31 @@ mat-sidenav-container {
   background-color: #282828;
 
   mat-sidenav {
-    min-width: 280px;
+    width: 360px;
+  }
+}
+
+div.form-field-and-toggle {
+  >mat-form-field {
+    max-width: 40%;
+  }
+
+  >mat-slide-toggle {
+    min-width: 50%;
+    margin-left: 1em;
+
+    &:hover {
+      // box-shadow: 0px 1px 0px 0px rgb(148 148 148);
+      // text-decoration: solid underline rgb(148 148 148);
+      background: rgba(0, 0, 0, .04);
+    }
+  }
+}
+
+div.form-field-numbers {
+  >mat-form-field {
+    max-width: 40%;
+    margin-right: 1em;
   }
 }
 
@@ -23,10 +47,6 @@ mat-sidenav-container {
   background-color: #f0f8ff50;
 }
 
-mat-expansion-panel {
-  max-width: 26em;
-}
-
 image.hidden {
   visibility: hidden;
   // display: none;
@@ -37,8 +57,9 @@ div.path-commands {
   padding: 0.5em;
   max-height: 24em;
   overflow-y: auto;
+
   // line-height: 1em;
-  > span {
+  >span {
     cursor: pointer;
     display: inline-block;
     width: 1.2em;
@@ -55,6 +76,30 @@ div.path-commands {
 
     &.selected {
       background-color: #ffff00;
+    }
+  }
+}
+
+svg {
+  g.control-points {
+    &>circle {
+      cursor: pointer;
+      stroke: black;
+      stroke-opacity: 0.75;
+      fill-opacity: 0.5;
+      // &:active {
+      //   cursor: none;
+      // }
+    }
+  }
+
+  &.dragging {
+    cursor: none;
+    g.control-points {
+      &>circle {
+        cursor: none;
+        fill-opacity: 0;
+      }
     }
   }
 }
