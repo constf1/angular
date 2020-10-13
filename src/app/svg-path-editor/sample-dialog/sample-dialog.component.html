@@ -1,0 +1,28 @@
+<ng-template #templateError>
+  <div>
+    <mat-icon>sentiment_very_dissatisfied</mat-icon>
+    {{errorMessage}}
+  </div>
+</ng-template>
+
+<ng-template #templateLoading>
+  <div *ngIf="!errorMessage; else templateError">Loading...</div>
+</ng-template>
+
+<h2 mat-dialog-title>SVG Path Samples</h2>
+<mat-dialog-content class="mat-typography">
+  <div *ngIf="samples; else templateLoading" class="sample-dialog-body">
+    <button *ngFor="let name of names" [class.sample-dialog-selection]="name === selection" (click)="onItemClick(name)">
+      <div>
+        <svg viewBox="0 0 1024 1024">
+          <path [attr.d]="samples[name]"></path>
+        </svg>
+      </div>
+      <span>{{name}}</span>
+    </button>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="selectedPath" [disabled]="!selection">Import</button>
+</mat-dialog-actions>

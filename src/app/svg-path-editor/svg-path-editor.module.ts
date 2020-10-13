@@ -11,6 +11,7 @@ import { EditorSettingsService } from './services/editor-settings.service';
 import { PathDataService } from './services/path-data.service';
 import { EditorComponent } from './editor/editor.component';
 import { PathGroupComponent } from './path-group/path-group.component';
+import { SampleDialogComponent } from './sample-dialog/sample-dialog.component';
 
 /**
  * Routes:
@@ -20,7 +21,8 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [EditorComponent, PathGroupComponent],
+  declarations: [EditorComponent, PathGroupComponent, SampleDialogComponent],
+  entryComponents: [SampleDialogComponent],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,

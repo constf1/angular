@@ -1,11 +1,13 @@
 // tslint:disable: variable-name
 import { Component, OnInit, Renderer2 } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 
 // app/common
 import { DragListener } from 'src/app/common/drag-listener';
 import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component';
 
 import { PathModel, Point } from '../path-model';
+import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component';
 import { EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
 
@@ -103,6 +105,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
+    private _dialog: MatDialog,
     private _renderer2: Renderer2) {
     super();
   }
@@ -231,6 +234,15 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
         reader.readAsDataURL(file);
       }
     }
+  }
+
+  openSampleDialog() {
+    const dialogRef = this._dialog.open(SampleDialogComponent);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && typeof result === 'string') {
+        this.onInputChange(result);
+      }
+    });
   }
 
   trackByIndex(index: number): number {

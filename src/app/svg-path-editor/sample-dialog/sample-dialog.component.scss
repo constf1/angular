@@ -1,0 +1,29 @@
+.sample-dialog-body {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  &>button {
+    cursor: pointer;
+    width: 18em;
+    height: 12em;
+    padding: 0.5em;
+    margin: 2px;
+
+    &.sample-dialog-selection {
+      // background-color: #ffd740;
+      background-color: rgba(0, 0, 255, 0.125);
+    }
+
+    &>div {
+      display: inline-block;
+      width: 10em;
+      height: 10em;
+      margin: 0.25em;
+    }
+
+    &>span {
+      vertical-align: top;
+    }
+  }
+}

@@ -125,7 +125,7 @@
 
       <mat-expansion-panel>
         <mat-expansion-panel-header>
-          <mat-icon>image</mat-icon>Background
+          <mat-icon>layers</mat-icon>Background
         </mat-expansion-panel-header>
         <mat-form-field>
           <mat-label>Color</mat-label>
@@ -133,7 +133,7 @@
             (ngModelChange)="settings.set({ backgroundColor: $event })">
         </mat-form-field>
         <br>
-        <label>Upload image:
+        <label><mat-icon>photo_library</mat-icon>Upload image:
           <input type="file" [multiple]="false" (change)="loadImage($event)" placeholder="file..." />
         </label>
         <div style="padding-top: 1em;">
@@ -155,6 +155,15 @@
             </mat-select>
           </mat-form-field>
         </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-icon>import_export</mat-icon>Import
+        </mat-expansion-panel-header>
+        <button mat-stroked-button (click)="openSampleDialog()">
+            <mat-icon>developer_board</mat-icon>Samples
+        </button>
       </mat-expansion-panel>
 
       <!--
