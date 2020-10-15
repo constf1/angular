@@ -112,6 +112,19 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     super();
   }
 
+  setSmallestViewBox(path: SVGGraphicsElement) {
+    if (path && typeof path.getBBox === 'function') {
+      const rc = path.getBBox();
+      const xOffset = Math.floor(rc.x);
+      const yOffset = Math.floor(rc.y);
+      const width = Math.ceil(rc.width);
+      const height = Math.ceil(rc.height);
+      if (width > 0 && height > 0) {
+        this.settings.set({ xOffset, yOffset, width, height });
+      }
+    }
+  }
+
   selectTab(tabIndex: number) {
     if (tabIndex !== this.pathTabSelector) {
       this.pathTabSelector = tabIndex;

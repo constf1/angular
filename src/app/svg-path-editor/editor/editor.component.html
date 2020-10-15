@@ -124,6 +124,9 @@
               (ngModelChange)="settings.set({ height: +$event })">
           </mat-form-field>
         </div>
+        <button mat-stroked-button (click)="setSmallestViewBox(pathRef)">
+          <mat-icon>border_outer</mat-icon>Fit In
+        </button>
       </mat-expansion-panel>
 
       <mat-expansion-panel>
@@ -182,7 +185,7 @@
         <image *ngIf="imageData" filter="url(#filterBackgroundImage)"
           [class.hidden]="settings.state.isBackgroundImageHidden" [attr.width]="imageWidth + '%'" x="0" y="0"
           [attr.href]="imageData"></image>
-        <path opacity="0.9" stroke-width="1"
+        <path #pathRef opacity="0.9" stroke-width="1"
           [attr.stroke]="settings.state.isPathStroke ? settings.state.pathStrokeColor : 'none'"
           [attr.fill]="settings.state.isPathFill ? settings.state.pathFillColor : 'none'" [attr.d]="pathData">
         </path>
