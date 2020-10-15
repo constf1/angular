@@ -67,9 +67,11 @@ interface DragData {
 export class EditorComponent extends UnsubscribableComponent implements OnInit {
   private _dragListener = new DragListener<DragData>();
 
+  pathTabs = ['Raw Data', 'Command Selector' /*, 'Control Points'*/];
+  pathTabSelector = 0;
+
   pathInput = '';
   pathModel = new PathModel();
-  showRawPathInput = true;
 
   imageData = ''; // image as dataURL
   imageWidth = 100; // in percent
@@ -110,12 +112,13 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     super();
   }
 
-  setShowRawPathInput(value: boolean) {
-    this.showRawPathInput = value;
-    // Clear any previously selected items. It's a design feature. NOT a bug!
-    this.pathModel.clearSelection();
+  selectTab(tabIndex: number) {
+    if (tabIndex !== this.pathTabSelector) {
+      this.pathTabSelector = tabIndex;
+      // Clear any previously selected items. It's a design feature. NOT a bug!
+      this.pathModel.clearSelection();
+    }
   }
-
 
   // selectNext(event: KeyboardEvent) {
   //   if (this.selectedNode + 1 < this.pathModel.nodes.length) {
@@ -139,19 +142,20 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     const data = this._dragListener.data;
     const point = data.point;
 
-    const dx = Math.floor(this._dragListener.deltaX);
-    const dy = Math.floor(this._dragListener.deltaY);
+    const x0 = point.x;
+    const y0 = point.y;
 
-    const xOffset = data.startX + dx - point.x;
-    const yOffset = data.startY + dy - point.y;
+    point.x = data.startX + Math.floor(this._dragListener.deltaX);
+    point.y = data.startY + Math.floor(this._dragListener.deltaY);
 
-    if (xOffset !== 0 || yOffset !== 0) {
+    if (point.x !== x0 || point.y !== y0) {
       const node = this.pathModel.firstSelection;
       if (node && node.endPoint === point) {
-        this.pathModel.moveSelectedNodes({ x: xOffset, y : yOffset });
-      } else {
-        point.x += xOffset;
-        point.y += yOffset;
+        // Rollback and move all selected control points.
+        const delta: Point = { x: point.x - x0, y: point.y - y0 };
+        point.x = x0;
+        point.y = y0;
+        this.pathModel.moveSelectedNodes(delta);
       }
     }
   }
@@ -239,7 +243,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   openSampleDialog() {
     const dialogRef = this._dialog.open(SampleDialogComponent);
     dialogRef.afterClosed().subscribe(result => {
-      if (result && typeof result === 'string') {
+      if (typeof result === 'string' && result.length > 0) {
         this.onInputChange(result);
       }
     });

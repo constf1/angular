@@ -35,8 +35,7 @@
               [ngModel]="settings.state.pathFillColor" (ngModelChange)="settings.set({ pathFillColor: $event })">
           </mat-form-field>
           <mat-slide-toggle [ngModel]="settings.state.isPathFill"
-            (ngModelChange)="settings.set({ isPathFill: $event })">
-            Fill</mat-slide-toggle>
+            (ngModelChange)="settings.set({ isPathFill: $event })">Fill</mat-slide-toggle>
         </div>
 
         <div class="form-field-and-toggle">
@@ -50,30 +49,34 @@
             (ngModelChange)="settings.set({ isControlPoints: $event })">Control Points</mat-slide-toggle>
         </div>
 
-        <div>
-          <!-- <button mat-stroked-button [disabled]="showRawPathInput" (click)="setShowRawPathInput(true)">Raw Data</button>
-            <button mat-stroked-button [disabled]="!showRawPathInput" (click)="setShowRawPathInput(false)">Commands</button> -->
-          <mat-slide-toggle [ngModel]="showRawPathInput" (ngModelChange)="setShowRawPathInput($event)">
-            {{showRawPathInput ? 'Raw Data' : 'Command Selector'}}</mat-slide-toggle>
-        </div>
-
-        <div *ngIf="showRawPathInput">
-          <mat-form-field style="width: 100%; margin-top: 1em; margin-bottom: 1em;">
-            <mat-label>SVG path data:</mat-label>
-            <textarea matInput matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="16"
-              placeholder="Place any SVG path data here" [ngModel]="pathInput"
-              (ngModelChange)="onInputChange($event)"></textarea>
-          </mat-form-field>
-          <div>
-            <button mat-stroked-button color="primary" (click)="convertInput(false)">Absolute</button>
-            <button mat-stroked-button color="primary" (click)="convertInput(true)">Relative</button>
-            <button mat-stroked-button color="primary" (click)="compactInput()">Compact</button>
+        <app-tab-group [items]="pathTabs" [selection]="pathTabSelector" (selectionChange)="selectTab($event)">
+          <div *ngIf="pathTabSelector === 0">
+            <mat-form-field style="width: 100%; margin-top: 1em; margin-bottom: 1em;">
+              <mat-label>SVG path data:</mat-label>
+              <textarea matInput matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="16"
+                placeholder="Place any SVG path data here" [ngModel]="pathInput"
+                (ngModelChange)="onInputChange($event)"></textarea>
+            </mat-form-field>
+            <div>
+              <button mat-stroked-button color="primary" (click)="convertInput(false)">Absolute</button>
+              <button mat-stroked-button color="primary" (click)="convertInput(true)">Relative</button>
+              <button mat-stroked-button color="primary" (click)="compactInput()">Compact</button>
+            </div>
           </div>
-        </div>
-        <div *ngIf="!showRawPathInput">
-          <app-path-group *ngFor="let group of pathModel.getGroups();index as i;trackBy:trackByIndex" [items]="group">
-          </app-path-group>
-        </div>
+
+          <div *ngIf="pathTabSelector === 1">
+            <mat-checkbox [checked]="pathModel.isAllSelected" [indeterminate]="pathModel.isSomeSelected"
+              (change)="pathModel.selectAll($event.checked)">Select All</mat-checkbox>
+            <div style="border-top: 1px solid lightgray; margin-top: 4px; padding-top: 5px;">
+              <app-path-group *ngFor="let group of pathModel.getGroups();index as i;trackBy:trackByIndex" [items]="group">
+              </app-path-group>
+            </div>
+          </div>
+
+          <!-- <div *ngIf="pathTabSelector === 2">
+            Point selector will be here.
+          </div> -->
+        </app-tab-group>
       </mat-expansion-panel>
 
       <mat-expansion-panel>
@@ -162,22 +165,9 @@
           <mat-icon>import_export</mat-icon>Import
         </mat-expansion-panel-header>
         <button mat-stroked-button (click)="openSampleDialog()">
-            <mat-icon>developer_board</mat-icon>Samples
+          <mat-icon>developer_board</mat-icon>Samples
         </button>
       </mat-expansion-panel>
-
-      <!--
-        <mat-expansion-panel>
-          <mat-expansion-panel-header>
-            <mat-icon>assignment</mat-icon>Commands
-          </mat-expansion-panel-header>
-           <ng-template matExpansionPanelContent>
-            <mat-action-list>
-              Some deferred content will be here.
-            </mat-action-list>
-          </ng-template>
-        </mat-expansion-panel>
--->
     </mat-accordion>
   </mat-sidenav>
 
@@ -201,12 +191,13 @@
           <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
             <path [attr.d]="pathModel.getControlHandles()"></path>
             <path stroke-dasharray="2" [attr.d]="pathModel.getReflectedControlHandles()"></path>
-            <path stroke-dasharray="2" [attr.d]="dragPath" [attr.stroke]="settings.state.controlPointsFillColor" ></path>
-            <!-- <path stroke-dasharray="3" stroke-width="2" stroke="magenta" [attr.d]="selectedPath"></path> -->
+            <path stroke-dasharray="2" [attr.d]="dragPath" [attr.stroke]="settings.state.controlPointsFillColor"></path>
           </g>
           <g class="control-points" [attr.fill]="settings.state.controlPointsFillColor">
             <circle *ngFor="let point of pathModel.getControlPoints();trackBy:trackByIndex" r="5" [attr.cx]="point.x"
-              [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, point)"></circle>
+              [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, point)">
+              <!-- <title>x:{{point.x}} y:{{point.y}}</title> -->
+            </circle>
           </g>
         </g>
       </svg>
