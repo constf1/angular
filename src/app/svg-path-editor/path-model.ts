@@ -577,6 +577,10 @@ export class PathModel {
   private _nodes: PathNode[] = [];
   private _points: Point[] = [];
 
+  get count() {
+    return this._nodes.length;
+  }
+
   get selectedCount() {
     let count = 0;
     for (const node of this._nodes) {
@@ -587,7 +591,7 @@ export class PathModel {
     return count;
   }
 
-  get firstSelection(): MoveNode | undefined {
+  get firstSelection(): PathNode | undefined {
     for (const node of this._nodes) {
       if (node.isSelected) {
         return node;
@@ -597,6 +601,20 @@ export class PathModel {
 
   get hasSelection(): boolean {
     return !!this.firstSelection;
+  }
+
+  get isAllSelected(): boolean {
+    for (const node of this._nodes) {
+      if (!node.isSelected) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  get isSomeSelected(): boolean {
+    const count = this.selectedCount;
+    return count > 0 && count < this._nodes.length;
   }
 
   fromString(path: string) {
@@ -711,10 +729,14 @@ export class PathModel {
     }
   }
 
-  clearSelection() {
+  selectAll(value: boolean) {
     for (const node of this._nodes) {
-      node.isSelected = false;
+      node.isSelected = value;
     }
+  }
+
+  clearSelection() {
+    this.selectAll(false);
   }
 
   getSelectedPath() {
