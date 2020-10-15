@@ -1,0 +1,10 @@
+<div class="tab-group" role="tabgroup">
+  <ul role="tablist">
+    <li role="presentation" *ngFor="let item of items; index as i">
+      <button role="tab" [attr.aria-selected]="i === selection" (click)="selectionChange.emit(i)">{{item}}</button>
+    </li>
+  </ul>
+  <div role="tabpanel">
+    <ng-content></ng-content>
+  </div>
+</div>

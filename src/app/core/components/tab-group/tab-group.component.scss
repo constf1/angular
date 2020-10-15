@@ -1,0 +1,66 @@
+div.tab-group[role=tabgroup] {
+  margin-top: 1em;
+
+  &>ul[role=tablist] {
+    display: flex;
+    margin: 0;
+    padding: 4px 0 0;
+    list-style: none;
+    border-bottom: 1px solid hsla(0, 0%, 89%, 1);
+
+    &>li {
+      list-style: none;
+      display: inline-block;
+
+      button[role=tab] {
+        cursor: pointer;
+        font: inherit;
+        // font-size: .875rem;
+        display: inline-block;
+        position: relative;
+        text-decoration: none;
+        box-sizing: border-box;
+        border: 0;
+        background: inherit;
+
+        padding-top: 8px;
+        padding-right: 15px;
+        padding-bottom: 4px;
+        padding-left: 15px;
+
+        margin-bottom: -1px;
+        color: hsla(0, 0%, 37%, 1);
+
+        &:hover:not([aria-selected=true]) {
+          background-color: hsla(0, 0%, 95%, 1);
+          color: hsla(206, 100%, 35%, 1);
+        }
+
+        &[aria-selected=true] {
+          outline: inherit;
+          padding-top: 4px;
+          padding-right: 14px;
+          padding-left: 14px;
+          color: hsla(0, 0%, 9%, 1);
+
+          border-style: solid;
+          border-width: 4px 1px 1px;
+          border-left-color: hsla(0, 0%, 89%, 1);
+          border-right-color: hsla(0, 0%, 89%, 1);
+          border-bottom-color: hsla(0, 0%, 100%, .998);
+          // border-top-color: hsla(206, 100%, 35%, 1);
+          border-top-color: #673ab7;
+        }
+      }
+    }
+  }
+
+  &>div[role=tabpanel] {
+    box-sizing: border-box;
+    border: 1px solid hsla(0, 0%, 89%, 1);
+    border-top: none;
+    padding: 15px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+}
