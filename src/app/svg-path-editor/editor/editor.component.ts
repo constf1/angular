@@ -8,6 +8,7 @@ import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component
 
 import { PathModel, Point } from '../path-model';
 import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component';
+import { BackgroundImageService } from '../services/background-image.service';
 import { EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
 
@@ -25,26 +26,6 @@ const SAMPLE_PATH_DATA =
 + 'a51 65 2 10-86-34l24 9a23 36 0 11 37 17zm-120-34a38 56-1 10-55 38l15-11a16 28-4 11 18-17z'
 + 'm-61 65c81 80 122 15 173-2v5c-52 27-103 80-174 3z';
 
-// https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feColorMatrix
-//
-// | R_ |     | r1 r2 r3 r4 r5 |   | R |
-// | G_ |     | g1 g2 g3 g4 g5 |   | G |
-// | B_ |  =  | b1 b2 b3 b4 b5 | * | B |
-// | A_ |     | a1 a2 a3 a4 a5 |   | A |
-// | 1  |     | 0  0  0  0  1  |   | 1 |
-//
-// R_ = r1*R + r2*G + r3*B + r4*A + r5
-// G_ = g1*R + g2*G + g3*B + g4*A + g5
-// B_ = b1*R + b2*G + b3*B + b4*A + b5
-// A_ = a1*R + a2*G + a3*B + a4*A + a5
-
-const FE_COLOR_MATRICES = {
-  identity: '1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0',
-  red: '1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0',
-  green: '0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 1 0',
-  blue: '0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0',
-  invert: '-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0',
-};
 
 function compact(pathData: string): string {
   // remove spaces:
@@ -67,20 +48,13 @@ interface DragData {
 export class EditorComponent extends UnsubscribableComponent implements OnInit {
   private _dragListener = new DragListener<DragData>();
 
-  pathTabs = ['Raw Data', 'Command Selector' /*, 'Control Points'*/];
+  // pathTabs = ['Raw Data', 'Command Selector' /*, 'Control Points'*/];
   pathTabSelector = 0;
 
   pathInput = '';
   pathModel = new PathModel();
 
-  imageData = ''; // image as dataURL
-  imageWidth = 100; // in percent
-  imageColorMatrixNames = Object.keys(FE_COLOR_MATRICES);
-  imageColorMatrixValue = this.imageColorMatrixNames[0];
-
-  get imageColorMatrix() {
-    return FE_COLOR_MATRICES[this.imageColorMatrixValue] || FE_COLOR_MATRICES.identity;
-  }
+  svgStyles: { [key: string]: any; } = {};
 
   get viewBox(): string {
     const s = this.settings.state;
@@ -107,6 +81,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
+    public background: BackgroundImageService,
     private _dialog: MatDialog,
     private _renderer2: Renderer2) {
     super();
@@ -158,8 +133,10 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     const x0 = point.x;
     const y0 = point.y;
 
-    point.x = data.startX + Math.floor(this._dragListener.deltaX);
-    point.y = data.startY + Math.floor(this._dragListener.deltaY);
+    const zoom = this.settings.state.zoom;
+
+    point.x = data.startX + Math.floor(this._dragListener.deltaX * 100 / zoom);
+    point.y = data.startY + Math.floor(this._dragListener.deltaY * 100 / zoom);
 
     if (point.x !== x0 || point.y !== y0) {
       const node = this.pathModel.firstSelection;
@@ -191,6 +168,15 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
         case 'DragMove': this.onDragMove(); break;
         case 'DragStop': this.onDragEnd(); break;
       }
+    }));
+
+    this._addSubscription(this.settings.subscribe(state => {
+      this.svgStyles = {
+        width: `${state.width}px`,
+        height: `${state.height}px`,
+        transform: `scale(${state.zoom / 100})`,
+        'background-color': state.backgroundColor,
+      };
     }));
 
     this.onInputChange(this.history.pathData || SAMPLE_PATH_DATA);
@@ -234,22 +220,6 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     if (this.history.canRedo) {
       this.history.redo();
       this.onInputChange(this.history.pathData);
-    }
-  }
-
-  loadImage(event: Event) {
-    const target = event.target as EventTarget & { files: FileList };
-    if (target && target.files[0]) {
-      const file: File = target.files[0];
-      if (file.type.startsWith('image')) {
-        const reader = new FileReader();
-        reader.onload = (ev: ProgressEvent) => {
-          if (typeof reader.result === 'string') {
-            this.imageData = reader.result;
-          }
-        };
-        reader.readAsDataURL(file);
-      }
     }
   }
 
