@@ -7,11 +7,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { CoreModule } from '../core/core.module';
 import { MaterialModule } from '../material/material.module';
 
+import { BackgroundImageService } from './services/background-image.service';
 import { EditorSettingsService } from './services/editor-settings.service';
 import { PathDataService } from './services/path-data.service';
+
 import { EditorComponent } from './editor/editor.component';
 import { PathGroupComponent } from './path-group/path-group.component';
 import { SampleDialogComponent } from './sample-dialog/sample-dialog.component';
+import { MenuViewComponent } from './menu-view/menu-view.component';
 
 /**
  * Routes:
@@ -21,7 +24,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [EditorComponent, PathGroupComponent, SampleDialogComponent],
+  declarations: [EditorComponent, PathGroupComponent, SampleDialogComponent, MenuViewComponent],
   entryComponents: [SampleDialogComponent],
   imports: [
     RouterModule.forChild(routes),
@@ -35,7 +38,9 @@ const routes: Routes = [
     RouterModule,
   ],
   providers: [
-    EditorSettingsService, PathDataService
+    BackgroundImageService,
+    EditorSettingsService,
+    PathDataService,
   ]
 })
 export class SvgPathEditorModule { }
