@@ -1,0 +1,28 @@
+// h3 {
+//   margin-left: 1em;
+// }
+
+// div.menu-view-zoom,
+// div.menu-view-viewbox {
+//   margin-bottom: 1em;
+// }
+
+div.menu-view-zoom {
+  >mat-form-field {
+    max-width: 40%;
+    margin-right: 1em;
+  }
+}
+
+div.menu-view-viewbox {
+  >mat-form-field {
+    max-width: 40%;
+    margin-right: 1em;
+  }
+}
+
+div.menu-view-background {
+  >div {
+    padding-top: 1em;
+  }
+}
