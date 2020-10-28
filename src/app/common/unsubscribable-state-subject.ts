@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import { OnDestroy } from '@angular/core';
 import { StateSubject } from './state-subject';
 
+// TODO: Add Angular decorator.
 export class UnsubscribableStateSubject<T> extends StateSubject<T> implements OnDestroy {
   constructor(initialValue: T | null = null, protected _subscriptions: Subscription[] = []) {
     super(initialValue);

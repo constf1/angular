@@ -2,6 +2,7 @@
 import { OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 
+// TODO: Add Angular decorator.
 export class UnsubscribableComponent implements OnDestroy {
   constructor(protected _subscriptions: Subscription[] = []) { }
 
