@@ -1,3 +1,30 @@
+<div class="menu-view-path">
+  <mat-form-field>
+    <mat-label>Color</mat-label>
+    <input matInput type="color" placeholder="color" [disabled]="!settings.state.isPathStroke"
+      [ngModel]="settings.state.pathStrokeColor" (ngModelChange)="settings.set({ pathStrokeColor: $event })">
+  </mat-form-field>
+  <mat-slide-toggle [ngModel]="settings.state.isPathStroke" (ngModelChange)="settings.set({ isPathStroke: $event })">
+    Path Stroke
+  </mat-slide-toggle>
+  <mat-form-field>
+    <mat-label>Color</mat-label>
+    <input matInput type="color" placeholder="color" [disabled]="!settings.state.isPathFill"
+      [ngModel]="settings.state.pathFillColor" (ngModelChange)="settings.set({ pathFillColor: $event })">
+  </mat-form-field>
+  <mat-slide-toggle [ngModel]="settings.state.isPathFill" (ngModelChange)="settings.set({ isPathFill: $event })">
+    Path Fill
+  </mat-slide-toggle>
+  <mat-form-field>
+    <mat-label>Color</mat-label>
+    <input matInput type="color" placeholder="color" [disabled]="!settings.state.isControlPoints"
+      [ngModel]="settings.state.controlPointsFillColor"
+      (ngModelChange)="settings.set({ controlPointsFillColor: $event })">
+  </mat-form-field>
+  <mat-slide-toggle [ngModel]="settings.state.isControlPoints"
+    (ngModelChange)="settings.set({ isControlPoints: $event })">Control Points</mat-slide-toggle>
+</div>
+
 <app-tab-group items="Zoom|Viewbox|Background" [(selection)]="tabSelection">
   <div class="menu-view-zoom" *ngIf="tabSelection === 0">
     <mat-form-field>
