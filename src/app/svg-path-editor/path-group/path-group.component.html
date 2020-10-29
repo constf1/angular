@@ -1,6 +1,6 @@
 <ng-template #templatePathItems>
   <span *ngFor="let item of items;index as i;trackBy:trackByIndex" (click)="onItemClick(i)"
-    [class.selected]="item.isSelected">{{item.command}}</span>
+    [class.selected]="item.isSelected">{{item.name}}</span>
 </ng-template>
 
 <div class="path-group">
@@ -9,7 +9,7 @@
     (change)="setAll($event.checked)"
   ></mat-checkbox>
   <div *ngIf="hideItems;else templatePathItems">
-    <span [class.selected]="selectedCount === items.length" (click)="hideItems=false">{{items[0].command}}…</span>
+    <span [class.selected]="selectedCount === items.length" (click)="hideItems=false">{{items[0].name}}…</span>
   </div>
   <div *ngIf="items.length > 1" (click)="hideItems = !hideItems" style="cursor: pointer; margin-left: 0.05em">
     {{hideItems ? '→' : '←'}}</div>

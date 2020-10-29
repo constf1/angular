@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PathNode } from '../path-model';
+import { PathItem } from '../svg-path-model';
+
 
 @Component({
   selector: 'app-path-group',
@@ -7,7 +8,7 @@ import { PathNode } from '../path-model';
   styleUrls: ['./path-group.component.scss']
 })
 export class PathGroupComponent implements OnInit {
-  @Input() items: PathNode[];
+  @Input() items: PathItem[];
 
   get selectedCount() {
     let count = 0;

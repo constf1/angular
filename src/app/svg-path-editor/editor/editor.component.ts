@@ -11,6 +11,7 @@ import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component'
 import { BackgroundImageService } from '../services/background-image.service';
 import { EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
+import { SvgPathModel } from '../svg-path-model';
 
 const SAMPLE_PATH_DATA =
 'm205 698c-17-194 169-280 169-408s-24-259 127-274s177 84 174 243s218 217 164 452c43 15 31 74 55 97'
@@ -35,7 +36,7 @@ function compact(pathData: string): string {
 }
 
 interface DragData {
-  point: Point;
+  index: number;
   startX: number;
   startY: number;
 }
@@ -52,7 +53,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   pathTabSelector = 0;
 
   pathInput = '';
-  pathModel = new PathModel();
+  pathModel = new SvgPathModel();
 
   svgStyles: { [key: string]: any; } = {};
 
@@ -62,7 +63,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   get pathData() {
-    return compact(this.pathModel.toAbsolutePath());
+    return compact(this.pathModel.toString());
   }
 
   get isDragging() {
@@ -72,8 +73,8 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   get dragPath() {
     if (this._dragListener.isDragging) {
       const data = this._dragListener.data;
-      const pt = data.point;
-      return `M${data.startX} ${data.startY}L${pt.x} ${pt.y}m-3 0h6m-3-3v6`;
+      const point = this.pathModel.controls[data.index];
+      return `M${data.startX} ${data.startY}L${point.x} ${point.y}m-3 0h6m-3-3v6`;
     }
     return '';
   }
@@ -128,33 +129,22 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
 
   onDragMove() {
     const data = this._dragListener.data;
-    const point = data.point;
-
-    const x0 = point.x;
-    const y0 = point.y;
-
+    const point = this.pathModel.controls[data.index];
     const zoom = this.settings.state.zoom;
 
-    point.x = data.startX + Math.floor(this._dragListener.deltaX * 100 / zoom);
-    point.y = data.startY + Math.floor(this._dragListener.deltaY * 100 / zoom);
+    const dx = data.startX + Math.round(this._dragListener.deltaX * 100 / zoom) - point.x;
+    const dy = data.startY + Math.round(this._dragListener.deltaY * 100 / zoom) - point.y;
 
-    if (point.x !== x0 || point.y !== y0) {
-      const node = this.pathModel.firstSelection;
-      if (node && node.endPoint === point) {
-        // Rollback and move all selected control points.
-        const delta: Point = { x: point.x - x0, y: point.y - y0 };
-        point.x = x0;
-        point.y = y0;
-        this.pathModel.moveSelectedNodes(delta);
-      }
+    if (dx !== 0 || dy !== 0) {
+      point.translate(dx, dy);
     }
   }
 
   onDragEnd() {
     const data = this._dragListener.data;
-    const point = data.point;
+    const point = this.pathModel.controls[data.index];
     if (point.x !== data.startX || point.y !== data.startY) {
-      this.pathInput = this.pathModel.toString('\n');
+      this.pathInput = this.pathModel.toFormattedString('\n');
       this.history.pathData = this.pathData;
     }
   }
@@ -182,18 +172,19 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     this.onInputChange(this.history.pathData || SAMPLE_PATH_DATA);
   }
 
-  controlPointMouseDown(event: MouseEvent, point: Point) {
+  controlPointMouseDown(event: MouseEvent, index: number) {
     if (event.button !== 0) {
       return;
     }
     event.preventDefault();
 
-    this._dragListener.mouseStart(event, this._renderer2, { point, startX: point.x, startY: point.y });
+    const point = this.pathModel.controls[index];
+    this._dragListener.mouseStart(event, this._renderer2, { index, startX: point.x, startY: point.y });
   }
 
   convertInput(relative: boolean) {
-    this.pathModel.convertTo(relative);
-    this.pathInput = this.pathModel.toString('\n');
+    this.pathModel.outputAsRelative(relative);
+    this.pathInput = this.pathModel.toFormattedString('\n');
   }
 
   compactInput() {

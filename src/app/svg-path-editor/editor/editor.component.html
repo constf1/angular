@@ -135,13 +135,13 @@
         [attr.d]="pathModel.getSelectedPath()"></path>
       <g *ngIf="settings.state.isControlPoints">
         <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
-          <path [attr.d]="pathModel.getControlHandles()"></path>
+          <path [attr.d]="pathModel.getCurveControlHandles()"></path>
           <path stroke-dasharray="2" [attr.d]="pathModel.getReflectedControlHandles()"></path>
           <path stroke-dasharray="2" [attr.d]="dragPath" [attr.stroke]="settings.state.controlPointsFillColor"></path>
         </g>
         <g class="control-points" [attr.fill]="settings.state.controlPointsFillColor">
-          <circle *ngFor="let point of pathModel.getControlPoints();trackBy:trackByIndex" r="5" [attr.cx]="point.x"
-            [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, point)">
+          <circle *ngFor="let point of pathModel.controls;index as i;trackBy:trackByIndex" r="5" [attr.cx]="point.x"
+            [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, i)">
             <!-- <title>x:{{point.x}} y:{{point.y}}</title> -->
           </circle>
         </g>
