@@ -1,13 +1,18 @@
 <div class="menu-transform">
-  <mat-form-field style="max-width: 50%;">
-    <mat-label>Transform function</mat-label>
-    <mat-select [(value)]="selection">
-      <mat-option *ngFor="let name of transformNames" [value]="name">{{transforms[name]}}</mat-option>
-    </mat-select>
-  </mat-form-field>
-  <button mat-stroked-button (click)="applyTransform()" style="float: right;">
-    <mat-icon>play_for_work</mat-icon>Apply
-  </button>
+  <div class="menu-transform-function">
+    <mat-form-field>
+      <mat-label>Transform function</mat-label>
+      <mat-select [(value)]="selection">
+        <mat-option *ngFor="let name of transformNames" [value]="name">{{transforms[name]}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-stroked-button (click)="applyTransform()" color="primary">
+      <mat-icon>play_for_work</mat-icon>Apply
+    </button>
+    <button mat-stroked-button (click)="togglePreview()" [color]="preview ? 'accent' : 'primary'">
+      <mat-icon>preview</mat-icon>
+    </button>
+  </div>
 
   <div class="menu-transform-move" *ngIf="selection === 'move'">
     <mat-form-field>

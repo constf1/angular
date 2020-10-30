@@ -1,7 +1,19 @@
 .menu-transform {
   border: 1px solid rgba(0, 0, 0, 0.26);
   border-radius: 4px;
-  padding: 1em;
+  // padding: 1em;
+  /* vertical | horizontal */
+  padding: 12px 16px;
+}
+
+.menu-transform-function {
+  display: flex;
+  align-items: flex-start;
+  >mat-form-field {
+    width: 30%;
+    flex-grow: 1;
+    margin-right: 1em;
+  }
 }
 
 .menu-transform-move,

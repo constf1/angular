@@ -33,6 +33,7 @@ export interface TransformChangeEvent {
 export class MenuTransformComponent implements OnInit {
   @Output() transformChange = new EventEmitter<TransformChangeEvent>();
 
+  preview = false;
   selection: TransformName = 'move';
 
   translateX = 0;
@@ -129,5 +130,9 @@ export class MenuTransformComponent implements OnInit {
           this.matrix = createIdentity();
         }
     }
+  }
+
+  togglePreview() {
+    this.preview = !this.preview;
   }
 }
