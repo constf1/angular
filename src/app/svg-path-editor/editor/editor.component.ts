@@ -6,11 +6,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { DragListener } from 'src/app/common/drag-listener';
 import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component';
 
-import { PathModel, Point } from '../path-model';
 import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component';
+import { TransformChangeEvent } from '../menu-transform/menu-transform.component';
+
 import { BackgroundImageService } from '../services/background-image.service';
 import { EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
+
 import { SvgPathModel } from '../svg-path-model';
 
 const SAMPLE_PATH_DATA =
@@ -56,6 +58,10 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   pathModel = new SvgPathModel();
 
   svgStyles: { [key: string]: any; } = {};
+
+  maximumFractionDigits = 3;
+  decimals = ['to integer', '#.#', '#.##', '#.###', '#.####', '%.5f', '%.6f'];
+  // decimals = ['to integer', '1 decimal place', '2 decimal places', '3 decimal places', '4 decimal places', '5 decimal places'];
 
   get viewBox(): string {
     const s = this.settings.state;
@@ -109,6 +115,11 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     }
   }
 
+  updatePathInput() {
+    this.pathInput = this.pathModel.toFormattedString('\n', this.maximumFractionDigits);
+    this.history.pathData = this.pathData;
+  }
+
   // selectNext(event: KeyboardEvent) {
   //   if (this.selectedNode + 1 < this.pathModel.nodes.length) {
   //     event.preventDefault();
@@ -144,8 +155,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     const data = this._dragListener.data;
     const point = this.pathModel.controls[data.index];
     if (point.x !== data.startX || point.y !== data.startY) {
-      this.pathInput = this.pathModel.toFormattedString('\n');
-      this.history.pathData = this.pathData;
+      this.updatePathInput();
     }
   }
 
@@ -162,9 +172,10 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
 
     this._addSubscription(this.settings.subscribe(state => {
       this.svgStyles = {
-        width: `${state.width}px`,
-        height: `${state.height}px`,
-        transform: `scale(${state.zoom / 100})`,
+        width: `${(state.width * state.zoom / 100).toFixed(2)}px`,
+        height: `${(state.height * state.zoom / 100).toFixed(2)}px`,
+        // scale is slow
+        // transform: `scale(${state.zoom / 100})`,
         'background-color': state.backgroundColor,
       };
     }));
@@ -184,7 +195,8 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
 
   convertInput(relative: boolean) {
     this.pathModel.outputAsRelative(relative);
-    this.pathInput = this.pathModel.toFormattedString('\n');
+    this.updatePathInput();
+    // this.pathInput = this.pathModel.toFormattedString('\n');
   }
 
   compactInput() {
@@ -225,5 +237,10 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
 
   trackByIndex(index: number): number {
     return index;
+  }
+
+  applyTransform(event: TransformChangeEvent) {
+    this.pathModel.transform(event.matrix);
+    this.updatePathInput();
   }
 }
