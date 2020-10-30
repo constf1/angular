@@ -15,6 +15,13 @@ div.menu-view-path {
   }
 }
 
+div.menu-view-zoom,
+div.menu-view-viewbox,
+div.menu-view-background {
+  /* vertical | horizontal */
+  padding: 12px 16px;
+}
+
 div.menu-view-zoom {
   >mat-form-field {
     max-width: 40%;
