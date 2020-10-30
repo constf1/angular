@@ -31,6 +31,8 @@ import {
   SmoothCurveNode,
   translate,
   translateStopPoint} from './svg-path/svg-path-node';
+import { ReadonlyMatrix } from '../common/matrix-math';
+import { transformedNode } from './svg-path/svg-path-transform';
 
 function formatDigit(value: number, fractionDigits?: number) {
   return ' ' + (fractionDigits < 0 ? value.toString() : formatDecimal(value, fractionDigits));
@@ -195,6 +197,22 @@ class Curve2ControlPoint implements ControlPoint {
   }
 }
 
+function createControlPoints(items: ReadonlyArray<Readonly<PathItem>>): ControlPoint[] {
+  const points: ControlPoint[] = [];
+  for (const item of items) {
+    if (hasControlPoint1(item)) {
+      points.push(new Curve1ControlPoint(item));
+    }
+    if (hasControlPoint2(item)) {
+      points.push(new Curve2ControlPoint(item));
+    }
+    if (!isClosePath(item)) {
+      points.push(new MoveControlPoint(item));
+    }
+  }
+  return points;
+}
+
 
 const RE_COMMAND = /([MLHVZCSQTA])/gi;
 const RE_FLAG = /[01]/;
@@ -309,6 +327,11 @@ export class SvgPathModel {
   }
 
   get controls(): ReadonlyArray<ControlPoint> {
+    const i = this.firstSelectionIndex;
+    if (i >= 0) {
+      const first = this._nodes[i];
+      return this._controlPoints.filter(control => control.item === first);
+    }
     return this._controlPoints;
   }
 
@@ -355,8 +378,6 @@ export class SvgPathModel {
 
   fromString(pathData: string) {
     const nodes: PathItem[] = [];
-    const points: ControlPoint[] = [];
-
     let node: PathItem | undefined;
 
     // Split by command.
@@ -393,18 +414,23 @@ export class SvgPathModel {
       }
     }
 
-    for (const item of nodes) {
-      if (hasControlPoint1(item)) {
-        points.push(new Curve1ControlPoint(item));
-      }
-      if (hasControlPoint2(item)) {
-        points.push(new Curve2ControlPoint(item));
-      }
-      if (!isClosePath(item)) {
-        points.push(new MoveControlPoint(item));
-      }
+    const points = createControlPoints(nodes);
+
+    this._nodes = nodes;
+    this._controlPoints = points;
+  }
+
+  transform(matrix: ReadonlyMatrix) {
+    const nodes: PathItem[] = [];
+    let node: PathItem | undefined;
+    for (const srcNode of this._nodes) {
+      node = append(node, transformedNode(matrix, srcNode)).tail;
+      node.outputAsRelative = srcNode.outputAsRelative;
+      node.isSelected = srcNode.isSelected;
+      nodes.push(node);
     }
 
+    const points = createControlPoints(nodes);
     this._nodes = nodes;
     this._controlPoints = points;
   }
@@ -424,9 +450,10 @@ export class SvgPathModel {
   }
 
   getCurveControlHandles() {
-    const showAll = !this.hasSelection;
+    // const showAll = !this.hasSelection;
     return this._nodes
-      .filter(node => (showAll || node.isSelected) && (isCurveTo(node) || isSmoothCurveTo(node) || isQCurveTo(node)))
+      // .filter(node => (showAll || node.isSelected) && (isCurveTo(node) || isSmoothCurveTo(node) || isQCurveTo(node)))
+      .filter(node => (isCurveTo(node) || isSmoothCurveTo(node) || isQCurveTo(node)))
       .map(getCurveControlHandles)
       .join('');
   }
@@ -436,17 +463,19 @@ export class SvgPathModel {
   }
 
   getReflectedCurveTangentLines() {
-    const showAll = !this.hasSelection;
+    // const showAll = !this.hasSelection;
     return this._nodes
-      .filter(node => (showAll || node.isSelected) && (isSmoothCurveTo(node) || isSmoothQCurveTo(node)))
+      // .filter(node => (showAll || node.isSelected) && (isSmoothCurveTo(node) || isSmoothQCurveTo(node)))
+      .filter(node => (isSmoothCurveTo(node) || isSmoothQCurveTo(node)))
       .map(getReflectedCurveTangentLines)
       .join('');
   }
 
   getReflectedEllipticalArcs() {
-    const showAll = !this.hasSelection;
+    // const showAll = !this.hasSelection;
     return this._nodes
-      .filter(node => (showAll || node.isSelected) && isEllipticalArc(node))
+      // .filter(node => (showAll || node.isSelected) && isEllipticalArc(node))
+      .filter(node => isEllipticalArc(node))
       .map(getReflectedEllipticalArc)
       .join('');
   }
