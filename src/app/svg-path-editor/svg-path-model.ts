@@ -31,7 +31,7 @@ import {
   SmoothCurveNode,
   translate,
   translateStopPoint} from './svg-path/svg-path-node';
-import { ReadonlyMatrix } from '../common/matrix-math';
+import { createIdentity, ReadonlyMatrix } from '../common/matrix-math';
 import { transformedNode } from './svg-path/svg-path-transform';
 
 function formatDigit(value: number, fractionDigits?: number) {
@@ -123,6 +123,14 @@ export type ControlPoint = {
   translate(dx: number, dy: number): void;
 };
 
+export function toPathData(head?: Readonly<PathItem>, maximumFractionDigits?: number): string {
+  let buf = '';
+  for (let node = head; node; node = node.next) {
+    buf += asFormattedString(node, node.outputAsRelative, maximumFractionDigits);
+  }
+  return buf;
+}
+
 class MoveControlPoint implements ControlPoint {
   readonly type = 'move';
 
@@ -197,21 +205,21 @@ class Curve2ControlPoint implements ControlPoint {
   }
 }
 
-function createControlPoints(items: ReadonlyArray<Readonly<PathItem>>): ControlPoint[] {
-  const points: ControlPoint[] = [];
-  for (const item of items) {
-    if (hasControlPoint1(item)) {
-      points.push(new Curve1ControlPoint(item));
-    }
-    if (hasControlPoint2(item)) {
-      points.push(new Curve2ControlPoint(item));
-    }
-    if (!isClosePath(item)) {
-      points.push(new MoveControlPoint(item));
-    }
-  }
-  return points;
-}
+// function createControlPoints(items: ReadonlyArray<Readonly<PathItem>>): ControlPoint[] {
+//   const points: ControlPoint[] = [];
+//   for (const item of items) {
+//     if (hasControlPoint1(item)) {
+//       points.push(new Curve1ControlPoint(item));
+//     }
+//     if (hasControlPoint2(item)) {
+//       points.push(new Curve2ControlPoint(item));
+//     }
+//     if (!isClosePath(item)) {
+//       points.push(new MoveControlPoint(item));
+//     }
+//   }
+//   return points;
+// }
 
 
 const RE_COMMAND = /([MLHVZCSQTA])/gi;
@@ -318,6 +326,8 @@ class Reader {
   }
 }
 
+const IM = createIdentity();
+
 export class SvgPathModel {
   private _nodes: PathItem[] = [];
   private _controlPoints: ControlPoint[] = [];
@@ -376,8 +386,29 @@ export class SvgPathModel {
     return count > 0 && count < this._nodes.length;
   }
 
-  fromString(pathData: string) {
+  setNodes(head?: PathItem) {
     const nodes: PathItem[] = [];
+    const points: ControlPoint[] = [];
+
+    for (let node = head; node; node = node.next) {
+      nodes.push(node);
+      if (hasControlPoint1(node)) {
+        points.push(new Curve1ControlPoint(node));
+      }
+      if (hasControlPoint2(node)) {
+        points.push(new Curve2ControlPoint(node));
+      }
+      if (!isClosePath(node)) {
+        points.push(new MoveControlPoint(node));
+      }
+    }
+
+    this._nodes = nodes;
+    this._controlPoints = points;
+  }
+
+
+  fromString(pathData: string) {
     let node: PathItem | undefined;
 
     // Split by command.
@@ -397,7 +428,6 @@ export class SvgPathModel {
             translate(node, getX(node.prev), getY(node.prev));
             node.outputAsRelative = true;
           }
-          nodes.push(node);
         } else {
           // console.warn('Couldn\'t properly parse this expression:', reader.data);
           break;
@@ -414,25 +444,19 @@ export class SvgPathModel {
       }
     }
 
-    const points = createControlPoints(nodes);
-
-    this._nodes = nodes;
-    this._controlPoints = points;
+    this.setNodes(node?.list?.head);
   }
 
-  transform(matrix: ReadonlyMatrix) {
-    const nodes: PathItem[] = [];
+  getTransformed(matrix: ReadonlyMatrix): PathItem | undefined {
+    const transformAll = !this.hasSelection;
+
     let node: PathItem | undefined;
     for (const srcNode of this._nodes) {
-      node = append(node, transformedNode(matrix, srcNode)).tail;
+      node = append(node, transformedNode((transformAll || srcNode.isSelected) ? matrix : IM, srcNode)).tail;
       node.outputAsRelative = srcNode.outputAsRelative;
       node.isSelected = srcNode.isSelected;
-      nodes.push(node);
     }
-
-    const points = createControlPoints(nodes);
-    this._nodes = nodes;
-    this._controlPoints = points;
+    return node?.list?.head;
   }
 
   toString(): string {
