@@ -22,7 +22,8 @@ export type TransformName = keyof typeof TRANSFORMS;
 
 export interface TransformChangeEvent {
   transformName: TransformName;
-  matrix: Matrix;
+  matrix?: Matrix;
+  preview?: boolean;
 }
 
 @Component({
@@ -58,81 +59,125 @@ export class MenuTransformComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  applyTransform() {
+  updatePreview() {
+    if (this.preview) {
+      this.emitPreview();
+    }
+  }
+
+  setSelection(value: TransformName) {
+    if (value !== this.selection) {
+      this.selection = value;
+      this.updatePreview();
+    }
+  }
+
+  setTranslate(x: number, y: number) {
+    if (x !== this.translateX || y !== this.translateY) {
+      this.translateX = x;
+      this.translateY = y;
+      this.updatePreview();
+    }
+  }
+
+  setScale(x: number, y: number) {
+    if (x !== this.scaleFactorX || y !== this.scaleFactorY) {
+      this.scaleFactorX = x;
+      this.scaleFactorY = y;
+      this.updatePreview();
+    }
+  }
+
+  setSkew(x: number, y: number) {
+    if (x !== this.skewXAngle || y !== this.skewYAngle) {
+      this.skewXAngle = x;
+      this.skewYAngle = y;
+      this.updatePreview();
+    }
+  }
+
+  setRotate(angle: number, x: number, y: number) {
+    if (angle !== this.rotateAngle || x !== this.rotateX || y !== this.rotateY) {
+      this.rotateAngle = angle;
+      this.rotateX = x;
+      this.rotateY = y;
+      this.updatePreview();
+    }
+  }
+
+  setMatrix(name: string, value: number) {
+    if (name in this.matrix && this.matrix[name] !== value) {
+      this.matrix[name] = value;
+      this.updatePreview();
+    }
+  }
+
+  emitTransform() {
+    this.preview = false;
     this.transformChange.emit({ transformName: this.selection, matrix: this.getSelectedMatrix() });
+  }
+
+  emitPreview() {
+    const matrix = this.preview ? this.getSelectedMatrix() : undefined;
+    this.transformChange.emit({ transformName: this.selection, matrix, preview: true });
   }
 
   getSelectedMatrix(): Matrix {
     switch (this.selection) {
-      case 'move': return createTranslate(+this.translateX, +this.translateY);
-      case 'scale': return createScale(+this.scaleFactorX / 100, +this.scaleFactorY / 100);
-      case 'skew': return createSkew(+this.skewXAngle * Math.PI / 180, +this.skewYAngle * Math.PI / 180);
+      case 'move': return createTranslate(this.translateX, this.translateY);
+      case 'scale': return createScale(this.scaleFactorX / 100, this.scaleFactorY / 100);
+      case 'skew': return createSkew(this.skewXAngle * Math.PI / 180, this.skewYAngle * Math.PI / 180);
       case 'rotate': if (this.rotateX !== 0 || this.rotateY !== 0) {
-        const dx = +this.rotateX || 0;
-        const dy = +this.rotateY || 0;
         return multiply(
-          multiply(createTranslate(dx, dy), createRotate(+this.rotateAngle * Math.PI / 180)),
-          createTranslate(-dx, -dy));
+          multiply(createTranslate(this.rotateX, this.rotateY), createRotate(+this.rotateAngle * Math.PI / 180)),
+          createTranslate(-this.rotateX, -this.rotateY));
       } else {
-        return createRotate(+this.rotateAngle * Math.PI / 180);
+        return createRotate(this.rotateAngle * Math.PI / 180);
       }
     }
     return { ...this.matrix };
   }
 
-  setScaleX(value: number) {
-    this.scaleFactorX = +value || 0;
-    if (this.shouldScaleProportionally) {
-      this.scaleFactorY = this.scaleFactorX;
-    }
-  }
-
-  setScaleY(value: number) {
-    this.scaleFactorY = +value || 0;
-    if (this.shouldScaleProportionally) {
-      this.scaleFactorX = this.scaleFactorY;
-    }
-  }
-
   setScaleProportionally(value: boolean) {
     this.shouldScaleProportionally = value;
     if (value) {
-      this.scaleFactorY = this.scaleFactorX;
+      this.setScale(this.scaleFactorX, this.scaleFactorX);
     }
   }
 
   addTransform() {
     this.matrix = multiply(this.matrix, this.getSelectedMatrix());
-    this.selection = 'matrix';
+    if (this.selection !== 'matrix') {
+      this.setSelection('matrix');
+    } else {
+      this.updatePreview();
+    }
   }
 
   clearTransform() {
     switch (this.selection) {
       case 'move':
-        this.translateX = 0;
-        this.translateY = 0;
+        this.setTranslate(0, 0);
         break;
       case 'scale':
-        this.scaleFactorX = 100;
-        this.scaleFactorY = 100;
+        this.setScale(100, 100);
         break;
       case 'skew':
-        this.skewXAngle = 0;
-        this.skewYAngle = 0;
+        this.setSkew(0, 0);
         break;
       case 'rotate':
-        this.rotateX = 0;
-        this.rotateY = 0;
-        this.rotateAngle = 0;
+        this.setRotate(0, 0, 0);
         break;
       default:
         if (!isIdentity(this.matrix)) {
           this.matrix = createIdentity();
+          this.updatePreview();
         }
     }
   }
 
   togglePreview() {
     this.preview = !this.preview;
+    this.emitPreview();
   }
 }
