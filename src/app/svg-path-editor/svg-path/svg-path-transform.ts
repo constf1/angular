@@ -7,11 +7,8 @@ import {
   isCurveTo,
   isEllipticalArc,
   isHLineTo,
-  isLineTo,
-  isMoveTo,
   isQCurveTo,
   isSmoothCurveTo,
-  isSmoothQCurveTo,
   isVLineTo
 } from './svg-path-commands';
 import { getX, getY, PathNode } from './svg-path-node';
@@ -90,40 +87,39 @@ export function transformedEllipse(m: ReadonlyMatrix, ellipse: Readonly<EllipseS
 
 export function transformedNode(matrix: ReadonlyMatrix, node: Readonly<PathNode>): PathNode {
   if (isClosePath(node)) {
-    return { name: 'Z'};
-  } else {
-    if (isHLineTo(node)) {
-      const y0 = getY(node.prev);
-      const x = transformedX(matrix, node.x, y0);
-      const y = transformedY(matrix, node.x, y0);
-      return { name: 'L', x, y };
-    } else if (isVLineTo(node)) {
-      const x0 = getX(node.prev);
-      const x = transformedX(matrix, x0, node.y);
-      const y = transformedY(matrix, x0, node.y);
-      return { name: 'L', x, y };
+    return { name: node.name };
+  } else if (isHLineTo(node)) {
+    const y0 = getY(node.prev);
+    const x = transformedX(matrix, node.x, y0);
+    const y = transformedY(matrix, node.x, y0);
+    return { name: 'L', x, y };
+  } else if (isVLineTo(node)) {
+    const x0 = getX(node.prev);
+    const x = transformedX(matrix, x0, node.y);
+    const y = transformedY(matrix, x0, node.y);
+    return { name: 'L', x, y };
+   } else {
+    const x = transformedX(matrix, node.x, node.y);
+    const y = transformedY(matrix, node.x, node.y);
+    if (isQCurveTo(node)) {
+      const x1 = transformedX(matrix, node.x1, node.y1);
+      const y1 = transformedY(matrix, node.x1, node.y1);
+      return { name: node.name, x1, y1, x, y };
+    } else if (isSmoothCurveTo(node)) {
+      const x2 = transformedX(matrix, node.x2, node.y2);
+      const y2 = transformedY(matrix, node.x2, node.y2);
+      return { name: node.name, x2, y2, x, y };
+    } else if (isCurveTo(node)) {
+      const x1 = transformedX(matrix, node.x1, node.y1);
+      const y1 = transformedY(matrix, node.x1, node.y1);
+      const x2 = transformedX(matrix, node.x2, node.y2);
+      const y2 = transformedY(matrix, node.x2, node.y2);
+      return { name: node.name, x1, y1, x2, y2, x, y };
+    } else if (isEllipticalArc(node)) {
+      return { name: node.name, ...transformedEllipse(matrix, node), x, y };
     } else {
-      const x = transformedX(matrix, node.x, node.y);
-      const y = transformedY(matrix, node.x, node.y);
-      if (isMoveTo(node) || isLineTo(node) || isSmoothQCurveTo(node)) {
-        return { name: node.name, x, y };
-      } else if (isQCurveTo(node)) {
-        const x1 = transformedX(matrix, node.x1, node.y1);
-        const y1 = transformedY(matrix, node.x1, node.y1);
-        return { name: node.name, x1, y1, x, y };
-      } else if (isSmoothCurveTo(node)) {
-        const x2 = transformedX(matrix, node.x2, node.y2);
-        const y2 = transformedY(matrix, node.x2, node.y2);
-        return { name: node.name, x2, y2, x, y };
-      } else if (isCurveTo(node)) {
-        const x1 = transformedX(matrix, node.x1, node.y1);
-        const y1 = transformedY(matrix, node.x1, node.y1);
-        const x2 = transformedX(matrix, node.x2, node.y2);
-        const y2 = transformedY(matrix, node.x2, node.y2);
-        return { name: node.name, x1, y1, x2, y2, x, y };
-      } else if (isEllipticalArc(node)) {
-        return { name: node.name, ...transformedEllipse(matrix, node), x, y };
-      }
+      // if (isMoveTo(node) || isLineTo(node) || isSmoothQCurveTo(node))
+      return { name: node.name, x, y };
     }
   }
 }
