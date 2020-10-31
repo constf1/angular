@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 // app/common
 import { DragListener } from 'src/app/common/drag-listener';
 import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component';
+import { isIdentity, ReadonlyMatrix } from 'src/app/common/matrix-math';
 
 import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component';
 import { TransformChangeEvent } from '../menu-transform/menu-transform.component';
@@ -13,7 +14,7 @@ import { BackgroundImageService } from '../services/background-image.service';
 import { EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
 
-import { SvgPathModel } from '../svg-path-model';
+import { SvgPathModel, toPathData } from '../svg-path-model';
 
 const SAMPLE_PATH_DATA =
 'm205 698c-17-194 169-280 169-408s-24-259 127-274s177 84 174 243s218 217 164 452c43 15 31 74 55 97'
@@ -59,9 +60,17 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
 
   svgStyles: { [key: string]: any; } = {};
 
-  maximumFractionDigits = 3;
-  decimals = ['to integer', '#.#', '#.##', '#.###', '#.####', '%.5f', '%.6f'];
+  maximumFractionDigits = 2;
+  decimals = ['to integer', '#.#', '#.##', '#.###', '%.4f', '%.5f', '%.6f'];
   // decimals = ['to integer', '1 decimal place', '2 decimal places', '3 decimal places', '4 decimal places', '5 decimal places'];
+
+  previewMatrix?: ReadonlyMatrix;
+
+  get previewPathData(): string {
+    return (!this.previewMatrix || isIdentity(this.previewMatrix))
+      ? ''
+      : compact(toPathData(this.pathModel.getTransformed(this.previewMatrix), this.maximumFractionDigits));
+  }
 
   get viewBox(): string {
     const s = this.settings.state;
@@ -69,7 +78,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   get pathData() {
-    return compact(this.pathModel.toString());
+    return compact(this.pathModel.toFormattedString('', this.maximumFractionDigits));
   }
 
   get isDragging() {
@@ -83,6 +92,16 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
       return `M${data.startX} ${data.startY}L${point.x} ${point.y}m-3 0h6m-3-3v6`;
     }
     return '';
+  }
+
+  get pathStrokeColor() {
+    const state = this.settings.state;
+    return state.isPathStroke ? state.pathStrokeColor : 'none';
+  }
+
+  get pathFillColor() {
+    const state = this.settings.state;
+    return state.isPathFill ? state.pathFillColor : 'none';
   }
 
   constructor(
@@ -113,11 +132,6 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
       // Clear any previously selected items. It's a design feature. NOT a bug!
       this.pathModel.clearSelection();
     }
-  }
-
-  updatePathInput() {
-    this.pathInput = this.pathModel.toFormattedString('\n', this.maximumFractionDigits);
-    this.history.pathData = this.pathData;
   }
 
   // selectNext(event: KeyboardEvent) {
@@ -155,7 +169,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     const data = this._dragListener.data;
     const point = this.pathModel.controls[data.index];
     if (point.x !== data.startX || point.y !== data.startY) {
-      this.updatePathInput();
+      this.onPathModelChange('transform');
     }
   }
 
@@ -195,12 +209,15 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
 
   convertInput(relative: boolean) {
     this.pathModel.outputAsRelative(relative);
-    this.updatePathInput();
-    // this.pathInput = this.pathModel.toFormattedString('\n');
+    this.formatInput();
   }
 
   compactInput() {
     this.pathInput = compact(this.pathInput);
+  }
+
+  formatInput() {
+    this.pathInput = this.pathModel.toFormattedString('\n', this.maximumFractionDigits);
   }
 
   onInputChange(pathInput: string) {
@@ -208,21 +225,23 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     if (pathInput !== this.pathInput) {
       this.pathInput = pathInput;
       this.pathModel.fromString(pathInput);
-      this.history.pathData = this.pathData;
+      this.onPathModelChange('input');
     }
   }
 
   onUndo() {
     if (this.history.canUndo) {
       this.history.undo();
-      this.onInputChange(this.history.pathData);
+      this.pathModel.fromString(this.history.pathData);
+      this.onPathModelChange('history');
     }
   }
 
   onRedo() {
     if (this.history.canRedo) {
       this.history.redo();
-      this.onInputChange(this.history.pathData);
+      this.pathModel.fromString(this.history.pathData);
+      this.onPathModelChange('history');
     }
   }
 
@@ -240,7 +259,24 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   applyTransform(event: TransformChangeEvent) {
-    this.pathModel.transform(event.matrix);
-    this.updatePathInput();
+    if (event.preview) {
+      this.previewMatrix = event.matrix;
+    } else {
+      this.previewMatrix = undefined;
+      const matrix = event.matrix;
+      if (matrix && !isIdentity(matrix)) {
+        this.pathModel.setNodes(this.pathModel.getTransformed(matrix));
+        this.onPathModelChange('transform');
+      }
+    }
+  }
+
+  onPathModelChange(changeType: 'input' | 'history' | 'transform') {
+    if (changeType !== 'input') {
+      this.formatInput();
+    }
+    if (changeType !== 'history') {
+      this.history.pathData = this.pathModel.toString();
+    }
   }
 }

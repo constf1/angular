@@ -60,11 +60,11 @@
               <div style="margin-top: 16px;">
                 <mat-form-field style="max-width: 40%;margin-right: 1em;">
                   <mat-label>Number of decimals</mat-label>
-                  <mat-select [(ngModel)]="maximumFractionDigits">
+                  <mat-select [(ngModel)]="maximumFractionDigits" (ngModelChange)="formatInput()">
                     <mat-option *ngFor="let name of decimals; index as i" [value]="i">{{i}}</mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-stroked-button color="primary">Format {{decimals[maximumFractionDigits]}}</button>
+                <button mat-stroked-button color="primary" (click)="formatInput()">Format {{decimals[maximumFractionDigits]}}</button>
                 <!-- <button mat-icon-button color="primary">
                   <mat-icon>short_text</mat-icon>
                 </button> -->
@@ -76,7 +76,8 @@
                 <mat-checkbox [checked]="pathModel.isAllSelected" [indeterminate]="pathModel.isSomeSelected"
                   (change)="pathModel.selectAll($event.checked)">Select All</mat-checkbox>
               </div>
-              <div style="border-top: 1px solid rgba(0, 0, 0, 0.26); padding-left: 16px; padding-top: 10px; height: 280px; overflow-y: auto;">
+              <div
+                style="border-top: 1px solid rgba(0, 0, 0, 0.26); padding-left: 16px; padding-top: 10px; height: 280px; overflow-y: auto;">
                 <app-path-group *ngFor="let group of pathModel.getGroups();index as i;trackBy:trackByIndex"
                   [items]="group">
                 </app-path-group>
@@ -119,12 +120,11 @@
       <image *ngIf="background.imageData" filter="url(#filterBackgroundImage)"
         [class.hidden]="settings.state.isBackgroundImageHidden" [attr.width]="settings.state.backgroundImageZoom + '%'"
         x="0" y="0" [attr.href]="background.imageData"></image>
-      <path #pathRef opacity="0.9" stroke-width="1"
-        [attr.stroke]="settings.state.isPathStroke ? settings.state.pathStrokeColor : 'none'"
-        [attr.fill]="settings.state.isPathFill ? settings.state.pathFillColor : 'none'" [attr.d]="pathData">
+      <path #pathRef opacity="0.9" stroke-width="1" [attr.stroke]="pathStrokeColor" [attr.fill]="pathFillColor"
+        [attr.d]="pathData">
       </path>
-      <path opacity="0.6" fill="none" stroke-dasharray="4 1" stroke-width="2" [attr.stroke]="settings.state.controlPointsFillColor"
-        [attr.d]="pathModel.getSelectedPath()"></path>
+      <path opacity="0.6" fill="none" stroke-dasharray="4 1" stroke-width="2"
+        [attr.stroke]="settings.state.controlPointsFillColor" [attr.d]="pathModel.getSelectedPath()"></path>
       <g *ngIf="settings.state.isControlPoints">
         <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
           <path [attr.d]="pathModel.getCurveControlHandles()"></path>
@@ -138,6 +138,8 @@
           </circle>
         </g>
       </g>
+      <path pointer-events="none" opacity="0.5" stroke-width="1" stroke-dasharray="2 1" [attr.stroke]="pathStrokeColor"
+        [attr.fill]="pathFillColor" [attr.d]="previewPathData"></path>
     </svg>
     <button *ngIf="settings.state.sidenavClosed" class="sidenav-open-button"
       (click)="settings.set({ sidenavClosed: false })" mat-icon-button color="primary"
