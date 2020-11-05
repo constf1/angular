@@ -66,7 +66,7 @@ function formatParams(node: Readonly<PathNode>, x0: number, y0: number, fraction
   return buf;
 }
 
-function asFormattedString(node: Readonly<PathNode>, asRelative?: boolean, maximumFractionDigits?: number): string {
+export function asFormattedString(node: Readonly<PathNode>, asRelative?: boolean, maximumFractionDigits?: number): string {
   if (asRelative) {
     return node.name.toLowerCase() + formatParams(node, getX(node.prev), getY(node.prev), maximumFractionDigits);
   } else {
@@ -337,9 +337,8 @@ export class SvgPathModel {
   }
 
   get controls(): ReadonlyArray<ControlPoint> {
-    const i = this.firstSelectionIndex;
-    if (i >= 0) {
-      const first = this._nodes[i];
+    const first = this.firstSelection;
+    if (first) {
       return this._controlPoints.filter(control => control.item === first);
     }
     return this._controlPoints;
@@ -359,7 +358,16 @@ export class SvgPathModel {
     return count;
   }
 
-  get firstSelectionIndex() {
+  get firstSelection(): PathItem | undefined {
+    for (const node of this._nodes) {
+      if (node.isSelected) {
+        return node;
+      }
+    }
+    return undefined;
+  }
+
+  get firstSelectionIndex(): number {
     for (let i = 0; i < this._nodes.length; i++) {
       if (this._nodes[i].isSelected) {
         return i;
@@ -369,7 +377,7 @@ export class SvgPathModel {
   }
 
   get hasSelection(): boolean {
-    return this.firstSelectionIndex >= 0;
+    return !!this.firstSelection;
   }
 
   get isAllSelected(): boolean {
@@ -502,6 +510,11 @@ export class SvgPathModel {
       .filter(node => isEllipticalArc(node))
       .map(getReflectedEllipticalArc)
       .join('');
+  }
+
+  selectDistinct(index: number) {
+    this.clearSelection();
+    this.select(index, true);
   }
 
   select(index: number, value: boolean) {
