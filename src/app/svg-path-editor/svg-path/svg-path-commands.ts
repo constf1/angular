@@ -122,3 +122,20 @@ export function hasControlPoint1(item: DrawTo): item is CurveTo | QCurveTo {
 export function hasControlPoint2(item: DrawTo): item is CurveTo | SmoothCurveTo {
   return isCurveTo(item) || isSmoothCurveTo(item);
 }
+
+export function isBezierCurve(item: DrawTo): item is CurveTo | SmoothCurveTo | QCurveTo | SmoothQCurveTo {
+  return isCurveTo(item) || isSmoothCurveTo(item) || isQCurveTo(item) || isSmoothQCurveTo(item);
+}
+
+export const COMMAND_FULL_NAMES: { [key in DrawCommand]: string } = {
+  M: 'MoveTo',
+  L: 'LineTo',
+  H: 'Horizontal LineTo',
+  V: 'Vertical LineTo',
+  C: 'Cubic Bézier Curve',
+  S: 'Smooth Cubic Bézier Curve',
+  Q: 'Quadratic Bézier Curve',
+  T: 'Smooth Quadratic Bézier Curve',
+  A: 'Elliptical Arc Curve',
+  Z: 'ClosePath',
+} as const;
