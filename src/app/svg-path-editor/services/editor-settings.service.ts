@@ -31,9 +31,11 @@ export const FE_COLOR_MATRICES = {
   // red: '1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0',
   // green: '0 0 0 0 0 1 1 1 1 0 0 0 0 0 0 0 0 0 1 0',
   // blue: '0 0 0 0 0 0 0 0 0 0 1 1 1 1 0 0 0 0 1 0',
-};
+} as const;
 
 export type FeColorMatrixName = keyof typeof FE_COLOR_MATRICES;
+
+export const DECIMAL_FORMAT_LABELS = ['to integer', '#.#', '#.##', '#.###', '%.4f', '%.5f', '%.6f'] as const;
 
 const SAVE_DELAY_MS = 1000;
 
@@ -61,6 +63,8 @@ export interface EditorSettingsState {
   sidenavClosed: boolean;
 
   backgroundColor: string;
+
+  maximumFractionDigits: number;
 }
 
 export const initialState: Readonly<EditorSettingsState> = {
@@ -87,6 +91,8 @@ export const initialState: Readonly<EditorSettingsState> = {
   sidenavClosed: true,
 
   backgroundColor: '#282828',
+
+  maximumFractionDigits: 2,
 };
 
 export const minState: Readonly<SubType<EditorSettingsState, number>> = {
@@ -96,6 +102,7 @@ export const minState: Readonly<SubType<EditorSettingsState, number>> = {
   height: 1,
   zoom: 25,
   backgroundImageZoom: 1,
+  maximumFractionDigits: 0,
 };
 
 export const maxState: Readonly<SubType<EditorSettingsState, number>> = {
@@ -105,6 +112,7 @@ export const maxState: Readonly<SubType<EditorSettingsState, number>> = {
   height: Number.MAX_SAFE_INTEGER,
   zoom: 400,
   backgroundImageZoom: 10000,
+  maximumFractionDigits: DECIMAL_FORMAT_LABELS.length - 1,
 };
 
 const KEY = '[svg-path-editor.settings]';
@@ -151,6 +159,10 @@ export class EditorSettingsService extends StateSubject<EditorSettingsState> {
     if (!(state.backgroundImageColorMatrixName in FE_COLOR_MATRICES)) {
       state.backgroundImageColorMatrixName = 'identity';
     }
+
+    // TODO: Validate color strings.
+    // The format is "#rrggbb" where rr, gg, bb are two-digit hexadecimal numbers.
+    // console.log('STATE:', state);
 
     return super._validate(state);
   }
