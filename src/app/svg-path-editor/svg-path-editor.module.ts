@@ -10,11 +10,14 @@ import { MaterialModule } from '../material/material.module';
 import { BackgroundImageService } from './services/background-image.service';
 import { EditorSettingsService } from './services/editor-settings.service';
 import { PathDataService } from './services/path-data.service';
+import { SvgFileService } from './services/svg-file.service';
 
 import { EditorComponent } from './editor/editor.component';
 import { MenuTransformComponent } from './menu-transform/menu-transform.component';
 import { MenuViewComponent } from './menu-view/menu-view.component';
 import { PathGroupComponent } from './path-group/path-group.component';
+import { PathItemComponent } from './path-item/path-item.component';
+import { PathItemSelectorComponent } from './path-item-selector/path-item-selector.component';
 import { SampleDialogComponent } from './sample-dialog/sample-dialog.component';
 
 /**
@@ -30,6 +33,8 @@ const routes: Routes = [
     MenuTransformComponent,
     MenuViewComponent,
     PathGroupComponent,
+    PathItemComponent,
+    PathItemSelectorComponent,
     SampleDialogComponent,
   ],
   entryComponents: [SampleDialogComponent],
@@ -48,6 +53,7 @@ const routes: Routes = [
     BackgroundImageService,
     EditorSettingsService,
     PathDataService,
+    SvgFileService
   ]
 })
 export class SvgPathEditorModule { }
