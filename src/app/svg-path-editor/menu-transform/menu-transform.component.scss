@@ -1,10 +1,10 @@
-.menu-transform {
-  border: 1px solid rgba(0, 0, 0, 0.26);
-  border-radius: 4px;
-  // padding: 1em;
-  /* vertical | horizontal */
-  padding: 12px 16px;
-}
+// .menu-transform {
+//   border: 1px solid rgba(0, 0, 0, 0.26);
+//   border-radius: 4px;
+//   // padding: 1em;
+//   /* vertical | horizontal */
+//   padding: 12px 16px;
+// }
 
 .menu-transform-function {
   display: flex;
@@ -24,12 +24,15 @@
   height: 10em;
   >mat-form-field {
     max-width: 30%;
-    margin-right: 1em;
   }
 
-  >span:not(:last-of-type) {
-    margin-right: 2em;
+  >span {
+    margin-left: 0.5em;
   }
+}
+
+.menu-transform-space {
+  margin-right: 2em;
 }
 
 .menu-transform-matrix {

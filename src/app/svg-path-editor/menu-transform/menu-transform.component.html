@@ -1,96 +1,112 @@
+<!--
 <div class="menu-transform">
-  <div class="menu-transform-function">
-    <mat-form-field>
-      <mat-label>Transform function</mat-label>
-      <mat-select [value]="selection" (valueChange)="setSelection($event)">
-        <mat-option *ngFor="let name of transformNames" [value]="name">{{transforms[name]}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-    <button mat-stroked-button (click)="emitTransform()" color="primary">
-      <mat-icon>play_for_work</mat-icon>Apply
-    </button>
-    <button mat-stroked-button (click)="togglePreview()" [color]="preview ? 'accent' : 'primary'">
-      <mat-icon>preview</mat-icon>
-    </button>
-  </div>
+</div>
+-->
 
-  <div class="menu-transform-move" *ngIf="selection === 'move'">
-    <mat-form-field>
-      <mat-label>Horizontal →</mat-label>
-      <input matInput type="number" [ngModel]="translateX" (ngModelChange)="setTranslate(+$event, translateY)">
-    </mat-form-field>
-    <span>px</span>
-    <mat-form-field>
-      <mat-label>Vertical ↓</mat-label>
-      <input matInput type="number" [ngModel]="translateY" (ngModelChange)="setTranslate(translateX, +$event)">
-    </mat-form-field>
-    <span>px</span>
-  </div>
+<div class="menu-transform-function">
+  <mat-form-field>
+    <mat-label>Transform function</mat-label>
+    <mat-select [value]="selection" (valueChange)="setSelection($event)">
+      <mat-option *ngFor="let name of transformNames" [value]="name">{{transforms[name]}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-stroked-button (click)="emitTransform()" color="primary">
+    <mat-icon>play_for_work</mat-icon>Apply
+  </button>
+  <button mat-stroked-button (click)="togglePreview()" [color]="preview ? 'accent' : 'primary'">
+    <mat-icon>preview</mat-icon>
+  </button>
+</div>
 
-  <div class="menu-transform-scale" *ngIf="selection === 'scale'">
-    <mat-form-field>
-      <mat-label>Width ↔</mat-label>
-      <input matInput type="number" [ngModel]="scaleFactorX"
-        (ngModelChange)="setScale(+$event, shouldScaleProportionally ? +$event : scaleFactorY)">
-    </mat-form-field>
-    <span>%</span>
-    <mat-form-field>
-      <mat-label>Height ↕</mat-label>
-      <input matInput type="number" [ngModel]="scaleFactorY"
-        (ngModelChange)="setScale(shouldScaleProportionally ? +$event : scaleFactorX, +$event)">
-    </mat-form-field>
-    <span>%</span>
-    <mat-checkbox [ngModel]="shouldScaleProportionally" (ngModelChange)="setScaleProportionally($event)">
-      Scale proportionally
-    </mat-checkbox>
-  </div>
+<div class="menu-transform-move" *ngIf="selection === 'move'">
+  <mat-form-field>
+    <mat-label>Horizontal →</mat-label>
+    <input matInput type="number" [ngModel]="translateX" (ngModelChange)="setTranslate(+$event, translateY)">
+  </mat-form-field>
+  <span class="menu-transform-space">px</span>
+  <mat-form-field>
+    <mat-label>Vertical ↓</mat-label>
+    <input matInput type="number" [ngModel]="translateY" (ngModelChange)="setTranslate(translateX, +$event)">
+  </mat-form-field>
+  <span>px</span>
+</div>
 
-  <div class="menu-transform-angle" *ngIf="selection === 'rotate'">
-    <mat-form-field>
-      <mat-label>Angle ↷</mat-label>
-      <input matInput type="number" [ngModel]="rotateAngle" (ngModelChange)="setRotate(+$event, rotateX, rotateY)">
-    </mat-form-field>
-    <span>°</span>
-    <br>
-    <mat-form-field>
-      <mat-label>Center x</mat-label>
-      <input matInput type="number" [ngModel]="rotateX" (ngModelChange)="setRotate(rotateAngle, +$event, rotateY)">
-    </mat-form-field>
-    <span>px</span>
-    <mat-form-field>
-      <mat-label>Center y</mat-label>
-      <input matInput type="number" [ngModel]="rotateY" (ngModelChange)="setRotate(rotateAngle, rotateX, +$event)">
-    </mat-form-field>
-    <span>px</span>
-  </div>
+<div class="menu-transform-scale" *ngIf="selection === 'scale'">
+  <mat-form-field>
+    <mat-label>Width ↔</mat-label>
+    <input matInput type="number" [ngModel]="scaleFactorX"
+      (ngModelChange)="setScale(+$event, scaleProportionally ? +$event : scaleFactorY, scaleX, scaleY)">
+  </mat-form-field>
+  <span>%</span>
+  <button mat-icon-button (click)="setScaleProportionally(!scaleProportionally)">
+    <mat-icon>{{scaleProportionally ? 'lock' : 'lock_open'}}</mat-icon>
+  </button>
+  <mat-form-field>
+    <mat-label>Height ↕</mat-label>
+    <input matInput type="number" [ngModel]="scaleFactorY"
+      (ngModelChange)="setScale(scaleProportionally ? +$event : scaleFactorX, +$event, scaleX, scaleY)">
+  </mat-form-field>
+  <span>%</span>
+  <br>
+  <mat-form-field>
+    <mat-label>Center x</mat-label>
+    <input matInput type="number" [ngModel]="scaleX"
+      (ngModelChange)="setScale(scaleFactorX, scaleFactorY, +$event, scaleY)">
+  </mat-form-field>
+  <span class="menu-transform-space">px</span>
+  <mat-form-field>
+    <mat-label>Center y</mat-label>
+    <input matInput type="number" [ngModel]="scaleY"
+      (ngModelChange)="setScale(scaleFactorX, scaleFactorY, scaleX, +$event)">
+  </mat-form-field>
+  <span>px</span>
+</div>
 
-  <div class="menu-transform-skew" *ngIf="selection === 'skew'">
-    <mat-form-field>
-      <mat-label>Horizontal ⇆</mat-label>
-      <input matInput type="number" [ngModel]="skewXAngle" (ngModelChange)="setSkew(+$event, skewYAngle)">
-    </mat-form-field>
-    <span>°</span>
-    <mat-form-field>
-      <mat-label>Vertical ⇅</mat-label>
-      <input matInput type="number" [ngModel]="skewYAngle" (ngModelChange)="setSkew(skewXAngle, +$event)">
-    </mat-form-field>
-    <span>°</span>
-  </div>
+<div class="menu-transform-angle" *ngIf="selection === 'rotate'">
+  <mat-form-field>
+    <mat-label>Angle ↷</mat-label>
+    <input matInput type="number" [ngModel]="rotateAngle" (ngModelChange)="setRotate(+$event, rotateX, rotateY)">
+  </mat-form-field>
+  <span>°</span>
+  <br>
+  <mat-form-field>
+    <mat-label>Center x</mat-label>
+    <input matInput type="number" [ngModel]="rotateX" (ngModelChange)="setRotate(rotateAngle, +$event, rotateY)">
+  </mat-form-field>
+  <span class="menu-transform-space">px</span>
+  <mat-form-field>
+    <mat-label>Center y</mat-label>
+    <input matInput type="number" [ngModel]="rotateY" (ngModelChange)="setRotate(rotateAngle, rotateX, +$event)">
+  </mat-form-field>
+  <span>px</span>
+</div>
 
-  <div class="menu-transform-matrix" *ngIf="selection === 'matrix'">
-    <mat-form-field *ngFor="let name of matrixNames">
-      <mat-label>{{name}}:</mat-label>
-      <input matInput type="number" [ngModel]="matrix[name]" (ngModelChange)="setMatrix(name, +$event)">
-    </mat-form-field>
-  </div>
+<div class="menu-transform-skew" *ngIf="selection === 'skew'">
+  <mat-form-field>
+    <mat-label>Horizontal ⇆</mat-label>
+    <input matInput type="number" [ngModel]="skewXAngle" (ngModelChange)="setSkew(+$event, skewYAngle)">
+  </mat-form-field>
+  <span class="menu-transform-space">°</span>
+  <mat-form-field>
+    <mat-label>Vertical ⇅</mat-label>
+    <input matInput type="number" [ngModel]="skewYAngle" (ngModelChange)="setSkew(skewXAngle, +$event)">
+  </mat-form-field>
+  <span>°</span>
+</div>
 
-  <div style="display: flex;">
-    <button mat-stroked-button (click)="clearTransform()" color="warn">
-      <mat-icon>clear</mat-icon>Clear
-    </button>
-    <span class="flex-space-filler-1"></span>
-    <button mat-stroked-button (click)="addTransform()">
-      <mat-icon>functions</mat-icon>Add To Matrix
-    </button>
-  </div>
+<div class="menu-transform-matrix" *ngIf="selection === 'matrix'">
+  <mat-form-field *ngFor="let name of matrixNames">
+    <mat-label>{{name}}:</mat-label>
+    <input matInput type="number" [ngModel]="matrix[name]" (ngModelChange)="setMatrix(name, +$event)">
+  </mat-form-field>
+</div>
+
+<div style="display: flex;">
+  <button mat-stroked-button (click)="clearTransform()" color="warn">
+    <mat-icon>clear</mat-icon>Clear
+  </button>
+  <span class="flex-space-filler-1"></span>
+  <button mat-stroked-button (click)="addTransform()">
+    <mat-icon>functions</mat-icon>Add To Matrix
+  </button>
 </div>

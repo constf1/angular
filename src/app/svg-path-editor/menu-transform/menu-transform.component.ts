@@ -41,14 +41,15 @@ export class MenuTransformComponent implements OnInit {
   translateY = 0;
   scaleFactorX = 100;
   scaleFactorY = 100;
+  scaleX = 0;
+  scaleY = 0;
+  scaleProportionally = false;
   skewXAngle = 0;
   skewYAngle = 0;
   rotateAngle = 0;
   rotateX = 0;
   rotateY = 0;
   matrix = createIdentity();
-
-  shouldScaleProportionally = false;
 
   readonly transforms = TRANSFORMS;
   readonly transformNames = Object.keys(TRANSFORMS);
@@ -80,10 +81,12 @@ export class MenuTransformComponent implements OnInit {
     }
   }
 
-  setScale(x: number, y: number) {
-    if (x !== this.scaleFactorX || y !== this.scaleFactorY) {
-      this.scaleFactorX = x;
-      this.scaleFactorY = y;
+  setScale(xScale: number, yScale: number, x: number, y: number) {
+    if (xScale !== this.scaleFactorX || yScale !== this.scaleFactorY || x !== this.scaleX || y !== this.scaleY) {
+      this.scaleFactorX = xScale;
+      this.scaleFactorY = yScale;
+      this.scaleX = x;
+      this.scaleY = y;
       this.updatePreview();
     }
   }
@@ -125,12 +128,19 @@ export class MenuTransformComponent implements OnInit {
   getSelectedMatrix(): Matrix {
     switch (this.selection) {
       case 'move': return createTranslate(this.translateX, this.translateY);
-      case 'scale': return createScale(this.scaleFactorX / 100, this.scaleFactorY / 100);
+      case 'scale':
+        if (this.scaleX !== 0 || this.scaleY !== 0) {
+          // transform="translate(cx, cy) scale(sx, sy) translate(-cx, -cy)"
+          return multiply(createTranslate(this.scaleX, this.scaleY),
+            multiply(createScale(this.scaleFactorX / 100, this.scaleFactorY / 100), createTranslate(-this.scaleX, -this.scaleY)));
+        } else {
+          return createScale(this.scaleFactorX / 100, this.scaleFactorY / 100);
+        }
       case 'skew': return createSkew(this.skewXAngle * Math.PI / 180, this.skewYAngle * Math.PI / 180);
       case 'rotate': if (this.rotateX !== 0 || this.rotateY !== 0) {
-        return multiply(
-          multiply(createTranslate(this.rotateX, this.rotateY), createRotate(+this.rotateAngle * Math.PI / 180)),
-          createTranslate(-this.rotateX, -this.rotateY));
+        // transform="translate(cx, cy) rotate(deg) translate(-cx, -cy)"
+        return multiply(createTranslate(this.rotateX, this.rotateY),
+          multiply(createRotate(this.rotateAngle * Math.PI / 180), createTranslate(-this.rotateX, -this.rotateY)));
       } else {
         return createRotate(this.rotateAngle * Math.PI / 180);
       }
@@ -139,14 +149,14 @@ export class MenuTransformComponent implements OnInit {
   }
 
   setScaleProportionally(value: boolean) {
-    this.shouldScaleProportionally = value;
+    this.scaleProportionally = value;
     if (value) {
-      this.setScale(this.scaleFactorX, this.scaleFactorX);
+      this.setScale(this.scaleFactorX, this.scaleFactorX, this.scaleX, this.scaleY);
     }
   }
 
   addTransform() {
-    this.matrix = multiply(this.matrix, this.getSelectedMatrix());
+    this.matrix = multiply(this.getSelectedMatrix(), this.matrix);
     if (this.selection !== 'matrix') {
       this.setSelection('matrix');
     } else {
@@ -160,7 +170,7 @@ export class MenuTransformComponent implements OnInit {
         this.setTranslate(0, 0);
         break;
       case 'scale':
-        this.setScale(100, 100);
+        this.setScale(100, 100, 0, 0);
         break;
       case 'skew':
         this.setSkew(0, 0);
