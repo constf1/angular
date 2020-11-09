@@ -1,3 +1,4 @@
+import { SubType } from 'src/app/common/types';
 
 export type MoveTo = {
   name: 'M';
@@ -73,6 +74,34 @@ export type EllipticalArc = EllipseShape & {
 
 export type DrawTo = MoveTo | LineTo | HLineTo | VLineTo | ClosePath | CurveTo | SmoothCurveTo | QCurveTo | SmoothQCurveTo | EllipticalArc;
 export type DrawCommand = DrawTo['name'];
+
+export type DrawNumberParam =
+  | keyof SubType<MoveTo, number>
+  | keyof SubType<LineTo, number>
+  | keyof SubType<HLineTo, number>
+  | keyof SubType<VLineTo, number>
+  | keyof SubType<ClosePath, number>
+  | keyof SubType<CurveTo, number>
+  | keyof SubType<SmoothCurveTo, number>
+  | keyof SubType<QCurveTo, number>
+  | keyof SubType<SmoothQCurveTo, number>
+  | keyof SubType<EllipticalArc, number>
+  ;
+
+export type DrawBooleanParam =
+  | keyof SubType<MoveTo, boolean>
+  | keyof SubType<LineTo, boolean>
+  | keyof SubType<HLineTo, boolean>
+  | keyof SubType<VLineTo, boolean>
+  | keyof SubType<ClosePath, boolean>
+  | keyof SubType<CurveTo, boolean>
+  | keyof SubType<SmoothCurveTo, boolean>
+  | keyof SubType<QCurveTo, boolean>
+  | keyof SubType<SmoothQCurveTo, boolean>
+  | keyof SubType<EllipticalArc, boolean>
+  ;
+
+export type DrawParam = DrawNumberParam | DrawBooleanParam;
 
 // Type Guards:
 export function isMoveTo(item: DrawTo): item is MoveTo {
