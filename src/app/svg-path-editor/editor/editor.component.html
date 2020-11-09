@@ -17,6 +17,9 @@
         <mat-expansion-panel-header>
           <mat-icon>import_export</mat-icon>File
         </mat-expansion-panel-header>
+        <button mat-stroked-button (click)="archive.next(viewBox, pathData)">
+          <mat-icon>archive</mat-icon>To SVG
+        </button>
         <button mat-stroked-button (click)="openSampleDialog()">
           <mat-icon>developer_board</mat-icon>Samples
         </button>
@@ -40,10 +43,9 @@
           </button>
         </div>
 
-        <app-tab-group items="Raw Data|Command Selector" [selection]="pathTabSelector"
-          (selectionChange)="selectTab($event)">
+        <app-tab-group items="Raw Data|Selector|Walker" [selection]="editMode" (selectionChange)="selectTab($event)">
           <div style="padding-top: 16px;">
-            <div *ngIf="pathTabSelector === 0" style="padding-left: 16px;">
+            <div *ngIf="editMode === 0" style="padding-left: 16px;">
               <mat-form-field style="width: 100%;">
                 <mat-label>SVG path data:</mat-label>
                 <!-- matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="16" -->
@@ -52,26 +54,27 @@
               </mat-form-field>
               <!-- <mat-slider max="20" min="0" step="1" tickInterval="1" thumbLabel="true"></mat-slider> -->
               <!-- <input type="radio" name="decimals" *ngFor="let name of decimals" [value]="name"> -->
-              <div style="margin-top: 8px;">
+              <div>
                 <button mat-stroked-button color="primary" (click)="convertInput(false)">Absolute</button>
                 <button mat-stroked-button color="primary" (click)="convertInput(true)">Relative</button>
                 <button mat-stroked-button color="primary" (click)="compactInput()">Compact</button>
               </div>
-              <div style="margin-top: 16px;">
+              <div style="margin-top: 1em;">
                 <mat-form-field style="max-width: 40%;margin-right: 1em;">
                   <mat-label>Number of decimals</mat-label>
-                  <mat-select [(ngModel)]="maximumFractionDigits" (ngModelChange)="formatInput()">
-                    <mat-option *ngFor="let name of decimals; index as i" [value]="i">{{i}}</mat-option>
+                  <mat-select [ngModel]="settings.state.maximumFractionDigits"
+                    (ngModelChange)="onFormatChange(+$event)">
+                    <mat-option *ngFor="let name of decimalFormats; index as i" [value]="i">{{i}}</mat-option>
                   </mat-select>
                 </mat-form-field>
-                <button mat-stroked-button color="primary" (click)="formatInput()">Format {{decimals[maximumFractionDigits]}}</button>
+                <button mat-stroked-button color="primary" (click)="formatInput()">{{formatLabel}}</button>
                 <!-- <button mat-icon-button color="primary">
                   <mat-icon>short_text</mat-icon>
                 </button> -->
               </div>
             </div>
 
-            <div *ngIf="pathTabSelector === 1">
+            <div *ngIf="editMode === 1">
               <div style="padding-left: 16px;padding-bottom: 10px">
                 <mat-checkbox [checked]="pathModel.isAllSelected" [indeterminate]="pathModel.isSomeSelected"
                   (change)="pathModel.selectAll($event.checked)">Select All</mat-checkbox>
@@ -84,15 +87,29 @@
               </div>
             </div>
 
-            <!-- <div *ngIf="pathTabSelector === 2">
-            Point selector will be here.
-          </div> -->
+            <div *ngIf="editMode === 2" style="padding-left: 1em; padding-right: 1em;">
+              <app-path-item-selector [count]="pathModel.count" [selection]="singleSelectionIndex"
+                (selectionChange)="onSingleSelectionChange($event)">
+              </app-path-item-selector>
+              <app-path-item *ngIf="pathModel.firstSelection as item" [item]="item"
+                [maximumFractionDigits]="settings.state.maximumFractionDigits"
+                (inputChange)="onSingleParameterChange()"></app-path-item>
+            </div>
           </div>
         </app-tab-group>
 
-        <div style="margin-top: 1em;">
+        <!-- <div style="margin-top: 1em;">
           <app-menu-transform (transformChange)="applyTransform($event)"></app-menu-transform>
-        </div>
+        </div> -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>transform</mat-icon>
+            </mat-panel-title>
+            <mat-panel-description>Transform</mat-panel-description>
+          </mat-expansion-panel-header>
+          <app-menu-transform (transformChange)="applyTransform($event)"></app-menu-transform>
+        </mat-expansion-panel>
       </mat-expansion-panel>
 
       <mat-expansion-panel>
@@ -125,6 +142,7 @@
       </path>
       <path opacity="0.6" fill="none" stroke-dasharray="4 1" stroke-width="2"
         [attr.stroke]="settings.state.controlPointsFillColor" [attr.d]="pathModel.getSelectedPath()"></path>
+      <!-- <path opacity="0.6" fill="none" stroke-width="2" [attr.stroke]="settings.state.pathStrokeColor" [attr.d]="hoverPath"></path> -->
       <g *ngIf="settings.state.isControlPoints">
         <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
           <path [attr.d]="pathModel.getCurveControlHandles()"></path>

@@ -11,8 +11,9 @@ import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component'
 import { TransformChangeEvent } from '../menu-transform/menu-transform.component';
 
 import { BackgroundImageService } from '../services/background-image.service';
-import { EditorSettingsService } from '../services/editor-settings.service';
+import { DECIMAL_FORMAT_LABELS, EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
+import { SvgFileService } from '../services/svg-file.service';
 
 import { SvgPathModel, toPathData } from '../svg-path-model';
 
@@ -30,6 +31,7 @@ const SAMPLE_PATH_DATA =
 + 'a51 65 2 10-86-34l24 9a23 36 0 11 37 17zm-120-34a38 56-1 10-55 38l15-11a16 28-4 11 18-17z'
 + 'm-61 65c81 80 122 15 173-2v5c-52 27-103 80-174 3z';
 
+const enum EditMode { All, Group, Single }
 
 function compact(pathData: string): string {
   // remove spaces:
@@ -52,24 +54,28 @@ interface DragData {
 export class EditorComponent extends UnsubscribableComponent implements OnInit {
   private _dragListener = new DragListener<DragData>();
 
-  // pathTabs = ['Raw Data', 'Command Selector' /*, 'Control Points'*/];
-  pathTabSelector = 0;
+  // pathTabs = ['Raw Data', 'Command Selector', 'Path Walker'];
+  editMode: EditMode = EditMode.All;
+  singleSelectionIndex = 0;
+  groupSelectionIndices: ReadonlyArray<number> = [];
 
   pathInput = '';
   pathModel = new SvgPathModel();
 
   svgStyles: { [key: string]: any; } = {};
 
-  maximumFractionDigits = 2;
-  decimals = ['to integer', '#.#', '#.##', '#.###', '%.4f', '%.5f', '%.6f'];
+  decimalFormats = DECIMAL_FORMAT_LABELS;
   // decimals = ['to integer', '1 decimal place', '2 decimal places', '3 decimal places', '4 decimal places', '5 decimal places'];
+
+  // hightlightedItem: PathItem | null;
 
   previewMatrix?: ReadonlyMatrix;
 
   get previewPathData(): string {
-    return (!this.previewMatrix || isIdentity(this.previewMatrix))
+    const m = this.previewMatrix;
+    return (!m || isIdentity(m))
       ? ''
-      : compact(toPathData(this.pathModel.getTransformed(this.previewMatrix), this.maximumFractionDigits));
+      : compact(toPathData(this.pathModel.getTransformed(m), this.settings.state.maximumFractionDigits));
   }
 
   get viewBox(): string {
@@ -78,7 +84,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   get pathData() {
-    return compact(this.pathModel.toFormattedString('', this.maximumFractionDigits));
+    return compact(this.pathModel.toFormattedString('', this.settings.state.maximumFractionDigits));
   }
 
   get isDragging() {
@@ -94,6 +100,24 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     return '';
   }
 
+  // get hoverPath() {
+  //   const node = this.hightlightedItem;
+  //   if (node) {
+  //     let path = `M${getX(node.prev)} ${getY(node.prev)}`;
+  //     if (isSmoothCurveTo(node)) {
+  //       path += asString({ ...node, name: 'C', x1: getReflectedX1(node), y1: getReflectedY1(node) });
+  //     } else if (isSmoothQCurveTo(node)) {
+  //       path += asString({ ...node, name: 'Q', x1: getReflectedX1(node), y1: getReflectedY1(node) });
+  //     } else if (isClosePath(node) || isMoveTo(node)) {
+  //       path += `L${getX(node)} ${getY(node)}`;
+  //     } else {
+  //       path += asString(node);
+  //     }
+  //     return path;
+  //   }
+  //   return '';
+  // }
+
   get pathStrokeColor() {
     const state = this.settings.state;
     return state.isPathStroke ? state.pathStrokeColor : 'none';
@@ -104,10 +128,16 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     return state.isPathFill ? state.pathFillColor : 'none';
   }
 
+  get formatLabel() {
+    const state = this.settings.state;
+    return `Format ${this.decimalFormats[state.maximumFractionDigits]}`;
+  }
+
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
     public background: BackgroundImageService,
+    public archive: SvgFileService,
     private _dialog: MatDialog,
     private _renderer2: Renderer2) {
     super();
@@ -126,12 +156,43 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     }
   }
 
-  selectTab(tabIndex: number) {
-    if (tabIndex !== this.pathTabSelector) {
-      this.pathTabSelector = tabIndex;
-      // Clear any previously selected items. It's a design feature. NOT a bug!
-      this.pathModel.clearSelection();
+  selectTab(mode: EditMode) {
+    // this.hightlightedItem = null;
+    if (mode !== this.editMode) {
+      if (this.editMode === EditMode.Group) {
+        // Save group selection.
+        this.groupSelectionIndices = this.pathModel.getSelectedIndices();
+      }
+      switch (mode) {
+        case EditMode.All:
+          // Clear any previously selected items.
+          this.pathModel.clearSelection();
+          this.editMode = EditMode.All;
+          break;
+        case EditMode.Group:
+          // Restore group selection.
+          this.pathModel.selectGroup(this.groupSelectionIndices);
+          this.editMode = EditMode.Group;
+          break;
+        case EditMode.Single:
+          // Restore single selection.
+          this.singleSelectionIndex = Math.min(Math.max(this.singleSelectionIndex, 0), this.pathModel.count - 1);
+          this.pathModel.selectDistinct(this.singleSelectionIndex);
+          this.editMode = EditMode.Single;
+          break;
+      }
     }
+  }
+
+  onSingleSelectionChange(value: number) {
+    if (this.singleSelectionIndex !== value) {
+      this.singleSelectionIndex = value;
+      this.pathModel.selectDistinct(value);
+    }
+  }
+
+  onSingleParameterChange() {
+    this.onPathModelChange('transform');
   }
 
   // selectNext(event: KeyboardEvent) {
@@ -194,7 +255,8 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
       };
     }));
 
-    this.onInputChange(this.history.pathData || SAMPLE_PATH_DATA);
+    this.pathModel.fromString(this.history.pathData || SAMPLE_PATH_DATA);
+    this.onPathModelChange('transform');
   }
 
   controlPointMouseDown(event: MouseEvent, index: number) {
@@ -217,7 +279,13 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   formatInput() {
-    this.pathInput = this.pathModel.toFormattedString('\n', this.maximumFractionDigits);
+    this.pathInput = this.pathModel.toFormattedString('\n', this.settings.state.maximumFractionDigits);
+  }
+
+  onFormatChange(value: number) {
+    if (this.settings.set({ maximumFractionDigits: value })) {
+      this.formatInput();
+    }
   }
 
   onInputChange(pathInput: string) {
