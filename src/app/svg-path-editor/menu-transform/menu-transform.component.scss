@@ -21,7 +21,7 @@
 .menu-transform-angle,
 .menu-transform-skew,
 .menu-transform-matrix {
-  height: 10em;
+  height: 8.5em;
   >mat-form-field {
     max-width: 30%;
   }
@@ -42,6 +42,6 @@
   // max-height: 10em;
 
   >mat-form-field {
-    flex: 1 1 5em;
+    flex: 1 1 4em;
   }
 }
