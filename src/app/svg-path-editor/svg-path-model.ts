@@ -517,6 +517,13 @@ export class SvgPathModel {
     this.select(index, true);
   }
 
+  selectGroup(indices: ReadonlyArray<number>) {
+    this.clearSelection();
+    for (const index of indices) {
+      this.select(index, true);
+    }
+  }
+
   select(index: number, value: boolean) {
     const node = this._nodes[index];
     if (node) {
@@ -528,6 +535,16 @@ export class SvgPathModel {
     for (const node of this._nodes) {
       node.isSelected = value;
     }
+  }
+
+  getSelectedIndices() {
+    const selections: number[] = [];
+    for (let i = 0; i < this._nodes.length; i++) {
+      if (this._nodes[i].isSelected) {
+        selections.push(i);
+      }
+    }
+    return selections;
   }
 
   clearSelection() {
