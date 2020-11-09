@@ -1,8 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { formatDecimal } from 'src/app/common/math-utils';
 import { asFormattedString, PathItem } from '../svg-path-model';
 import {
   COMMAND_FULL_NAMES,
+  DrawBooleanParam,
+  DrawNumberParam,
   hasControlPoint1,
   hasControlPoint2,
   isBezierCurve,
@@ -14,6 +16,14 @@ import {
   isVLineTo } from '../svg-path/svg-path-commands';
 import { getReflectedX1, getReflectedY1, getX, getY } from '../svg-path/svg-path-node';
 
+export type ItemParamChange = {
+  name: DrawNumberParam;
+  value: number;
+} | {
+  name: DrawBooleanParam | 'outputAsRelative';
+  value: boolean;
+};
+
 @Component({
   selector: 'app-path-item',
   templateUrl: './path-item.component.html',
@@ -22,6 +32,7 @@ import { getReflectedX1, getReflectedY1, getX, getY } from '../svg-path/svg-path
 export class PathItemComponent implements OnInit {
   @Input() item: PathItem;
   @Input() maximumFractionDigits?: number;
+  @Output() inputChange = new EventEmitter<ItemParamChange>();
 
   get path() {
     return asFormattedString(this.item, this.item.outputAsRelative, this.maximumFractionDigits);
@@ -129,72 +140,112 @@ export class PathItemComponent implements OnInit {
   setRelative(value: boolean) {
     if (this.item.outputAsRelative !== value) {
       this.item.outputAsRelative = value;
+      this.inputChange.emit({ name: 'outputAsRelative', value });
     }
   }
 
   setX(value: number) {
     if (!(isClosePath(this.item) || isVLineTo(this.item))) {
-      this.item.x = value + this.dx;
+      value += this.dx;
+      if (this.item.x !== value) {
+        this.item.x = value;
+        this.inputChange.emit({ name: 'x', value });
+      }
     }
   }
 
   setY(value: number) {
     if (!(isClosePath(this.item) || isHLineTo(this.item))) {
-      this.item.y = value + this.dy;
+      value += this.dy;
+      if (this.item.y !== value) {
+        this.item.y = value;
+        this.inputChange.emit({ name: 'y', value });
+      }
     }
   }
 
   setX1(value: number) {
     if (hasControlPoint1(this.item)) {
-      this.item.x1 = value + this.dx;
+      value += this.dx;
+      if (this.item.x1 !== value) {
+        this.item.x1 = value;
+        this.inputChange.emit({ name: 'x1', value });
+      }
     }
   }
 
   setY1(value: number) {
     if (hasControlPoint1(this.item)) {
-      this.item.y1 = value + this.dy;
+      value += this.dy;
+      if (this.item.y1 !== value) {
+        this.item.y1 = value;
+        this.inputChange.emit({ name: 'y1', value });
+      }
     }
   }
 
   setX2(value: number) {
     if (hasControlPoint2(this.item)) {
-      this.item.x2 = value + this.dx;
+      value += this.dx;
+      if (this.item.x2 !== value) {
+        this.item.x2 = value;
+        this.inputChange.emit({ name: 'x2', value });
+      }
     }
   }
 
   setY2(value: number) {
     if (hasControlPoint2(this.item)) {
-      this.item.y2 = value + this.dy;
+      value += this.dy;
+      if (this.item.y2 !== value) {
+        this.item.y2 = value;
+        this.inputChange.emit({ name: 'y2', value });
+      }
     }
   }
 
   setRx(value: number) {
     if (isEllipticalArc(this.item)) {
-      this.item.rx = value;
+      if (this.item.rx !== value && value > 0) {
+        this.item.rx = value;
+        this.inputChange.emit({ name: 'rx', value });
+      }
     }
   }
 
   setRy(value: number) {
     if (isEllipticalArc(this.item)) {
-      this.item.ry = value;
+      if (this.item.ry !== value && value > 0) {
+        this.item.ry = value;
+        this.inputChange.emit({ name: 'ry', value });
+      }
     }
   }
 
   setAngle(value: number) {
     if (isEllipticalArc(this.item)) {
-      this.item.angle = value;
+      if (this.item.angle !== value) {
+        this.item.angle = value;
+        this.inputChange.emit({ name: 'angle', value });
+      }
     }
   }
 
   setLargeArcFlag(value: boolean) {
     if (isEllipticalArc(this.item)) {
-      this.item.largeArcFlag = value;
+      if (this.item.largeArcFlag !== value) {
+        this.item.largeArcFlag = value;
+        this.inputChange.emit({ name: 'largeArcFlag', value });
+      }
     }
   }
 
   setSweepFlag(value: boolean) {
     if (isEllipticalArc(this.item)) {
-      this.item.sweepFlag = value;
+      if (this.item.sweepFlag !== value) {
+        this.item.sweepFlag = value;
+        this.inputChange.emit({ name: 'sweepFlag', value });
+      }
     }
   }
 
@@ -202,7 +253,7 @@ export class PathItemComponent implements OnInit {
     return formatDecimal(value, this.maximumFractionDigits);
   }
 
-  getFormatted(name: 'x' | 'y' | 'x1' | 'y1' | 'x2' | 'y2' | 'rx' | 'ry' | 'angle') {
+  getFormatted(name: DrawNumberParam) {
     const value = this[name];
     return this.format(value);
   }
