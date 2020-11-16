@@ -1,0 +1,23 @@
+.index-selector {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  .index-selector-input {
+    min-width: 5em;
+    max-width: 9em;
+    flex: 1 1 5em;
+  }
+
+  .index-selector-buttons {
+    display: inline-block;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  .index-selector-slider {
+    flex: 1;
+    max-width: 32em;
+  }
+}

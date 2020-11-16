@@ -1,0 +1,20 @@
+<div class="index-selector">
+  <mat-form-field class="index-selector-input">
+    <mat-label>{{label}}</mat-label>
+    <input matInput type="number" step="1" min="1" [max]="count" [disabled]="0 >= count" [ngModel]="selection + 1"
+      (ngModelChange)="requestSelectionChange(+$event - 1)">
+    <mat-hint>From 1 to {{count}}</mat-hint>
+  </mat-form-field>
+
+  <div class="index-selector-buttons">
+    <button mat-stroked-button [disabled]="0 >= selection" (click)="requestSelectionChange(selection - 1)">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-stroked-button [disabled]="selection + 1 >= count" (click)="requestSelectionChange(selection + 1)">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
+  <mat-slider class="index-selector-slider" step="1" min="1" [max]="count" [disabled]="0 >= count"
+    [ngModel]="selection + 1" (input)="requestSelectionChange($event.value - 1)"></mat-slider>
+</div>

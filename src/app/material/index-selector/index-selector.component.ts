@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
-  selector: 'app-path-item-selector',
-  templateUrl: './path-item-selector.component.html',
-  styleUrls: ['./path-item-selector.component.scss']
+  selector: 'app-index-selector',
+  templateUrl: './index-selector.component.html',
+  styleUrls: ['./index-selector.component.scss']
 })
-export class PathItemSelectorComponent implements OnInit {
+export class IndexSelectorComponent implements OnInit {
+  @Input() label = 'Index';
   @Input() count = 0;
   @Input() selection = -1;
   @Output() selectionChange = new EventEmitter<number>();
