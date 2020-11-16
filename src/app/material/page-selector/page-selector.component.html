@@ -1,0 +1,13 @@
+<ng-container *ngIf="pageSizeOptions?.length > 1">
+  <button mat-icon-button class="page-selector-menu-button" [matMenuTriggerFor]="menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <div class="page-selector-menu-label">Items per page:</div>
+    <button mat-menu-item *ngFor="let size of pageSizeOptions" [disabled]="size === pageSize"
+      (click)="requestPageChange(size, pageSize * pageIndex)">{{size}}</button>
+  </mat-menu>
+</ng-container>
+
+<app-index-selector label="Page" [count]="pageCount" [selection]="pageIndex"
+  (selectionChange)="requestPageChange(pageSize, pageSize * $event)"></app-index-selector>
