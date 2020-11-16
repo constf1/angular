@@ -17,8 +17,8 @@ import { MenuTransformComponent } from './menu-transform/menu-transform.componen
 import { MenuViewComponent } from './menu-view/menu-view.component';
 import { PathGroupComponent } from './path-group/path-group.component';
 import { PathItemComponent } from './path-item/path-item.component';
-import { PathItemSelectorComponent } from './path-item-selector/path-item-selector.component';
 import { SampleDialogComponent } from './sample-dialog/sample-dialog.component';
+import { SvgOpenDialogComponent } from './svg-open-dialog/svg-open-dialog.component';
 
 /**
  * Routes:
@@ -34,8 +34,8 @@ const routes: Routes = [
     MenuViewComponent,
     PathGroupComponent,
     PathItemComponent,
-    PathItemSelectorComponent,
     SampleDialogComponent,
+    SvgOpenDialogComponent,
   ],
   entryComponents: [SampleDialogComponent],
   imports: [

@@ -1,0 +1,40 @@
+<ng-template #templateStatus>
+  <div>{{status}}</div>
+</ng-template>
+
+<h2 mat-dialog-title style="margin: 0;">SVG Path</h2>
+<div>{{data.name}}</div>
+<div *ngIf="items.length > 0; else templateStatus" class="svg-open-dialog-content">
+  <div class="svg-open-dialog-preview">
+    <svg [attr.viewBox]="viewBox" width="100%" height="100%">
+      <path #pathRef [attr.d]="selectedPath"></path>
+    </svg>
+  </div>
+
+  <ng-container *ngIf="items.length > 1">
+    <div>Path Count: {{items.length}}</div>
+    <mat-form-field>
+      <mat-label>Selection</mat-label>
+      <input matInput type="text" [ngModel]="selectionInput" (ngModelChange)="setSelectionInput($event)">
+      <button mat-button *ngIf="selectionInput" matSuffix mat-icon-button aria-label="Clear"
+        (click)="setSelectionInput('')">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <div class="svg-open-dialog-items">
+      <mat-checkbox *ngFor="let i of pageSize | xrange;trackBy:trackByIndex" [style.visibility]="getVisibility(i)"
+        [ngModel]="getSelectionItem(i)" (ngModelChange)="setSelectionItem(i, $event)">{{pageSize * pageIndex + i + 1}}.
+      </mat-checkbox>
+    </div>
+
+    <app-page-selector *ngIf="pageSizeOptions.length > 1" [pageSize]="pageSize" [pageIndex]="pageIndex"
+      [itemCount]="items.length" [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="setPage($event.pageSize, $event.pageIndex)">
+    </app-page-selector>
+  </ng-container>
+</div>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Cancel</button>
+  <button mat-button [mat-dialog-close]="selectedPath" [disabled]="!selectedPath">Import</button>
+</mat-dialog-actions>

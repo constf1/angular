@@ -1,0 +1,32 @@
+.svg-open-dialog-items {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  max-width: 52em;
+  padding: 1em;
+
+  >mat-checkbox {
+    display: inline-block;
+    min-width: 5em;
+  }
+}
+
+.svg-open-dialog-content {
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  overflow-y: auto;
+  min-width: 42vmin;
+  min-height: 42vmin;
+  max-height: 80vh;
+}
+
+.svg-open-dialog-preview {
+  width: 40vmin;
+  height: 40vmin;
+}
+
+@media (max-height: 480px) {
+  .svg-open-dialog-content {
+    max-height: 60vh;
+  }
+}

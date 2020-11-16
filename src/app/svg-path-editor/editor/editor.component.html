@@ -17,6 +17,12 @@
         <mat-expansion-panel-header>
           <mat-icon>import_export</mat-icon>File
         </mat-expansion-panel-header>
+
+        <input #inputSvgFile type="file" multiple="false" style="display: none;" accept=".svg,.txt" (change)="loadSvg($event)" />
+        <button mat-stroked-button (click)="inputSvgFile.click()">
+          <mat-icon>open_in_browser</mat-icon>Open
+        </button>
+
         <button mat-stroked-button (click)="archive.next(viewBox, pathData)">
           <mat-icon>archive</mat-icon>To SVG
         </button>
@@ -88,9 +94,9 @@
             </div>
 
             <div *ngIf="editMode === 2" style="padding-left: 1em; padding-right: 1em;">
-              <app-path-item-selector [count]="pathModel.count" [selection]="singleSelectionIndex"
+              <app-index-selector [count]="pathModel.count" [selection]="singleSelectionIndex"
                 (selectionChange)="onSingleSelectionChange($event)">
-              </app-path-item-selector>
+              </app-index-selector>
               <app-path-item *ngIf="pathModel.firstSelection as item" [item]="item"
                 [maximumFractionDigits]="settings.state.maximumFractionDigits"
                 (inputChange)="onSingleParameterChange()"></app-path-item>

@@ -8,6 +8,7 @@ import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component
 import { isIdentity, ReadonlyMatrix } from 'src/app/common/matrix-math';
 
 import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component';
+import { SvgOpenDialogComponent } from '../svg-open-dialog/svg-open-dialog.component';
 import { TransformChangeEvent } from '../menu-transform/menu-transform.component';
 
 import { BackgroundImageService } from '../services/background-image.service';
@@ -256,7 +257,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     }));
 
     this.pathModel.fromString(this.history.pathData || SAMPLE_PATH_DATA);
-    this.onPathModelChange('transform');
+    this.onPathModelChange();
   }
 
   controlPointMouseDown(event: MouseEvent, index: number) {
@@ -339,12 +340,30 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
     }
   }
 
-  onPathModelChange(changeType: 'input' | 'history' | 'transform') {
+  onPathModelChange(changeType?: 'input' | 'history' | 'transform') {
     if (changeType !== 'input') {
       this.formatInput();
     }
     if (changeType !== 'history') {
       this.history.pathData = this.pathModel.toString();
+    }
+  }
+
+  loadSvg(event: Event) {
+    const target = event.target as EventTarget & { files: FileList, value: any };
+    if (target && target.files[0]) {
+      const file: File = target.files[0];
+
+      // There is no standard method to reset file input element. We'll just clear it.
+      target.value = '';
+
+      const dialogRef = this._dialog.open(SvgOpenDialogComponent, { data: file });
+      dialogRef.afterClosed().subscribe(result => {
+        if (typeof result === 'string' && result.length > 0) {
+          this.pathModel.fromString(result);
+          this.onPathModelChange();
+        }
+      });
     }
   }
 }
