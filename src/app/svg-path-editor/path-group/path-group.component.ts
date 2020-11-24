@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PathItem } from '../svg-path-model';
+import { PathItem } from '../svg-path/svg-path-item';
 
 
 @Component({

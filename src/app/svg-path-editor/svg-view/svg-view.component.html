@@ -1,0 +1,33 @@
+<svg [attr.viewBox]="viewBox" [class.dragging]="isDragging" [ngStyle]="styles">
+  <filter id="filterBackgroundImage">
+    <feColorMatrix in="SourceGraphic" type="matrix" [attr.values]="settings.imageColorMatrix" />
+  </filter>
+  <image *ngIf="background.imageData as imageData" x="0" y="0" filter="url(#filterBackgroundImage)"
+    [attr.visibility]="backgroundImageVisibility" [attr.width]="backgroundImageZoom" [attr.href]="imageData"></image>
+
+  <path #pathRef opacity="0.9" stroke-width="1" [attr.stroke]="pathStrokeColor" [attr.fill]="pathFillColor"
+    [attr.d]="pathData">
+  </path>
+
+  <path opacity="0.6" fill="none" stroke-dasharray="4 1" stroke-width="2" [attr.stroke]="pathSelectionColor"
+    [attr.d]="pathSelectionData"></path>
+
+  <path pointer-events="none" opacity="0.5" stroke-width="1" stroke-dasharray="2 1" [attr.stroke]="pathStrokeColor"
+    [attr.fill]="pathFillColor" [attr.d]="pathPreviewData"></path>
+
+  <!-- controls -->
+  <g *ngIf="settingsState.isControlPoints">
+    <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
+      <path [attr.d]="curveControlHandles"></path>
+      <path stroke-dasharray="2" [attr.d]="reflectedControlHandles"></path>
+      <path stroke-dasharray="2" [attr.d]="pathDragData" [attr.stroke]="settingsState.controlPointsFillColor"></path>
+    </g>
+
+    <g class="control-points" [attr.fill]="settingsState.controlPointsFillColor">
+      <circle *ngFor="let point of controls;index as i;trackBy:trackByIndex" r="5"
+        [attr.visibility]="getVisibility(point.item)" [attr.cx]="point.x" [attr.cy]="point.y"
+        (mousedown)="controlPointMouseDown($event, i)">
+      </circle>
+    </g>
+  </g>
+</svg>

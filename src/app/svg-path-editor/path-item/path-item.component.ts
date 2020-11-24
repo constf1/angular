@@ -1,26 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { formatDecimal } from 'src/app/common/math-utils';
-import { asFormattedString, PathItem } from '../svg-path-model';
-import {
-  COMMAND_FULL_NAMES,
-  DrawBooleanParam,
-  DrawNumberParam,
-  hasControlPoint1,
-  hasControlPoint2,
-  isBezierCurve,
-  isClosePath,
-  isEllipticalArc,
-  isHLineTo,
-  isSmoothCurveTo,
-  isSmoothQCurveTo,
-  isVLineTo } from '../svg-path/svg-path-commands';
-import { getReflectedX1, getReflectedY1, getX, getY } from '../svg-path/svg-path-node';
+import * as Path from '../svg-path/svg-path-item';
 
 export type ItemParamChange = {
-  name: DrawNumberParam;
+  name: Path.DrawNumberParam;
   value: number;
 } | {
-  name: DrawBooleanParam | 'outputAsRelative';
+  name: Path.DrawBooleanParam | 'outputAsRelative';
   value: boolean;
 };
 
@@ -30,102 +16,102 @@ export type ItemParamChange = {
   styleUrls: ['./path-item.component.scss']
 })
 export class PathItemComponent implements OnInit {
-  @Input() item: PathItem;
+  @Input() item: Path.PathItem;
   @Input() maximumFractionDigits?: number;
   @Output() inputChange = new EventEmitter<ItemParamChange>();
 
   get path() {
-    return asFormattedString(this.item, this.item.outputAsRelative, this.maximumFractionDigits);
+    return Path.asFormattedString(this.item, this.maximumFractionDigits);
   }
 
   get info() {
-    return `${COMMAND_FULL_NAMES[this.item.name]}`;
+    return `${Path.COMMAND_FULL_NAMES[this.item.name]}`;
   }
 
   get dx() {
-    return this.item.outputAsRelative ? getX(this.item.prev) : 0;
+    return this.item.outputAsRelative ? Path.getX(this.item.prev) : 0;
   }
 
   get dy() {
-    return this.item.outputAsRelative ? getY(this.item.prev) : 0;
+    return this.item.outputAsRelative ? Path.getY(this.item.prev) : 0;
   }
 
   get x() {
-    return getX(this.item) - this.dx;
+    return Path.getX(this.item) - this.dx;
   }
 
   get y() {
-    return getY(this.item) - this.dy;
+    return Path.getY(this.item) - this.dy;
   }
 
   get x1() {
-    if (hasControlPoint1(this.item)) {
+    if (Path.hasControlPoint1(this.item)) {
       return this.item.x1 - this.dx;
-    } else if (isSmoothCurveTo(this.item) || isSmoothQCurveTo(this.item)) {
-      return getReflectedX1(this.item) - this.dx;
+    } else if (Path.isSmoothCurveTo(this.item) || Path.isSmoothQCurveTo(this.item)) {
+      return Path.getReflectedX1(this.item) - this.dx;
     }
     return 0;
   }
 
   get y1() {
-    if (hasControlPoint1(this.item)) {
+    if (Path.hasControlPoint1(this.item)) {
       return this.item.y1 - this.dy;
-    } else if (isSmoothCurveTo(this.item) || isSmoothQCurveTo(this.item)) {
-      return getReflectedY1(this.item) - this.dy;
+    } else if (Path.isSmoothCurveTo(this.item) || Path.isSmoothQCurveTo(this.item)) {
+      return Path.getReflectedY1(this.item) - this.dy;
     }
     return 0;
   }
 
   get x2() {
-    return hasControlPoint2(this.item) ? (this.item.x2 - this.dx) : 0;
+    return Path.hasControlPoint2(this.item) ? (this.item.x2 - this.dx) : 0;
   }
 
   get y2() {
-    return hasControlPoint2(this.item) ? (this.item.y2 - this.dy) : 0;
+    return Path.hasControlPoint2(this.item) ? (this.item.y2 - this.dy) : 0;
   }
 
   get rx() {
-    return isEllipticalArc(this.item) ? this.item.rx : 0;
+    return Path.isEllipticalArc(this.item) ? this.item.rx : 0;
   }
 
   get ry() {
-    return isEllipticalArc(this.item) ? this.item.ry : 0;
+    return Path.isEllipticalArc(this.item) ? this.item.ry : 0;
   }
 
   get angle() {
-    return isEllipticalArc(this.item) ? this.item.angle : 0;
+    return Path.isEllipticalArc(this.item) ? this.item.angle : 0;
   }
 
   get largeArcFlag() {
-    return isEllipticalArc(this.item) ? this.item.largeArcFlag : false;
+    return Path.isEllipticalArc(this.item) ? this.item.largeArcFlag : false;
   }
 
   get sweepFlag() {
-    return isEllipticalArc(this.item) ? this.item.sweepFlag : false;
+    return Path.isEllipticalArc(this.item) ? this.item.sweepFlag : false;
   }
 
   get hasX() {
-    return !(isClosePath(this.item) || isVLineTo(this.item));
+    return !(Path.isClosePath(this.item) || Path.isVLineTo(this.item));
   }
 
   get hasY() {
-    return !(isClosePath(this.item) || isHLineTo(this.item));
+    return !(Path.isClosePath(this.item) || Path.isHLineTo(this.item));
   }
 
   get isBezierCurve() {
-    return isBezierCurve(this.item);
+    return Path.isBezierCurve(this.item);
   }
 
   get hasControlPoint1() {
-    return hasControlPoint1(this.item);
+    return Path.hasControlPoint1(this.item);
   }
 
   get hasControlPoint2() {
-    return hasControlPoint2(this.item);
+    return Path.hasControlPoint2(this.item);
   }
 
   get isEllipticalArc() {
-    return isEllipticalArc(this.item);
+    return Path.isEllipticalArc(this.item);
   }
 
   get isRelative() {
@@ -145,7 +131,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setX(value: number) {
-    if (!(isClosePath(this.item) || isVLineTo(this.item))) {
+    if (!(Path.isClosePath(this.item) || Path.isVLineTo(this.item))) {
       value += this.dx;
       if (this.item.x !== value) {
         this.item.x = value;
@@ -155,7 +141,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setY(value: number) {
-    if (!(isClosePath(this.item) || isHLineTo(this.item))) {
+    if (!(Path.isClosePath(this.item) || Path.isHLineTo(this.item))) {
       value += this.dy;
       if (this.item.y !== value) {
         this.item.y = value;
@@ -165,7 +151,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setX1(value: number) {
-    if (hasControlPoint1(this.item)) {
+    if (Path.hasControlPoint1(this.item)) {
       value += this.dx;
       if (this.item.x1 !== value) {
         this.item.x1 = value;
@@ -175,7 +161,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setY1(value: number) {
-    if (hasControlPoint1(this.item)) {
+    if (Path.hasControlPoint1(this.item)) {
       value += this.dy;
       if (this.item.y1 !== value) {
         this.item.y1 = value;
@@ -185,7 +171,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setX2(value: number) {
-    if (hasControlPoint2(this.item)) {
+    if (Path.hasControlPoint2(this.item)) {
       value += this.dx;
       if (this.item.x2 !== value) {
         this.item.x2 = value;
@@ -195,7 +181,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setY2(value: number) {
-    if (hasControlPoint2(this.item)) {
+    if (Path.hasControlPoint2(this.item)) {
       value += this.dy;
       if (this.item.y2 !== value) {
         this.item.y2 = value;
@@ -205,7 +191,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setRx(value: number) {
-    if (isEllipticalArc(this.item)) {
+    if (Path.isEllipticalArc(this.item)) {
       if (this.item.rx !== value && value > 0) {
         this.item.rx = value;
         this.inputChange.emit({ name: 'rx', value });
@@ -214,7 +200,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setRy(value: number) {
-    if (isEllipticalArc(this.item)) {
+    if (Path.isEllipticalArc(this.item)) {
       if (this.item.ry !== value && value > 0) {
         this.item.ry = value;
         this.inputChange.emit({ name: 'ry', value });
@@ -223,7 +209,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setAngle(value: number) {
-    if (isEllipticalArc(this.item)) {
+    if (Path.isEllipticalArc(this.item)) {
       if (this.item.angle !== value) {
         this.item.angle = value;
         this.inputChange.emit({ name: 'angle', value });
@@ -232,7 +218,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setLargeArcFlag(value: boolean) {
-    if (isEllipticalArc(this.item)) {
+    if (Path.isEllipticalArc(this.item)) {
       if (this.item.largeArcFlag !== value) {
         this.item.largeArcFlag = value;
         this.inputChange.emit({ name: 'largeArcFlag', value });
@@ -241,7 +227,7 @@ export class PathItemComponent implements OnInit {
   }
 
   setSweepFlag(value: boolean) {
-    if (isEllipticalArc(this.item)) {
+    if (Path.isEllipticalArc(this.item)) {
       if (this.item.sweepFlag !== value) {
         this.item.sweepFlag = value;
         this.inputChange.emit({ name: 'sweepFlag', value });
@@ -253,7 +239,7 @@ export class PathItemComponent implements OnInit {
     return formatDecimal(value, this.maximumFractionDigits);
   }
 
-  getFormatted(name: DrawNumberParam) {
+  getFormatted(name: Path.DrawNumberParam) {
     const value = this[name];
     return this.format(value);
   }

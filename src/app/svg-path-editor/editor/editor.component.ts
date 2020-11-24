@@ -1,12 +1,11 @@
 // tslint:disable: variable-name
-import { Component, OnInit, Renderer2 } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 // app/common
-import { DragListener } from 'src/app/common/drag-listener';
-import { UnsubscribableComponent } from 'src/app/common/unsubscribable-component';
 import { isIdentity, ReadonlyMatrix } from 'src/app/common/matrix-math';
 
+import { ControlDragEvent } from '../svg-view/svg-view.component';
 import { SampleDialogComponent } from '../sample-dialog/sample-dialog.component';
 import { SvgOpenDialogComponent } from '../svg-open-dialog/svg-open-dialog.component';
 import { TransformChangeEvent } from '../menu-transform/menu-transform.component';
@@ -14,9 +13,8 @@ import { TransformChangeEvent } from '../menu-transform/menu-transform.component
 import { BackgroundImageService } from '../services/background-image.service';
 import { DECIMAL_FORMAT_LABELS, EditorSettingsService } from '../services/editor-settings.service';
 import { PathDataService } from '../services/path-data.service';
-import { SvgFileService } from '../services/svg-file.service';
 
-import { SvgPathModel, toPathData } from '../svg-path-model';
+import * as Path from '../svg-path/svg-path-item';
 
 const SAMPLE_PATH_DATA =
 'm205 698c-17-194 169-280 169-408s-24-259 127-274s177 84 174 243s218 217 164 452c43 15 31 74 55 97'
@@ -41,144 +39,100 @@ function compact(pathData: string): string {
     .replace(/\s+(\-)/gmi, '$1');
 }
 
-interface DragData {
-  index: number;
-  startX: number;
-  startY: number;
-}
-
 @Component({
   selector: 'app-svg-path-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.scss']
 })
-export class EditorComponent extends UnsubscribableComponent implements OnInit {
-  private _dragListener = new DragListener<DragData>();
-
+export class EditorComponent implements OnInit {
   // pathTabs = ['Raw Data', 'Command Selector', 'Path Walker'];
   editMode: EditMode = EditMode.All;
   singleSelectionIndex = 0;
   groupSelectionIndices: ReadonlyArray<number> = [];
 
+  path: Path.PathArray = [];
   pathInput = '';
-  pathModel = new SvgPathModel();
-
-  svgStyles: { [key: string]: any; } = {};
 
   decimalFormats = DECIMAL_FORMAT_LABELS;
   // decimals = ['to integer', '1 decimal place', '2 decimal places', '3 decimal places', '4 decimal places', '5 decimal places'];
 
-  // hightlightedItem: PathItem | null;
-
   previewMatrix?: ReadonlyMatrix;
 
-  get previewPathData(): string {
-    const m = this.previewMatrix;
-    return (!m || isIdentity(m))
-      ? ''
-      : compact(toPathData(this.pathModel.getTransformed(m), this.settings.state.maximumFractionDigits));
+  get activeItem() {
+    return this.path[this.firstSelectionIndex];
   }
 
-  get viewBox(): string {
-    const s = this.settings.state;
-    return `${s.xOffset} ${s.yOffset} ${s.width} ${s.height}`;
+  get selectMode(){
+    const count = Path.countSelected(this.path);
+    return count === 1 ? 'Single Item' : count > 0 ? 'Selection' : 'All';
   }
 
-  get pathData() {
-    return compact(this.pathModel.toFormattedString('', this.settings.state.maximumFractionDigits));
+  get isAllSelected() {
+    return Path.isAllSelected(this.path);
   }
 
-  get isDragging() {
-    return this._dragListener.isDragging;
+  get isSomeSelected() {
+    return Path.isSomeSelected(this.path);
   }
 
-  get dragPath() {
-    if (this._dragListener.isDragging) {
-      const data = this._dragListener.data;
-      const point = this.pathModel.controls[data.index];
-      return `M${data.startX} ${data.startY}L${point.x} ${point.y}m-3 0h6m-3-3v6`;
-    }
-    return '';
+  get groups() {
+    return Path.getGroups(this.path);
   }
 
-  // get hoverPath() {
-  //   const node = this.hightlightedItem;
-  //   if (node) {
-  //     let path = `M${getX(node.prev)} ${getY(node.prev)}`;
-  //     if (isSmoothCurveTo(node)) {
-  //       path += asString({ ...node, name: 'C', x1: getReflectedX1(node), y1: getReflectedY1(node) });
-  //     } else if (isSmoothQCurveTo(node)) {
-  //       path += asString({ ...node, name: 'Q', x1: getReflectedX1(node), y1: getReflectedY1(node) });
-  //     } else if (isClosePath(node) || isMoveTo(node)) {
-  //       path += `L${getX(node)} ${getY(node)}`;
-  //     } else {
-  //       path += asString(node);
-  //     }
-  //     return path;
-  //   }
-  //   return '';
-  // }
-
-  get pathStrokeColor() {
-    const state = this.settings.state;
-    return state.isPathStroke ? state.pathStrokeColor : 'none';
-  }
-
-  get pathFillColor() {
-    const state = this.settings.state;
-    return state.isPathFill ? state.pathFillColor : 'none';
-  }
-
-  get formatLabel() {
-    const state = this.settings.state;
-    return `Format ${this.decimalFormats[state.maximumFractionDigits]}`;
+  get firstSelectionIndex() {
+    return Path.getFirstSelectionIndex(this.path);
   }
 
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
     public background: BackgroundImageService,
-    public archive: SvgFileService,
-    private _dialog: MatDialog,
-    private _renderer2: Renderer2) {
-    super();
-  }
+    private _dialog: MatDialog) { }
 
-  setSmallestViewBox(path: SVGGraphicsElement) {
-    if (path && typeof path.getBBox === 'function') {
-      const rc = path.getBBox();
-      const xOffset = Math.floor(rc.x);
-      const yOffset = Math.floor(rc.y);
-      const width = Math.ceil(rc.width);
-      const height = Math.ceil(rc.height);
-      if (width > 0 && height > 0) {
-        this.settings.set({ xOffset, yOffset, width, height });
+  onDrag(event: ControlDragEvent) {
+    if (event.name === 'DragMove') {
+      switch (event.point.type) {
+        case 'curve1':
+          Path.curve1At(this.path, event.point.itemIndex, event.deltaX, event.deltaY);
+          break;
+        case 'curve2':
+          Path.curve2At(this.path, event.point.itemIndex, event.deltaX, event.deltaY);
+          break;
+        case 'move':
+          Path.moveAt(this.path, event.point.itemIndex, event.deltaX, event.deltaY);
+          break;
+      }
+    } else if (event.name === 'DragStop') {
+      if (event.startX !== event.point.x || event.startY !== event.point.y) {
+        this.onPathModelChange('transform');
       }
     }
   }
 
   selectTab(mode: EditMode) {
-    // this.hightlightedItem = null;
     if (mode !== this.editMode) {
       if (this.editMode === EditMode.Group) {
         // Save group selection.
-        this.groupSelectionIndices = this.pathModel.getSelectedIndices();
+        this.groupSelectionIndices = Path.getSelectedIndices(this.path);
+      } else if (this.editMode === EditMode.Single) {
+        // Save single selection.
+        this.singleSelectionIndex = this.firstSelectionIndex;
       }
       switch (mode) {
         case EditMode.All:
           // Clear any previously selected items.
-          this.pathModel.clearSelection();
+          Path.selectAll(this.path, false);
           this.editMode = EditMode.All;
           break;
         case EditMode.Group:
           // Restore group selection.
-          this.pathModel.selectGroup(this.groupSelectionIndices);
+          Path.selectGroup(this.path, this.groupSelectionIndices, true);
           this.editMode = EditMode.Group;
           break;
         case EditMode.Single:
           // Restore single selection.
-          this.singleSelectionIndex = Math.min(Math.max(this.singleSelectionIndex, 0), this.pathModel.count - 1);
-          this.pathModel.selectDistinct(this.singleSelectionIndex);
+          this.singleSelectionIndex = Math.min(Math.max(this.singleSelectionIndex, 0), this.path.length - 1);
+          Path.selectDistinct(this.path, this.singleSelectionIndex, true);
           this.editMode = EditMode.Single;
           break;
       }
@@ -188,7 +142,21 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   onSingleSelectionChange(value: number) {
     if (this.singleSelectionIndex !== value) {
       this.singleSelectionIndex = value;
-      this.pathModel.selectDistinct(value);
+      Path.selectDistinct(this.path, value, true);
+    }
+  }
+
+  onDelete() {
+    if (Path.isSomeSelected(this.path)) {
+      this.path = Path.deleteSelection(this.path);
+      // Restore single selection.
+      if (this.editMode === EditMode.Single) {
+        this.singleSelectionIndex = Math.min(Math.max(this.singleSelectionIndex, 0), this.path.length - 1);
+        Path.selectDistinct(this.path, this.singleSelectionIndex, true);
+      }
+      this.onPathModelChange();
+    } else {
+      this.onInputChange('M0 0');
     }
   }
 
@@ -214,64 +182,13 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   //   console.log('Key:', event);
   // }
 
-  onDragMove() {
-    const data = this._dragListener.data;
-    const point = this.pathModel.controls[data.index];
-    const zoom = this.settings.state.zoom;
-
-    const dx = data.startX + Math.round(this._dragListener.deltaX * 100 / zoom) - point.x;
-    const dy = data.startY + Math.round(this._dragListener.deltaY * 100 / zoom) - point.y;
-
-    if (dx !== 0 || dy !== 0) {
-      point.translate(dx, dy);
-    }
-  }
-
-  onDragEnd() {
-    const data = this._dragListener.data;
-    const point = this.pathModel.controls[data.index];
-    if (point.x !== data.startX || point.y !== data.startY) {
-      this.onPathModelChange('transform');
-    }
-  }
-
   ngOnInit(): void {
-    this._addSubscription(this._dragListener.dragChange.subscribe(event => {
-      switch (event) {
-        // case 'DragStart':
-        //   console.log('DragStart');
-        //   break;
-        case 'DragMove': this.onDragMove(); break;
-        case 'DragStop': this.onDragEnd(); break;
-      }
-    }));
-
-    this._addSubscription(this.settings.subscribe(state => {
-      this.svgStyles = {
-        width: `${(state.width * state.zoom / 100).toFixed(2)}px`,
-        height: `${(state.height * state.zoom / 100).toFixed(2)}px`,
-        // scale is slow
-        // transform: `scale(${state.zoom / 100})`,
-        'background-color': state.backgroundColor,
-      };
-    }));
-
-    this.pathModel.fromString(this.history.pathData || SAMPLE_PATH_DATA);
+    this.path = Path.createFromString(this.history.pathData || SAMPLE_PATH_DATA);
     this.onPathModelChange();
   }
 
-  controlPointMouseDown(event: MouseEvent, index: number) {
-    if (event.button !== 0) {
-      return;
-    }
-    event.preventDefault();
-
-    const point = this.pathModel.controls[index];
-    this._dragListener.mouseStart(event, this._renderer2, { index, startX: point.x, startY: point.y });
-  }
-
   convertInput(relative: boolean) {
-    this.pathModel.outputAsRelative(relative);
+    Path.setOutputAsRelative(this.path, relative);
     this.formatInput();
   }
 
@@ -280,7 +197,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   formatInput() {
-    this.pathInput = this.pathModel.toFormattedString('\n', this.settings.state.maximumFractionDigits);
+    this.pathInput = Path.asFormattedStringArray(this.path, this.settings.state.maximumFractionDigits).join('\n');
   }
 
   onFormatChange(value: number) {
@@ -290,10 +207,9 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   }
 
   onInputChange(pathInput: string) {
-    // console.log({ prev: this.pathInput, next: pathInput});
     if (pathInput !== this.pathInput) {
       this.pathInput = pathInput;
-      this.pathModel.fromString(pathInput);
+      this.path = Path.createFromString(pathInput);
       this.onPathModelChange('input');
     }
   }
@@ -301,7 +217,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   onUndo() {
     if (this.history.canUndo) {
       this.history.undo();
-      this.pathModel.fromString(this.history.pathData);
+      this.path = Path.createFromString(this.history.pathData);
       this.onPathModelChange('history');
     }
   }
@@ -309,7 +225,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
   onRedo() {
     if (this.history.canRedo) {
       this.history.redo();
-      this.pathModel.fromString(this.history.pathData);
+      this.path = Path.createFromString(this.history.pathData);
       this.onPathModelChange('history');
     }
   }
@@ -334,7 +250,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
       this.previewMatrix = undefined;
       const matrix = event.matrix;
       if (matrix && !isIdentity(matrix)) {
-        this.pathModel.setNodes(this.pathModel.getTransformed(matrix));
+        this.path = Path.createTransformed(this.path, matrix);
         this.onPathModelChange('transform');
       }
     }
@@ -345,7 +261,7 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
       this.formatInput();
     }
     if (changeType !== 'history') {
-      this.history.pathData = this.pathModel.toString();
+      this.history.pathData = compact(this.path.map(item => Path.asString(item, -1)).join(''));
     }
   }
 
@@ -360,10 +276,18 @@ export class EditorComponent extends UnsubscribableComponent implements OnInit {
       const dialogRef = this._dialog.open(SvgOpenDialogComponent, { data: file });
       dialogRef.afterClosed().subscribe(result => {
         if (typeof result === 'string' && result.length > 0) {
-          this.pathModel.fromString(result);
-          this.onPathModelChange();
+          this.onInputChange(result);
         }
       });
     }
+  }
+
+  onPathReverse() {
+    this.path = Path.createReveresed(this.path);
+    this.onPathModelChange();
+  }
+
+  onSelectAll(value: boolean) {
+    Path.selectAll(this.path, value);
   }
 }

@@ -1,3 +1,4 @@
+import { formatDecimal } from 'src/app/common/math-utils';
 import { SubType } from 'src/app/common/types';
 
 export type MoveTo = {
@@ -168,3 +169,88 @@ export const COMMAND_FULL_NAMES: { [key in DrawCommand]: string } = {
   A: 'Elliptical Arc Curve',
   Z: 'ClosePath',
 } as const;
+
+function formatDigit(value: number, fractionDigits?: number) {
+  return ' ' + (fractionDigits < 0 ? value.toString() : formatDecimal(value, fractionDigits));
+}
+
+export function formatParams(item: Readonly<DrawTo>, x0: number, y0: number, fractionDigits?: number): string {
+  let buf = '';
+  if (!isClosePath(item)) {
+    if (hasControlPoint1(item)) {
+      buf += formatDigit(item.x1 - x0, fractionDigits);
+      buf += formatDigit(item.y1 - y0, fractionDigits);
+    }
+    if (hasControlPoint2(item)) {
+      buf += formatDigit(item.x2 - x0, fractionDigits);
+      buf += formatDigit(item.y2 - y0, fractionDigits);
+    }
+    if (isEllipticalArc(item)) {
+      buf += formatDigit(item.rx, fractionDigits);
+      buf += formatDigit(item.ry, fractionDigits);
+      buf += formatDigit(item.angle, fractionDigits);
+      buf += ' ' + (item.largeArcFlag ? '1' : '0') + (item.sweepFlag ? '1' : '0');
+    }
+
+    if (!isVLineTo(item)) {
+      buf += formatDigit(item.x - x0, fractionDigits);
+    }
+    if (!isHLineTo(item)) {
+      buf += formatDigit(item.y - y0, fractionDigits);
+    }
+  }
+  return buf;
+}
+
+/**
+ * Returns a string representing the draw command in absolute form.
+ * @param item SVG path single draw command
+ * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
+ */
+export function asString(item: Readonly<DrawTo>, fractionDigits?: number): string {
+  return item.name + formatParams(item, 0, 0, fractionDigits);
+}
+
+export function translate(item: DrawTo, dx: number, dy: number) {
+  if (!isClosePath(item)) {
+    if (!isVLineTo(item)) {
+      item.x += dx;
+    }
+    if (!isHLineTo(item)) {
+      item.y += dy;
+    }
+    if (hasControlPoint1(item)) {
+      item.x1 += dx;
+      item.y1 += dy;
+    }
+    if (hasControlPoint2(item)) {
+      item.x2 += dx;
+      item.y2 += dy;
+    }
+  }
+}
+
+export function translateStopPoint(item: DrawTo, dx: number, dy: number) {
+  if (!isClosePath(item)) {
+    if (!isVLineTo(item)) {
+      item.x += dx;
+    }
+    if (!isHLineTo(item)) {
+      item.y += dy;
+    }
+  }
+}
+
+export function translateControlPoint1(item: DrawTo, dx: number, dy: number) {
+  if (hasControlPoint1(item)) {
+    item.x1 += dx;
+    item.y1 += dy;
+  }
+}
+
+export function translateControlPoint2(item: DrawTo, dx: number, dy: number) {
+  if (hasControlPoint2(item)) {
+    item.x2 += dx;
+    item.y2 += dy;
+  }
+}

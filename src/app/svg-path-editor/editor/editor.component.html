@@ -18,12 +18,13 @@
           <mat-icon>import_export</mat-icon>File
         </mat-expansion-panel-header>
 
-        <input #inputSvgFile type="file" multiple="false" style="display: none;" accept=".svg,.txt" (change)="loadSvg($event)" />
+        <input #inputSvgFile type="file" multiple="false" style="display: none;" accept=".svg,.txt"
+          (change)="loadSvg($event)" />
         <button mat-stroked-button (click)="inputSvgFile.click()">
           <mat-icon>open_in_browser</mat-icon>Open
         </button>
 
-        <button mat-stroked-button (click)="archive.next(viewBox, pathData)">
+        <button mat-stroked-button (click)="svgView.toArchive()">
           <mat-icon>archive</mat-icon>To SVG
         </button>
         <button mat-stroked-button (click)="openSampleDialog()">
@@ -35,78 +36,82 @@
         <mat-expansion-panel-header>
           <mat-icon>design_services</mat-icon>Edit
         </mat-expansion-panel-header>
-        <div style="display: flex; flex-direction: row;">
-          <!-- <mat-icon>edit_road</mat-icon> -->
+
+        <!-- History -->
+        <div>
+          <button mat-stroked-button style="float: right;" [disabled]="!history.hasLink" (click)="history.unlink()">
+            <mat-icon>link_off</mat-icon>Unlink
+          </button>
           <button mat-stroked-button [disabled]="!history.canUndo" (click)="onUndo()">
             <mat-icon>undo</mat-icon>Undo
           </button>
           <button mat-stroked-button [disabled]="!history.canRedo" (click)="onRedo()">
             <mat-icon>redo</mat-icon>Redo
           </button>
-          <span class="flex-space-filler-1"></span>
-          <button mat-stroked-button [disabled]="!history.hasLink" (click)="history.unlink()">
-            <mat-icon>link_off</mat-icon>Unlink
-          </button>
         </div>
 
+        <!-- Input -->
         <app-tab-group items="Raw Data|Selector|Walker" [selection]="editMode" (selectionChange)="selectTab($event)">
-          <div style="padding-top: 16px;">
-            <div *ngIf="editMode === 0" style="padding-left: 16px;">
+          <div style="padding-top: 1em;">
+            <div style="padding-left: 16px;" [style.display]="editMode === 0 ? 'block' : 'none'">
               <mat-form-field style="width: 100%;">
                 <mat-label>SVG path data:</mat-label>
-                <!-- matTextareaAutosize matAutosizeMinRows="4" matAutosizeMaxRows="16" -->
-                <textarea matInput rows="11" style="resize: none;" placeholder="Place any SVG path data here"
+                <textarea matInput rows="15" style="resize: none;" placeholder="Place any SVG path data here"
                   [ngModel]="pathInput" (ngModelChange)="onInputChange($event)"></textarea>
               </mat-form-field>
-              <!-- <mat-slider max="20" min="0" step="1" tickInterval="1" thumbLabel="true"></mat-slider> -->
-              <!-- <input type="radio" name="decimals" *ngFor="let name of decimals" [value]="name"> -->
-              <div>
-                <button mat-stroked-button color="primary" (click)="convertInput(false)">Absolute</button>
-                <button mat-stroked-button color="primary" (click)="convertInput(true)">Relative</button>
-                <button mat-stroked-button color="primary" (click)="compactInput()">Compact</button>
-              </div>
-              <div style="margin-top: 1em;">
-                <mat-form-field style="max-width: 40%;margin-right: 1em;">
-                  <mat-label>Number of decimals</mat-label>
-                  <mat-select [ngModel]="settings.state.maximumFractionDigits"
-                    (ngModelChange)="onFormatChange(+$event)">
-                    <mat-option *ngFor="let name of decimalFormats; index as i" [value]="i">{{i}}</mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <button mat-stroked-button color="primary" (click)="formatInput()">{{formatLabel}}</button>
-                <!-- <button mat-icon-button color="primary">
-                  <mat-icon>short_text</mat-icon>
-                </button> -->
-              </div>
             </div>
 
             <div *ngIf="editMode === 1">
               <div style="padding-left: 16px;padding-bottom: 10px">
-                <mat-checkbox [checked]="pathModel.isAllSelected" [indeterminate]="pathModel.isSomeSelected"
-                  (change)="pathModel.selectAll($event.checked)">Select All</mat-checkbox>
+                <mat-checkbox [checked]="isAllSelected" [indeterminate]="isSomeSelected"
+                  (change)="onSelectAll($event.checked)">Select All</mat-checkbox>
               </div>
               <div
                 style="border-top: 1px solid rgba(0, 0, 0, 0.26); padding-left: 16px; padding-top: 10px; height: 280px; overflow-y: auto;">
-                <app-path-group *ngFor="let group of pathModel.getGroups();index as i;trackBy:trackByIndex"
-                  [items]="group">
+                <app-path-group *ngFor="let group of groups;index as i;trackBy:trackByIndex" [items]="group">
                 </app-path-group>
               </div>
             </div>
 
             <div *ngIf="editMode === 2" style="padding-left: 1em; padding-right: 1em;">
-              <app-index-selector [count]="pathModel.count" [selection]="singleSelectionIndex"
+              <app-index-selector [count]="path.length" [selection]="firstSelectionIndex"
                 (selectionChange)="onSingleSelectionChange($event)">
               </app-index-selector>
-              <app-path-item *ngIf="pathModel.firstSelection as item" [item]="item"
+              <app-path-item *ngIf="activeItem as item" [item]="item"
                 [maximumFractionDigits]="settings.state.maximumFractionDigits"
                 (inputChange)="onSingleParameterChange()"></app-path-item>
             </div>
           </div>
         </app-tab-group>
 
-        <!-- <div style="margin-top: 1em;">
-          <app-menu-transform (transformChange)="applyTransform($event)"></app-menu-transform>
-        </div> -->
+        <div style="margin-top: 1em;">
+          <mat-form-field style="max-width: 5em;margin-right: 1em;">
+            <mat-label>Decimal digits</mat-label>
+            <mat-select [ngModel]="settings.state.maximumFractionDigits" (ngModelChange)="onFormatChange(+$event)">
+              <mat-option *ngFor="let name of decimalFormats; index as i" [value]="i">{{i}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <button mat-stroked-button color="primary" (click)="formatInput()">Pretty</button>
+          <button mat-stroked-button color="primary" (click)="compactInput()">Compact</button>
+
+          <button mat-icon-button color="primary" [matMenuTriggerFor]="menu" #menuTrigger="matMenuTrigger"
+            style="float: right;">
+            <mat-icon>{{menuTrigger.menuOpen ? 'menu_open' : 'menu' }}</mat-icon>
+          </button>
+          <mat-menu #menuConvert="matMenu">
+            <button mat-menu-item (click)="convertInput(false)">Convert to Absolute</button>
+            <button mat-menu-item (click)="convertInput(true)">Convert to Relative</button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="onDelete()">
+              <mat-icon>clear</mat-icon><span>Delete</span>
+            </button>
+          </mat-menu>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item [matMenuTriggerFor]="menuConvert">Edit {{selectMode}}</button>
+            <button mat-menu-item (click)="onPathReverse()">Reverse Path Direction</button>
+          </mat-menu>
+        </div>
+
         <mat-expansion-panel>
           <mat-expansion-panel-header>
             <mat-panel-title>
@@ -123,7 +128,7 @@
           <mat-icon>visibility</mat-icon>View
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <app-menu-view (requestSmallestViewBox)="setSmallestViewBox(pathRef)"></app-menu-view>
+          <app-menu-view (requestSmallestViewBox)="svgView.adjustViewBox()"></app-menu-view>
         </ng-template>
       </mat-expansion-panel>
 
@@ -136,35 +141,8 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <svg [attr.viewBox]="viewBox" [class.dragging]="isDragging" [ngStyle]="svgStyles">
-      <filter id="filterBackgroundImage">
-        <feColorMatrix in="SourceGraphic" type="matrix" [attr.values]="settings.imageColorMatrix" />
-      </filter>
-      <image *ngIf="background.imageData" filter="url(#filterBackgroundImage)"
-        [class.hidden]="settings.state.isBackgroundImageHidden" [attr.width]="settings.state.backgroundImageZoom + '%'"
-        x="0" y="0" [attr.href]="background.imageData"></image>
-      <path #pathRef opacity="0.9" stroke-width="1" [attr.stroke]="pathStrokeColor" [attr.fill]="pathFillColor"
-        [attr.d]="pathData">
-      </path>
-      <path opacity="0.6" fill="none" stroke-dasharray="4 1" stroke-width="2"
-        [attr.stroke]="settings.state.controlPointsFillColor" [attr.d]="pathModel.getSelectedPath()"></path>
-      <!-- <path opacity="0.6" fill="none" stroke-width="2" [attr.stroke]="settings.state.pathStrokeColor" [attr.d]="hoverPath"></path> -->
-      <g *ngIf="settings.state.isControlPoints">
-        <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
-          <path [attr.d]="pathModel.getCurveControlHandles()"></path>
-          <path stroke-dasharray="2" [attr.d]="pathModel.getReflectedControlHandles()"></path>
-          <path stroke-dasharray="2" [attr.d]="dragPath" [attr.stroke]="settings.state.controlPointsFillColor"></path>
-        </g>
-        <g class="control-points" [attr.fill]="settings.state.controlPointsFillColor">
-          <circle *ngFor="let point of pathModel.controls;index as i;trackBy:trackByIndex" r="5" [attr.cx]="point.x"
-            [attr.cy]="point.y" (mousedown)="controlPointMouseDown($event, i)">
-            <!-- <title>x:{{point.x}} y:{{point.y}}</title> -->
-          </circle>
-        </g>
-      </g>
-      <path pointer-events="none" opacity="0.5" stroke-width="1" stroke-dasharray="2 1" [attr.stroke]="pathStrokeColor"
-        [attr.fill]="pathFillColor" [attr.d]="previewPathData"></path>
-    </svg>
+    <app-svg-view #svgView [pathItems]="path" [activeItem]="activeItem" [previewMatrix]="previewMatrix"
+      (controlDrag)="onDrag($event)"></app-svg-view>
     <button *ngIf="settings.state.sidenavClosed" class="sidenav-open-button"
       (click)="settings.set({ sidenavClosed: false })" mat-icon-button color="primary"
       style="position: absolute; left: 0; top: 0">

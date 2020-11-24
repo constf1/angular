@@ -1,33 +1,16 @@
 // tslint:disable: variable-name
 
 import { Linkable } from '../../common/linkable';
-import {
-  CurveTo,
-  DrawCommand,
-  DrawTo,
-  EllipticalArc,
-  hasControlPoint1,
-  hasControlPoint2,
-  isClosePath,
-  isCurveTo,
-  isEllipticalArc,
-  isHLineTo,
-  isMoveTo,
-  isQCurveTo,
-  isSmoothCurveTo,
-  isSmoothQCurveTo,
-  isVLineTo,
-  MoveTo,
-  QCurveTo,
-  SmoothCurveTo,
-  SmoothQCurveTo
-} from './svg-path-commands';
+import * as Path from './svg-path-commands';
 
-export type PathNode = Linkable<PathNode> & DrawTo;
-export type CurveNode = PathNode & (CurveTo | QCurveTo | SmoothCurveTo | SmoothQCurveTo);
-export type SmoothCurveNode = PathNode & (SmoothCurveTo | SmoothQCurveTo);
+// reexport
+export * from './svg-path-commands';
 
-export function createPathNode(name: DrawCommand, args: string[], prev?: PathNode): PathNode {
+export type PathNode = Linkable<PathNode> & Path.DrawTo;
+export type CurveNode = PathNode & (Path.CurveTo | Path.QCurveTo | Path.SmoothCurveTo | Path.SmoothQCurveTo);
+export type SmoothCurveNode = PathNode & (Path.SmoothCurveTo | Path.SmoothQCurveTo);
+
+export function createPathNode(name: Path.DrawCommand, args: string[], prev?: PathNode): PathNode {
   switch (name) {
     case 'Z':
       return { name, prev };
@@ -51,9 +34,9 @@ export function createPathNode(name: DrawCommand, args: string[], prev?: PathNod
   }
 }
 
-function getMoveTo(item?: Readonly<PathNode>): Readonly<PathNode & MoveTo> | undefined {
+function getMoveTo(item?: Readonly<PathNode>): Readonly<PathNode & Path.MoveTo> | undefined {
   for (let node = item; node; node = node.prev) {
-    if (isMoveTo(node)) {
+    if (Path.isMoveTo(node)) {
       return node;
     }
   }
@@ -61,9 +44,9 @@ function getMoveTo(item?: Readonly<PathNode>): Readonly<PathNode & MoveTo> | und
 
 export function getX(item?: Readonly<PathNode>): number {
   if (item) {
-    if (isClosePath(item)) {
+    if (Path.isClosePath(item)) {
       return getX(getMoveTo(item.prev));
-    } else if (isVLineTo(item)) {
+    } else if (Path.isVLineTo(item)) {
       return getX(item.prev);
     } else {
       return item.x;
@@ -74,9 +57,9 @@ export function getX(item?: Readonly<PathNode>): number {
 
 export function getY(item?: Readonly<PathNode>): number {
   if (item) {
-    if (isClosePath(item)) {
+    if (Path.isClosePath(item)) {
       return getY(getMoveTo(item.prev));
-    } else if (isHLineTo(item)) {
+    } else if (Path.isHLineTo(item)) {
       return getY(item.prev);
     } else {
       return item.y;
@@ -86,9 +69,9 @@ export function getY(item?: Readonly<PathNode>): number {
 }
 
 function getLastControlX(node: Readonly<CurveNode>): number {
-  if (hasControlPoint2(node)) {
+  if (Path.hasControlPoint2(node)) {
     return node.x2;
-  } else if (isQCurveTo(node)) {
+  } else if (Path.isQCurveTo(node)) {
     return node.x1;
   } else {
     return getReflectedX1(node);
@@ -96,9 +79,9 @@ function getLastControlX(node: Readonly<CurveNode>): number {
 }
 
 function getLastControlY(node: Readonly<CurveNode>): number {
-  if (hasControlPoint2(node)) {
+  if (Path.hasControlPoint2(node)) {
     return node.y2;
-  } else if (isQCurveTo(node)) {
+  } else if (Path.isQCurveTo(node)) {
     return node.y1;
   } else {
     return getReflectedY1(node);
@@ -107,8 +90,8 @@ function getLastControlY(node: Readonly<CurveNode>): number {
 
 function isReflectable(node: Readonly<SmoothCurveNode>, prev: Readonly<PathNode>): prev is Readonly<CurveNode> {
   return prev.name === node.name
-   || (isCurveTo(prev) && isSmoothCurveTo(node))
-   || (isQCurveTo(prev) && isSmoothQCurveTo(node));
+   || (Path.isCurveTo(prev) && Path.isSmoothCurveTo(node))
+   || (Path.isQCurveTo(prev) && Path.isSmoothQCurveTo(node));
 }
 
 /**
@@ -144,7 +127,7 @@ export function getReflectedY1(node: Readonly<SmoothCurveNode>): number {
 }
 
 // Specification: https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
-export function getCenterPoint(node: Readonly<PathNode & EllipticalArc>): { x: number, y: number } {
+export function getCenterPoint(node: Readonly<PathNode & Path.EllipticalArc>): { x: number, y: number } {
   // Given the following variables:
   // x1 y1 x2 y2 fA fS rx ry phi
   const x1 = getX(node.prev);
@@ -195,73 +178,6 @@ export function getCenterPoint(node: Readonly<PathNode & EllipticalArc>): { x: n
   return { x: cx + (x1 + x2) / 2, y: cy + (y1 + y2) / 2};
 }
 
-export function translateStopPoint(item: PathNode, dx: number, dy: number) {
-  if (!isClosePath(item)) {
-    if (!isVLineTo(item)) {
-      item.x += dx;
-    }
-    if (!isHLineTo(item)) {
-      item.y += dy;
-    }
-  }
-}
-
-export function translateControlPoint1(item: PathNode, dx: number, dy: number) {
-  if (hasControlPoint1(item)) {
-    item.x1 += dx;
-    item.y1 += dy;
-  }
-}
-
-export function translateControlPoint2(item: PathNode, dx: number, dy: number) {
-  if (hasControlPoint2(item)) {
-    item.x2 += dx;
-    item.y2 += dy;
-  }
-}
-
-export function translate(item: PathNode, dx: number, dy: number) {
-  if (!isClosePath(item)) {
-    if (!isVLineTo(item)) {
-      item.x += dx;
-    }
-    if (!isHLineTo(item)) {
-      item.y += dy;
-    }
-    if (hasControlPoint1(item)) {
-      item.x1 += dx;
-      item.y1 += dy;
-    }
-    if (hasControlPoint2(item)) {
-      item.x2 += dx;
-      item.y2 += dy;
-    }
-  }
-}
-
-export function asString(node: Readonly<PathNode>): string {
-  let buf = node.name;
-  if (!isClosePath(node)) {
-    if (hasControlPoint1(node)) {
-      buf += ' ' + node.x1;
-      buf += ' ' + node.y1;
-    }
-    if (hasControlPoint2(node)) {
-      buf += ' ' + node.x2;
-      buf += ' ' + node.y2;
-    }
-    if (isEllipticalArc(node)) {
-      buf += ' ' + node.rx;
-      buf += ' ' + node.ry;
-      buf += ' ' + node.angle;
-      buf += ' ' + (node.largeArcFlag ? '1' : '0') + (node.sweepFlag ? '1' : '0');
-    }
-    if (!isVLineTo(node)) {
-      buf += ' ' + node.x;
-    }
-    if (!isHLineTo(node)) {
-      buf += ' ' + node.y;
-    }
-  }
-  return buf;
+export function asRelativeString(item: Readonly<PathNode>, fractionDigits?: number): string {
+  return item.name.toLowerCase() + Path.formatParams(item, getX(item.prev), getY(item.prev), fractionDigits);
 }

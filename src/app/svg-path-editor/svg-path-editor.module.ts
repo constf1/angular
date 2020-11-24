@@ -19,6 +19,7 @@ import { PathGroupComponent } from './path-group/path-group.component';
 import { PathItemComponent } from './path-item/path-item.component';
 import { SampleDialogComponent } from './sample-dialog/sample-dialog.component';
 import { SvgOpenDialogComponent } from './svg-open-dialog/svg-open-dialog.component';
+import { SvgViewComponent } from './svg-view/svg-view.component';
 
 /**
  * Routes:
@@ -36,6 +37,7 @@ const routes: Routes = [
     PathItemComponent,
     SampleDialogComponent,
     SvgOpenDialogComponent,
+    SvgViewComponent,
   ],
   entryComponents: [SampleDialogComponent],
   imports: [
