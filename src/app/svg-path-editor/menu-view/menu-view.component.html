@@ -29,7 +29,7 @@
   <div class="menu-view-zoom" *ngIf="tabSelection === 0">
     <mat-form-field>
       <mat-label>%</mat-label>
-      <input matInput name="fZoom" type="number" step="1" min="25" max="400" [(ngModel)]="zoom">
+      <input matInput name="fZoom" type="number" step="any" min="25" max="400" [(ngModel)]="zoom">
     </mat-form-field>
     <mat-button-toggle-group [value]="zoom">
       <mat-button-toggle *ngFor="let item of zooms" [value]="item.value" (click)="zoom=item.value">{{item.label}}
@@ -41,21 +41,21 @@
     <p>The position and dimension, in user space, of an SVG viewport.</p>
     <mat-form-field>
       <mat-label>x:</mat-label>
-      <input matInput type="number" [ngModel]="settings.state.xOffset"
+      <input matInput type="number" step="any" [ngModel]="settings.state.xOffset"
         (ngModelChange)="settings.set({ xOffset: +$event })">
     </mat-form-field>
     <mat-form-field>
       <mat-label>y:</mat-label>
-      <input matInput type="number" [ngModel]="settings.state.yOffset"
+      <input matInput type="number" step="any" [ngModel]="settings.state.yOffset"
         (ngModelChange)="settings.set({ yOffset: +$event })">
     </mat-form-field>
     <mat-form-field>
       <mat-label>width:</mat-label>
-      <input matInput type="number" [ngModel]="settings.state.width" (ngModelChange)="settings.set({ width: +$event })">
+      <input matInput type="number" step="any" [ngModel]="settings.state.width" (ngModelChange)="settings.set({ width: +$event })">
     </mat-form-field>
     <mat-form-field>
       <mat-label>height:</mat-label>
-      <input matInput type="number" [ngModel]="settings.state.height"
+      <input matInput type="number" step="any" [ngModel]="settings.state.height"
         (ngModelChange)="settings.set({ height: +$event })">
     </mat-form-field>
     <button mat-stroked-button (click)="requestSmallestViewBox.emit()">
@@ -78,7 +78,7 @@
     <div>
       <mat-form-field>
         <mat-label>width (%):</mat-label>
-        <input matInput type="number" min="1" step="1" [ngModel]="settings.state.backgroundImageZoom"
+        <input matInput type="number" min="1" step="any" [ngModel]="settings.state.backgroundImageZoom"
           (ngModelChange)="settings.set({ backgroundImageZoom: +$event })">
       </mat-form-field>
     </div>

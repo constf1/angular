@@ -11,15 +11,15 @@
   <div>Ellipse Shape:</div>
   <mat-form-field>
     <mat-label>rx</mat-label>
-    <input matInput type="number" min="0" [ngModel]="getFormatted('rx')" (ngModelChange)="setRx(+$event)">
+    <input matInput type="number" min="0" step="any" [ngModel]="getFormatted('rx')" (ngModelChange)="setRx(+$event)">
   </mat-form-field>
   <mat-form-field>
     <mat-label>ry</mat-label>
-    <input matInput type="number" min="0" [ngModel]="getFormatted('ry')" (ngModelChange)="setRy(+$event)">
+    <input matInput type="number" min="0" step="any" [ngModel]="getFormatted('ry')" (ngModelChange)="setRy(+$event)">
   </mat-form-field>
   <mat-form-field>
     <mat-label>angle ↷</mat-label>
-    <input matInput type="number" [ngModel]="getFormatted('angle')" (ngModelChange)="setAngle(+$event)">
+    <input matInput type="number" step="any" [ngModel]="getFormatted('angle')" (ngModelChange)="setAngle(+$event)">
   </mat-form-field>
   <mat-checkbox [checked]="largeArcFlag" (change)="setLargeArcFlag($event.checked)">Large
   </mat-checkbox>
@@ -31,12 +31,12 @@
   <div>First Control Point:</div>
   <mat-form-field>
     <mat-label>{{item.outputAsRelative ? 'dx1' : 'x1'}}</mat-label>
-    <input matInput type="number" [disabled]="!hasControlPoint1" [ngModel]="getFormatted('x1')"
+    <input matInput type="number" step="any" [disabled]="!hasControlPoint1" [ngModel]="getFormatted('x1')"
       (ngModelChange)="setX1(+$event)">
   </mat-form-field>
   <mat-form-field>
     <mat-label>{{item.outputAsRelative ? 'dy1' : 'y1'}}</mat-label>
-    <input matInput type="number" [disabled]="!hasControlPoint1" [ngModel]="getFormatted('y1')"
+    <input matInput type="number" step="any" [disabled]="!hasControlPoint1" [ngModel]="getFormatted('y1')"
       (ngModelChange)="setY1(+$event)">
   </mat-form-field>
 </div>
@@ -46,11 +46,11 @@
   <div>Second Control Point:</div>
   <mat-form-field>
     <mat-label>{{item.outputAsRelative ? 'dx2' : 'x2'}}</mat-label>
-    <input matInput type="number" [ngModel]="getFormatted('x2')" (ngModelChange)="setX2(+$event)">
+    <input matInput type="number" step="any" [ngModel]="getFormatted('x2')" (ngModelChange)="setX2(+$event)">
   </mat-form-field>
   <mat-form-field>
     <mat-label>{{item.outputAsRelative ? 'dy2' : 'y2'}}</mat-label>
-    <input matInput type="number" [ngModel]="getFormatted('y2')" (ngModelChange)="setY2(+$event)">
+    <input matInput type="number" step="any" [ngModel]="getFormatted('y2')" (ngModelChange)="setY2(+$event)">
   </mat-form-field>
 </div>
 
@@ -59,10 +59,10 @@
   <div>Stop Point:</div>
   <mat-form-field>
     <mat-label>{{item.outputAsRelative ? 'dx' : 'x'}}</mat-label>
-    <input matInput type="number" [disabled]="!hasX" [ngModel]="getFormatted('x')" (ngModelChange)="setX(+$event)">
+    <input matInput type="number" step="any" [disabled]="!hasX" [ngModel]="getFormatted('x')" (ngModelChange)="setX(+$event)">
   </mat-form-field>
   <mat-form-field>
     <mat-label>{{item.outputAsRelative ? 'dy' : 'y'}}</mat-label>
-    <input matInput type="number" [disabled]="!hasY" [ngModel]="getFormatted('y')" (ngModelChange)="setY(+$event)">
+    <input matInput type="number" step="any" [disabled]="!hasY" [ngModel]="getFormatted('y')" (ngModelChange)="setY(+$event)">
   </mat-form-field>
 </div>
