@@ -10,7 +10,7 @@ export type PathNode = Linkable<PathNode> & Path.DrawTo;
 export type CurveNode = PathNode & (Path.CurveTo | Path.QCurveTo | Path.SmoothCurveTo | Path.SmoothQCurveTo);
 export type SmoothCurveNode = PathNode & (Path.SmoothCurveTo | Path.SmoothQCurveTo);
 
-export function createPathNode(name: Path.DrawCommand, args: string[], prev?: PathNode): PathNode {
+export function createPathNode(name: Path.DrawCommand, args: (string | number)[], prev?: PathNode): PathNode {
   switch (name) {
     case 'Z':
       return { name, prev };
@@ -30,7 +30,7 @@ export function createPathNode(name: Path.DrawCommand, args: string[], prev?: Pa
       return { name, x1: +args[0], y1: +args[1], x2: +args[2], y2: +args[3], x: +args[4], y: +args[5], prev };
     case 'A':
       return { name, rx: +args[0], ry: +args[1], angle: +args[2],
-        largeArcFlag: args[3] === '1', sweepFlag: args[4] === '1', x: +args[5], y: +args[6], prev };
+        largeArcFlag: +args[3] === 1, sweepFlag: +args[4] === 1, x: +args[5], y: +args[6], prev };
   }
 }
 
