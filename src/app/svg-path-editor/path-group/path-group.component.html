@@ -8,7 +8,7 @@
     [indeterminate]="selectedCount > 0 && selectedCount !== items.length"
     (change)="setAll($event.checked)"
   ></mat-checkbox>
-  <div *ngIf="hideItems;else templatePathItems">
+  <div *ngIf="hideItems && items.length > 1;else templatePathItems">
     <span [class.selected]="selectedCount === items.length" (click)="hideItems=false">{{items[0].name}}…</span>
   </div>
   <div *ngIf="items.length > 1" (click)="hideItems = !hideItems" style="cursor: pointer; margin-left: 0.05em">
