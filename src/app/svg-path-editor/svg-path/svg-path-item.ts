@@ -1,5 +1,5 @@
 import { append, connect, Linkable } from 'src/app/common/linkable';
-import { createIdentity, ReadonlyMatrix } from 'src/app/common/matrix-math';
+import { ReadonlyMatrix } from 'src/app/common/matrix-math';
 import { transformedNode } from './svg-path-transform';
 
 import * as Path from './svg-path-node';
@@ -270,27 +270,68 @@ export function createFromString(pathData: string): PathItem[] {
   return nodes;
 }
 
-const IM = createIdentity();
+function copy(item: Readonly<PathItem>): PathItem {
+  return { ...item, prev: undefined, next: undefined, list: undefined };
+}
+
+function extract(item: Readonly<PathItem>): PathItem {
+  if (item.prev && !item.prev.isSelected !== !item.isSelected) {
+    if (Path.isSmoothCurveTo(item)) {
+      const x1 = Path.getReflectedX1(item);
+      const y1 = Path.getReflectedY1(item);
+      return { ...item, name: 'C', x1, y1, prev: undefined, next: undefined, list: undefined };
+    } else if (Path.isSmoothQCurveTo(item)) {
+      const x1 = Path.getReflectedX1(item);
+      const y1 = Path.getReflectedY1(item);
+      return { ...item, name: 'Q', x1, y1, prev: undefined, next: undefined, list: undefined };
+    }
+  }
+  return copy(item);
+}
+
+function connected(items: PathItem[]): PathItem[] {
+  connect(...items);
+  return items;
+}
+
+export function cloneAll(items: PathView): PathItem[] {
+  return connected(items.map(copy));
+}
+
+export function cloneSelection(items: PathView): PathItem[] {
+  const first = items[getFirstSelectionIndex(items)];
+  const next = items.filter(item => item.isSelected).map(extract);
+
+  if (!(first && Path.isMoveTo(first))) {
+    next.splice(0, 0, { name: 'M', x: Path.getX(first?.prev), y: Path.getY(first?.prev), isSelected: true });
+  }
+  return connected(next);
+  // return connected(items
+  //   .filter(item => item.isSelected)
+  //   .map(clone));
+}
 
 export function createTransformed(items: PathView, matrix: ReadonlyMatrix): PathItem[] {
   const transformAll = !hasSelection(items);
 
   const transformed = items.map(item => {
-    const next: PathItem = transformedNode((transformAll || item.isSelected) ? matrix : IM, item);
+    const next: PathItem = (transformAll || item.isSelected) ? transformedNode(matrix, item) : extract(item);
     next.outputAsRelative = item.outputAsRelative;
     next.isSelected = item.isSelected;
     return next;
   });
-  connect(...transformed);
-  return transformed;
+  return connected(transformed);
 }
 
 export function deleteSelection(items: PathView): PathItem[] {
-  const next = items
-    .filter(item => !item.isSelected)
-    .map(item => ({ ...item, prev: undefined, next: undefined, list: undefined }));
-  connect(...next);
-  return next;
+  return connected(items.filter(item => !item.isSelected).map(extract));
+}
+
+export function appendAt(items: PathView, index: number, ...itemsToAppend: PathView): PathItem[] {
+  const next = items.map(copy);
+  const addon = itemsToAppend.map(copy);
+  next.splice(index, 0, ...addon);
+  return connected(next);
 }
 
 function hasClosePath(items: PathView, index: number) {
@@ -389,8 +430,7 @@ export function createReveresed(items: PathView): PathItem[] {
       appendReversed(items, i, reveresed);
     }
   }
-  connect(...reveresed);
-  return reveresed;
+  return connected(reveresed);
 }
 
 // In place changes.
