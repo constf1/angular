@@ -51,7 +51,7 @@
         </div>
 
         <!-- Input -->
-        <app-tab-group items="Raw Data|Selector|Walker" [selection]="editMode" (selectionChange)="selectTab($event)">
+        <app-tab-group items="Raw Data|Selector|Inspector" [selection]="editMode" (selectionChange)="selectTab($event)">
           <div style="padding-top: 1em;">
             <div style="padding-left: 16px;" [style.display]="editMode === 0 ? 'block' : 'none'">
               <mat-form-field style="width: 100%;">
@@ -101,13 +101,19 @@
           <mat-menu #menuConvert="matMenu">
             <button mat-menu-item (click)="convertInput(false)">Convert to Absolute</button>
             <button mat-menu-item (click)="convertInput(true)">Convert to Relative</button>
+            <button mat-menu-item (click)="onClone(false)">Clone</button>
+            <button mat-menu-item (click)="onClone(true)">Clone Reversed</button>
             <mat-divider></mat-divider>
             <button mat-menu-item (click)="onDelete()">
               <mat-icon>clear</mat-icon><span>Delete</span>
             </button>
           </mat-menu>
+          <mat-menu #menuAppend="matMenu">
+            <button mat-menu-item *ngFor="let command of commands" (click)="onAppend(command)">{{command + ': ' + commandNames[command]}}</button>
+          </mat-menu>
           <mat-menu #menu="matMenu">
-            <button mat-menu-item [matMenuTriggerFor]="menuConvert">Edit {{selectMode}}</button>
+            <button mat-menu-item [matMenuTriggerFor]="menuAppend">Append</button>
+            <button mat-menu-item *ngIf="path?.length > 0" [matMenuTriggerFor]="menuConvert">Edit {{selectMode}}</button>
             <button mat-menu-item (click)="onPathReverse()">Reverse Path Direction</button>
           </mat-menu>
         </div>

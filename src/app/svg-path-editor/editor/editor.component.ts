@@ -30,6 +30,21 @@ const SAMPLE_PATH_DATA =
 + 'a51 65 2 10-86-34l24 9a23 36 0 11 37 17zm-120-34a38 56-1 10-55 38l15-11a16 28-4 11 18-17z'
 + 'm-61 65c81 80 122 15 173-2v5c-52 27-103 80-174 3z';
 
+const SAMPLE_STEP = 25;
+
+const SAMPLE_PATH_ITEMS: { [key in Path.DrawCommand] : number[] } = {
+  M: [SAMPLE_STEP, SAMPLE_STEP],
+  L: [SAMPLE_STEP, SAMPLE_STEP],
+  H: [SAMPLE_STEP],
+  V: [SAMPLE_STEP],
+  Z: [],
+  C: [SAMPLE_STEP, 0, 0, SAMPLE_STEP, SAMPLE_STEP, SAMPLE_STEP],
+  S: [0, SAMPLE_STEP, SAMPLE_STEP, SAMPLE_STEP],
+  Q: [SAMPLE_STEP, 0, SAMPLE_STEP, SAMPLE_STEP],
+  T: [SAMPLE_STEP, SAMPLE_STEP],
+  A: [SAMPLE_STEP, SAMPLE_STEP, 0, 0, 0, SAMPLE_STEP, SAMPLE_STEP],
+};
+
 const enum EditMode { All, Group, Single }
 
 function compact(pathData: string): string {
@@ -53,10 +68,13 @@ export class EditorComponent implements OnInit {
   path: Path.PathArray = [];
   pathInput = '';
 
-  decimalFormats = DECIMAL_FORMAT_LABELS;
+  readonly decimalFormats = DECIMAL_FORMAT_LABELS;
   // decimals = ['to integer', '1 decimal place', '2 decimal places', '3 decimal places', '4 decimal places', '5 decimal places'];
 
   previewMatrix?: ReadonlyMatrix;
+
+  readonly commandNames = Path.COMMAND_FULL_NAMES;
+  readonly commands = Object.keys(Path.COMMAND_FULL_NAMES);
 
   get activeItem() {
     return this.path[this.firstSelectionIndex];
@@ -289,5 +307,66 @@ export class EditorComponent implements OnInit {
 
   onSelectAll(value: boolean) {
     Path.selectAll(this.path, value);
+  }
+
+  onAppend(command: Path.DrawCommand) {
+    let lastIndex = Path.getLastSelectionIndex(this.path);
+    if (lastIndex < 0) {
+      lastIndex = this.path.length - 1;
+    }
+    const last = this.path[lastIndex];
+    const next: Path.PathItem = Path.createPathNode(command, SAMPLE_PATH_ITEMS[command]);
+    Path.translate(next, Path.getX(last), Path.getY(last));
+    next.outputAsRelative = true;
+
+    const nextIndex = lastIndex + 1;
+    this.path = Path.appendAt(this.path, nextIndex, next);
+    if (this.editMode === EditMode.Single || this.editMode === EditMode.Group) {
+      Path.selectDistinct(this.path, this.singleSelectionIndex = nextIndex, true);
+    }
+    this.onPathModelChange();
+  }
+
+  onClone(reversed?: boolean) {
+    const path = this.path;
+
+    // let firstIndex = Path.getFirstSelectionIndex(path);
+    // if (firstIndex < 0) {
+    //   firstIndex = 0;
+    // }
+
+    let lastIndex = Path.getLastSelectionIndex(path);
+    if (lastIndex < 0) {
+      lastIndex = path.length - 1;
+    }
+
+    let clone = Path.hasSelection(path) ? Path.cloneSelection(path) : Path.cloneAll(path);
+    if (reversed) {
+      clone = Path.createReveresed(clone);
+    }
+    // const deltaX = Path.getX(path[lastIndex]) - Path.getX(path[firstIndex]?.prev);
+    // const deltaY = Path.getY(path[lastIndex]) - Path.getY(path[firstIndex]?.prev);
+    // if (deltaX !== 0 || deltaY !== 0) {
+    //   for (const node of clone) {
+    //     Path.translate(node, deltaX, deltaY);
+    //   }
+    // }
+
+    const nextIndex = lastIndex + 1;
+    const next = Path.appendAt(path, nextIndex, ...clone);
+
+    // Move selection to the newly created items.
+    if (this.editMode === EditMode.Single) {
+      Path.selectDistinct(next, this.singleSelectionIndex = nextIndex, true);
+    } else if (this.editMode === EditMode.Group) {
+      Path.selectAll(next, false);
+      for (let i = nextIndex; i < nextIndex + clone.length; i++) {
+        Path.selectItem(next, i, true);
+      }
+      this.groupSelectionIndices = Path.getSelectedIndices(next);
+    }
+
+    this.path = next;
+    this.onPathModelChange();
   }
 }
