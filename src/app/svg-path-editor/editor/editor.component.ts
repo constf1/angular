@@ -235,17 +235,33 @@ export class EditorComponent implements OnInit {
   onUndo() {
     if (this.history.canUndo) {
       this.history.undo();
-      this.path = Path.createFromString(this.history.pathData);
-      this.onPathModelChange('history');
+      this.onHistoryChange();
     }
   }
 
   onRedo() {
     if (this.history.canRedo) {
       this.history.redo();
-      this.path = Path.createFromString(this.history.pathData);
-      this.onPathModelChange('history');
+      this.onHistoryChange();
     }
+  }
+
+  onHistoryChange() {
+    const prevPath = this.path;
+    const nextPath = Path.createFromString(this.history.pathData);
+
+    // Temporary hack. Till the undo/redo concept is sorted out.
+    if (Path.isAllSelected(prevPath)) {
+      Path.selectAll(nextPath, true);
+    } else if (Path.isSomeSelected(prevPath)) {
+      for (let i = Math.min(prevPath.length, nextPath.length); i-- > 0;) {
+        nextPath[i].outputAsRelative = prevPath[i].outputAsRelative;
+        nextPath[i].selected = prevPath[i].selected;
+      }
+    }
+
+    this.path = nextPath;
+    this.onPathModelChange('history');
   }
 
   openSampleDialog() {
