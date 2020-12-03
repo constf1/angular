@@ -1,6 +1,6 @@
 <ng-template #templatePathItems>
   <span *ngFor="let item of items;index as i;trackBy:trackByIndex" (click)="onItemClick(i)"
-    [class.selected]="item.isSelected">{{item.name}}</span>
+    [class.selected]="item.selected">{{item.name}}</span>
 </ng-template>
 
 <div class="path-group">

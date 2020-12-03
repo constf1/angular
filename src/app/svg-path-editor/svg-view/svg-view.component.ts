@@ -122,9 +122,9 @@ export class SvgViewComponent implements OnInit, OnDestroy {
   get pathSelectionData() {
     const nodes: Readonly<Path.DrawTo>[] = [];
     for (const node of this._items) {
-      if (node.isSelected) {
+      if (node.selected) {
         const prev = node.prev;
-        const prevNotSelected = !(prev?.isSelected);
+        const prevNotSelected = !(prev?.selected);
         if (prevNotSelected) {
           nodes.push({ name: 'M', x: Path.getX(prev), y: Path.getY(prev)});
         }

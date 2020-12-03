@@ -3,10 +3,13 @@ import { ReadonlyMatrix } from 'src/app/common/matrix-math';
 import { transformedNode } from './svg-path-transform';
 
 import * as Path from './svg-path-node';
+import * as Select from 'src/app/common/selectable';
+
 // reexport
 export * from './svg-path-node';
+export * from 'src/app/common/selectable';
 
-export type PathItem = Path.PathNode & Linkable<PathItem> & { isSelected?: boolean, outputAsRelative?: boolean };
+export type PathItem = Path.PathNode & Linkable<PathItem> & Select.Selectable & { outputAsRelative?: boolean };
 export type PathArray = ReadonlyArray<PathItem>;
 export type PathView = ReadonlyArray<Readonly<PathItem>>;
 
@@ -41,88 +44,6 @@ export function getGroups(items: PathView): PathItem[][]  {
     groups.push(next);
   }
   return groups;
-}
-
-// Selection
-export function countSelected(items: PathView) {
-  let count = 0;
-  for (const item of items) {
-    if (item.isSelected) {
-      count++;
-    }
-  }
-  return count;
-}
-
-export function getSelectedIndices(items: PathView) {
-  const selections: number[] = [];
-  for (let i = 0; i < items.length; i++) {
-    if (items[i].isSelected) {
-      selections.push(i);
-    }
-  }
-  return selections;
-}
-
-export function getFirstSelectionIndex(items: PathView): number {
-  for (let i = 0; i < items.length; i++) {
-    if (items[i].isSelected) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-export function getLastSelectionIndex(items: PathView): number {
-  for (let i = items.length; i-- > 0;) {
-    if (items[i].isSelected) {
-      return i;
-    }
-  }
-  return -1;
-}
-
-export function hasSelection(items: PathView): boolean {
-  return getFirstSelectionIndex(items) >= 0;
-}
-
-export function isAllSelected(items: PathView): boolean {
-  for (const item of items) {
-    if (!item.isSelected) {
-      return false;
-    }
-  }
-  return true;
-}
-
-export function isSomeSelected(items: PathView): boolean {
-  const count = countSelected(items);
-  return count > 0 && count < items.length;
-}
-
-export function selectItem(items: PathArray, index: number, value: boolean) {
-  const item = items[index];
-  if (item) {
-    item.isSelected = value;
-  }
-}
-
-export function selectAll(items: PathArray, value: boolean) {
-  for (const item of items) {
-    item.isSelected = value;
-  }
-}
-
-export function selectDistinct(items: PathArray, index: number, value: boolean) {
-  selectAll(items, !value);
-  selectItem(items, index, value);
-}
-
-export function selectGroup(items: PathArray, indices: ReadonlyArray<number>, value: boolean) {
-  selectAll(items, !value);
-  for (const index of indices) {
-    selectItem(items, index, value);
-  }
 }
 
 // Creation
@@ -275,7 +196,7 @@ function copy(item: Readonly<PathItem>): PathItem {
 }
 
 function extract(item: Readonly<PathItem>): PathItem {
-  if (item.prev && !item.prev.isSelected !== !item.isSelected) {
+  if (item.prev && !item.prev.selected !== !item.selected) {
     if (Path.isSmoothCurveTo(item)) {
       const x1 = Path.getReflectedX1(item);
       const y1 = Path.getReflectedY1(item);
@@ -299,11 +220,11 @@ export function cloneAll(items: PathView): PathItem[] {
 }
 
 export function cloneSelection(items: PathView): PathItem[] {
-  const first = items[getFirstSelectionIndex(items)];
-  const next = items.filter(item => item.isSelected).map(extract);
+  const first = items[Select.getFirstSelectionIndex(items)];
+  const next = items.filter(item => item.selected).map(extract);
 
   if (!(first && Path.isMoveTo(first))) {
-    next.splice(0, 0, { name: 'M', x: Path.getX(first?.prev), y: Path.getY(first?.prev), isSelected: true });
+    next.splice(0, 0, { name: 'M', x: Path.getX(first?.prev), y: Path.getY(first?.prev), selected: true });
   }
   return connected(next);
   // return connected(items
@@ -312,19 +233,19 @@ export function cloneSelection(items: PathView): PathItem[] {
 }
 
 export function createTransformed(items: PathView, matrix: ReadonlyMatrix): PathItem[] {
-  const transformAll = !hasSelection(items);
+  const transformAll = !Select.hasSelection(items);
 
   const transformed = items.map(item => {
-    const next: PathItem = (transformAll || item.isSelected) ? transformedNode(matrix, item) : extract(item);
+    const next: PathItem = (transformAll || item.selected) ? transformedNode(matrix, item) : extract(item);
     next.outputAsRelative = item.outputAsRelative;
-    next.isSelected = item.isSelected;
+    next.selected = item.selected;
     return next;
   });
   return connected(transformed);
 }
 
 export function deleteSelection(items: PathView): PathItem[] {
-  return connected(items.filter(item => !item.isSelected).map(extract));
+  return connected(items.filter(item => !item.selected).map(extract));
 }
 
 export function appendAt(items: PathView, index: number, ...itemsToAppend: PathView): PathItem[] {
@@ -349,50 +270,50 @@ function hasClosePath(items: PathView, index: number) {
 
 function appendReversed(items: PathView, index: number, accum: PathItem[]) {
   const item = items[index];
-  const { outputAsRelative, isSelected } = item;
+  const { outputAsRelative, selected } = item;
 
   const x = Path.getX(item.prev);
   const y = Path.getY(item.prev);
 
   if (Path.isEllipticalArc(item)) {
     accum.push({ name: 'A', rx: item.rx, ry: item.ry, angle: item.angle,
-      largeArcFlag: item.largeArcFlag, sweepFlag: !item.sweepFlag, x, y, outputAsRelative, isSelected });
+      largeArcFlag: item.largeArcFlag, sweepFlag: !item.sweepFlag, x, y, outputAsRelative, selected });
   } else if (Path.isLineTo(item)) {
     // if (!(node.prev && isMoveTo(node.prev))) {
-      accum.push({ name: 'L', x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'L', x, y, outputAsRelative, selected });
     // }
   } else if (Path.isHLineTo(item)) {
     // if (!(node.prev && isMoveTo(node.prev))) {
-      accum.push({ name: 'H', x, outputAsRelative, isSelected });
+      accum.push({ name: 'H', x, outputAsRelative, selected });
     // }
   } else if (Path.isVLineTo(item)) {
     // if (!(node.prev && isMoveTo(node.prev))) {
-      accum.push({ name: 'V', y, outputAsRelative, isSelected });
+      accum.push({ name: 'V', y, outputAsRelative, selected });
     // }
   } else if (Path.isCurveTo(item)) {
     if (item.next && Path.isSmoothCurveTo(item.next)) {
-      accum.push({ name: 'S', x2: item.x1, y2: item.y1, x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'S', x2: item.x1, y2: item.y1, x, y, outputAsRelative, selected });
     } else {
-      accum.push({ name: 'C', x1: item.x2, y1: item.y2, x2: item.x1, y2: item.y1, x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'C', x1: item.x2, y1: item.y2, x2: item.x1, y2: item.y1, x, y, outputAsRelative, selected });
     }
   } else if (Path.isQCurveTo(item)) {
     if (item.next && Path.isSmoothQCurveTo(item.next)) {
-      accum.push({ name: 'T', x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'T', x, y, outputAsRelative, selected });
     } else {
-      accum.push({ name: 'Q', x1: item.x1, y1: item.y1, x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'Q', x1: item.x1, y1: item.y1, x, y, outputAsRelative, selected });
     }
   } else if (Path.isSmoothCurveTo(item)) {
     if (item.next && Path.isSmoothCurveTo(item.next)) {
-      accum.push({ name: 'S', x2: Path.getReflectedX1(item), y2: Path.getReflectedY1(item), x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'S', x2: Path.getReflectedX1(item), y2: Path.getReflectedY1(item), x, y, outputAsRelative, selected });
     } else {
       accum.push({ name: 'C', x1: item.x2, y1: item.y2, x2: Path.getReflectedX1(item), y2: Path.getReflectedY1(item),
-        x, y, outputAsRelative, isSelected });
+        x, y, outputAsRelative, selected });
     }
   } else if (Path.isSmoothQCurveTo(item)) {
     if (item.next && Path.isSmoothQCurveTo(item.next)) {
-      accum.push({ name: 'T', x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'T', x, y, outputAsRelative, selected });
     } else {
-      accum.push({ name: 'Q', x1: Path.getReflectedX1(item), y1: Path.getReflectedY1(item), x, y, outputAsRelative, isSelected });
+      accum.push({ name: 'Q', x1: Path.getReflectedX1(item), y1: Path.getReflectedY1(item), x, y, outputAsRelative, selected });
     }
   } else {
     const x0 = Path.getX(item);
@@ -400,20 +321,20 @@ function appendReversed(items: PathView, index: number, accum: PathItem[]) {
 
     if (Path.isMoveTo(item)) {
       if (hasClosePath(items, index + 1)) {
-        accum.push({ name: 'Z', outputAsRelative, isSelected });
+        accum.push({ name: 'Z', outputAsRelative, selected });
       }
       if (item.prev && (x0 !== x || y0 !== y)) {
-        accum.push({ name: 'M', x, y, outputAsRelative: item.prev.outputAsRelative, isSelected: item.prev.isSelected });
+        accum.push({ name: 'M', x, y, outputAsRelative: item.prev.outputAsRelative, selected: item.prev.selected });
       }
     } else if (Path.isClosePath(item)) {
       if (x0 !== x) {
         if (y0 !== y) {
-          accum.push({ name: 'L', x, y, outputAsRelative, isSelected });
+          accum.push({ name: 'L', x, y, outputAsRelative, selected });
         } else {
-          accum.push({ name: 'H', x, outputAsRelative, isSelected });
+          accum.push({ name: 'H', x, outputAsRelative, selected });
         }
       } else if (y0 !== y) {
-        accum.push({ name: 'V', y, outputAsRelative, isSelected });
+        accum.push({ name: 'V', y, outputAsRelative, selected });
       }
     }
   }
@@ -425,7 +346,7 @@ export function createReveresed(items: PathView): PathItem[] {
   if (i > 0) {
     const last = items[i - 1];
     reveresed.push({ name: 'M', x: Path.getX(last), y: Path.getY(last),
-      outputAsRelative: last.outputAsRelative, isSelected: last.isSelected });
+      outputAsRelative: last.outputAsRelative, selected: last.selected });
     while (i-- > 0) {
       appendReversed(items, i, reveresed);
     }
@@ -435,10 +356,10 @@ export function createReveresed(items: PathView): PathItem[] {
 
 // In place changes.
 export function setOutputAsRelative(items: PathArray, relative: boolean) {
-  const transformAll = !hasSelection(items);
+  const transformAll = !Select.hasSelection(items);
 
   for (const item of items) {
-    if (transformAll || item.isSelected) {
+    if (transformAll || item.selected) {
       item.outputAsRelative = relative;
     }
   }
@@ -447,7 +368,7 @@ export function setOutputAsRelative(items: PathArray, relative: boolean) {
 export function moveAt(items: PathArray, index: number, dx: number, dy: number) {
   const item = items[index];
   if (item && (dx !== 0 || dy !== 0)) {
-    if (item.isSelected) {
+    if (item.selected) {
       // Translate all selected items.
       const x0 = Path.getX(item);
       const y0 = Path.getY(item);
@@ -458,7 +379,7 @@ export function moveAt(items: PathArray, index: number, dx: number, dy: number) 
       if (dx !== 0 || dy !== 0) {
         for (let i = index + 1; i < items.length; i++) {
           const next = items[i];
-          if (next.isSelected) {
+          if (next.selected) {
             Path.translate(next, dx, dy);
           }
         }

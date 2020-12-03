@@ -13,7 +13,7 @@ export class PathGroupComponent implements OnInit {
   get selectedCount() {
     let count = 0;
     for (const node of this.items) {
-      if (node.isSelected) {
+      if (node.selected) {
         count++;
       }
     }
@@ -30,13 +30,13 @@ export class PathGroupComponent implements OnInit {
   onItemClick(index: number) {
     const node = this.items[index];
     if (node) {
-      node.isSelected = !node.isSelected;
+      node.selected = !node.selected;
     }
   }
 
   setAll(selected: boolean) {
     for (const node of this.items) {
-      node.isSelected = selected;
+      node.selected = selected;
     }
   }
 
