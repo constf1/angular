@@ -11,7 +11,7 @@
   </div>
   <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="playAudio()">
   </div>
-  <img #imageRef [ngStyle]="imageStyles">
+  <img #imageRef [ngStyle]="imageStyles" (click)="explodeImage()" >
   <div class="missing-letters-front">
     <button *ngIf="state === 'ready'" (click)="onStart()">START</button>
     <ng-container *ngIf="state === 'active'">

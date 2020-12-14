@@ -4,68 +4,12 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { randomItem } from 'src/app/common/array-utils';
 import { randomInteger } from 'src/app/common/math-utils';
-import { Answer, ChatBot } from './chat-bot';
+import { Answer, ChatBot, countErrors } from './chat-bot';
+import { ASSETS_URL, IMAGES } from './missing-letters-assets';
 
 interface GameData {
   [key: string]: string;
 }
-
-interface Frame {
-  left: number;
-  right?: number;
-  top: number;
-  bottom?: number;
-  width: number;
-}
-
-interface Image {
-  src: string;
-  frames: Frame[];
-}
-
-const IMAGES: Image[] = [
-  {
-    src: 'kitten-jump.webp',
-    frames: [
-      { left: 870, top: 117, width: 58 },  // bulletin board
-      { left: 966, top: 464, width: 52 },  // pot
-      { left: 60, right: 68, top: 22, width: 72 },  // teacher
-      { left: 900, top: 450, width: 60 },  // girl
-      { left: 108, top: 230, width: 100 },  // teacher's pocket
-      { left: 846, right: 954, top: 0, width: 68 },  // bulletin board top
-      { left: 228, right: 742, top: 400, width: 80 },  // blackboard
-      { left: 0, right: 862, top: 550, width: 160 },  // front
-    ]
-  },
-  {
-    src: 'doggy-jump.webp',
-    frames: [
-      { left: 870, top: 117, width: 58 },  // bulletin board
-      { left: 966, top: 464, width: 52 },  // pot
-      { left: 130, right: 136, top: 17, width: 80 },  // teacher's head
-      { left: 900, top: 450, width: 60 },  // girl
-      { left: 108, top: 230, width: 100 },  // teacher's pocket
-      { left: 846, right: 954, top: 0, width: 68 },  // bulletin board top
-      { left: 228, right: 742, top: 400, width: 80 },  // blackboard
-      { left: 0, right: 862, top: 550, width: 160 },  // front
-    ]
-  },
-  {
-    src: 'rabbit-jump.webp',
-    frames: [
-      { left: 870, top: 114, width: 58 },  // bulletin board
-      { left: 970, top: 460, width: 48 },  // pot
-      { left: 138, right: 142, top: 10, width: 72 },  // teacher's head
-      { left: 898, top: 435, width: 60 },  // girl
-      { left: 108, top: 230, width: 84 },  // teacher's pocket
-      { left: 846, right: 964, top: 0, width: 58 },  // bulletin board top
-      { left: 228, right: 742, top: 382, width: 80 },  // blackboard
-      { left: 0, right: 862, top: 510, width: 160 },  // front
-    ]
-  }
-];
-
-const ASSETS_URL = 'assets/school/missing-letters/';
 
 @Component({
   selector: 'app-missing-letters',
@@ -73,8 +17,6 @@ const ASSETS_URL = 'assets/school/missing-letters/';
   styleUrls: ['./missing-letters.component.scss']
 })
 export class MissingLettersComponent implements OnInit {
-  readonly images: ReadonlyArray<Readonly<Image>> = IMAGES;
-
   @ViewChild('imageRef') imageRef: ElementRef<HTMLImageElement>;
   imageStyles: { [key: string]: string } = {
     display: 'none'
@@ -223,35 +165,33 @@ export class MissingLettersComponent implements OnInit {
   }
 
   onAnswer(value: string, board: HTMLElement) {
+    this.clearImage();
     this.isAnswered = true;
     this.quizUserAnswer = value;
 
     const a = this.quizPrefix + this.quizUserAnswer + this.quizSuffix;
     const b = this.quizPrefix + this.quizRealAnswer + this.quizSuffix;
 
-    const elem = this.imageRef?.nativeElement;
-    if (elem) {
-      elem.src = '';
-    }
-
     setTimeout(() => {
+      const elem = this.imageRef?.nativeElement;
       if (elem) {
-        if (a === b) {
-          const image = randomItem(this.images);
+        const success = (this.quizes.length === 0 && countErrors(this.answers) === 0);
+        const images = (a !== b) ? IMAGES.looks : success ? IMAGES.dances : IMAGES.jumps;
 
-          elem.src = ASSETS_URL + image.src;
+        const image = randomItem(images);
 
-          const frame = randomItem(image.frames);
-          const left = typeof frame.right === 'number' ? randomInteger(frame.left, frame.right) : frame.left;
-          const top = typeof frame.bottom === 'number' ? randomInteger(frame.top, frame.bottom) : frame.top;
+        elem.src = ASSETS_URL + image.src;
 
-          this.imageStyles = {
-            position: 'absolute',
-            left: left + 'px',
-            top: top + 'px',
-            width: frame.width + 'px'
-          };
-        }
+        const frame = randomItem(image.frames);
+        const left = typeof frame.right === 'number' ? randomInteger(frame.left, frame.right) : frame.left;
+        const top = typeof frame.bottom === 'number' ? randomInteger(frame.top, frame.bottom) : frame.top;
+
+        this.imageStyles = {
+          position: 'absolute',
+          left: left + 'px',
+          top: top + 'px',
+          width: frame.width + 'px'
+        };
       }
     }, 10);
 
@@ -271,5 +211,22 @@ export class MissingLettersComponent implements OnInit {
 
   trackByIndex(index: number) {
     return index;
+  }
+
+  clearImage() {
+    const elem = this.imageRef?.nativeElement;
+    if (elem) {
+      elem.src = '';
+    }
+    this.imageStyles = { display: 'none' };
+  }
+
+  explodeImage() {
+    const elem = this.imageRef?.nativeElement;
+    if (elem) {
+      const image = randomItem(IMAGES.booms);
+      const src = ASSETS_URL + image.src;
+      elem.src = src;
+    }
   }
 }
