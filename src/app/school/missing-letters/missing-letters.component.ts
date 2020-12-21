@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { randomItem } from 'src/app/common/array-utils';
 import { randomInteger } from 'src/app/common/math-utils';
 import { Answer, ChatBot, countErrors } from './chat-bot';
-import { ASSETS_URL, IMAGES } from './missing-letters-assets';
+import { ASSETS_URL, IMAGES, WIN_AUDIOS } from './missing-letters-assets';
 
 interface GameData {
   [key: string]: string;
@@ -86,7 +86,7 @@ export class MissingLettersComponent implements OnInit {
       this.setQuiz(word);
       qs.splice(i, 1);
 
-      this.setAudio(word);
+      this.setAudio(this.gameData[word]);
       return true;
     }
     this.state = 'done';
@@ -143,8 +143,7 @@ export class MissingLettersComponent implements OnInit {
     this.quizUserAnswer = '_';
   }
 
-  setAudio(word: string) {
-    const uri = this.gameData[word];
+  setAudio(uri: string) {
     if (uri) {
       this.audio.src = ASSETS_URL + 'audio/' + uri + '.mp3';
       // First time play normally.
@@ -164,6 +163,16 @@ export class MissingLettersComponent implements OnInit {
     }
   }
 
+  onAudioClick() {
+    if (this.state === 'done') {
+      if (countErrors(this.answers) === 0) {
+        this.setAudio(randomItem(WIN_AUDIOS));
+      }
+    } else {
+      this.playAudio();
+    }
+  }
+
   onAnswer(value: string, board: HTMLElement) {
     this.clearImage();
     this.isAnswered = true;
@@ -175,8 +184,8 @@ export class MissingLettersComponent implements OnInit {
     setTimeout(() => {
       const elem = this.imageRef?.nativeElement;
       if (elem) {
-        const success = (this.quizes.length === 0 && countErrors(this.answers) === 0);
-        const images = (a !== b) ? IMAGES.looks : success ? IMAGES.dances : IMAGES.jumps;
+        const images = (a === b) ? (this.quizes.length === 0 && countErrors(this.answers) === 0) ?
+          IMAGES.dances : IMAGES.jumps : IMAGES.looks;
 
         const image = randomItem(images);
 

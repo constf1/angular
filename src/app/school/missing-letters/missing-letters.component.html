@@ -9,9 +9,9 @@
       <!-- <span style="visibility: hidden;color: #0000;padding-right: 0.4em">,</span> -->
     </span>
   </div>
-  <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="playAudio()">
+  <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="onAudioClick()">
   </div>
-  <img #imageRef [ngStyle]="imageStyles" (click)="explodeImage()" >
+  <img class="missing-letters-effects" #imageRef [ngStyle]="imageStyles" (click)="explodeImage()" >
   <div class="missing-letters-front">
     <button *ngIf="state === 'ready'" (click)="onStart()">START</button>
     <ng-container *ngIf="state === 'active'">

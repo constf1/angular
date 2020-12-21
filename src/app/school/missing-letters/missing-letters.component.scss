@@ -143,6 +143,10 @@ div.missing-letters-frame {
     }
   }
 
+  img.missing-letters-effects {
+    animation: keyframes-fade-in 0.5s ease;
+  }
+
   div.missing-letters-front {
     position: absolute;
     display: flex;
