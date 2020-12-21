@@ -109,6 +109,21 @@ export const IMAGES: { [key: string]: Image[] } = {
         { left: 0, top: 530, bottom: 556, width: 100 },  // floor left corner middle
         { left: 0, top: 560, bottom: 586, width: 120 },  // floor left corner front
       ]
+    },
+    {
+      src: 'tortoise-look.webp',
+      frames: [
+        { left: 690, top: 398, width: 140 },  // blackboard bottom right corner
+        { left: 690, top: 556, width: 200 },  // floor right corner middle
+      ]
+    },
+    {
+      src: 'rabbit-sneeze.webp',
+      frames: [
+        { left: 676, top: 388, width: 150 },  // blackboard bottom right corner
+        { left: 692, top: 540, bottom: 584, width: 180 },  // floor right corner middle
+        { left: 904, top: 0, width: 120 },  // bulletin board top
+      ]
     }
   ],
   booms: [
@@ -122,3 +137,5 @@ export const IMAGES: { [key: string]: Image[] } = {
 };
 
 export const ASSETS_URL = 'assets/school/missing-letters/';
+
+export const WIN_AUDIOS = ['snare-flute', 'sneaky-xylophone', 'silly-baritone', 'swell-trombone', 'gramophone-1'] as const;
