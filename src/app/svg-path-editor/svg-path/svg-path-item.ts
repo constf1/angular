@@ -4,6 +4,7 @@ import { transformedNode } from './svg-path-transform';
 
 import * as Path from './svg-path-node';
 import * as Select from 'src/app/common/selectable';
+import { lerp } from 'src/app/common/math-utils';
 
 // reexport
 export * from './svg-path-node';
@@ -210,6 +211,96 @@ function extract(item: Readonly<PathItem>): PathItem {
   return copy(item);
 }
 
+function bisect(item: Readonly<PathItem>, t: number): PathItem[] {
+  const prev = undefined;
+  const next = undefined;
+  const list = undefined;
+
+  if (Path.isHLineTo(item)) {
+    const x = lerp(Path.getX(item.prev), item.x, t);
+    return [{ ...item, x, prev, next, list }, copy(item)];
+  } else if (Path.isVLineTo(item)) {
+    const y = lerp(Path.getY(item.prev), item.y, t);
+    return [{ ...item, y, prev, next, list }, copy(item)];
+  } else if (Path.isLineTo(item)) {
+    const x = lerp(Path.getX(item.prev), item.x, t);
+    const y = lerp(Path.getY(item.prev), item.y, t);
+    return [{ ...item, x, y, prev, next, list }, copy(item)];
+  } else if (Path.isCurveTo(item) || Path.isSmoothCurveTo(item)) {
+    // De Casteljau's Algorithm. https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm
+    const X0 = Path.getX(item.prev);
+    const Y0 = Path.getY(item.prev);
+
+    const X1 = Path.getFirstControlX(item);
+    const Y1 = Path.getFirstControlY(item);
+
+    const X2 = item.x2;
+    const Y2 = item.y2;
+
+    const X12 = lerp(X1, X2, t);
+    const Y12 = lerp(Y1, Y2, t);
+
+    const XB3 = item.x;
+    const YB3 = item.y;
+    const XB2 = lerp(X2, XB3, t);
+    const YB2 = lerp(Y2, YB3, t);
+    const XB1 = lerp(X12, XB2, t);
+    const YB1 = lerp(Y12, YB2, t);
+
+    const XA1 = lerp(X0, X1, t);
+    const YA1 = lerp(Y0, Y1, t);
+    const XA2 = lerp(XA1, X12, t);
+    const YA2 = lerp(YA1, Y12, t);
+    const XA3 = lerp(XA2, XB1, t);
+    const YA3 = lerp(YA2, YB1, t);
+
+    return [
+      { ...item, name: 'C', x1: XA1, y1: YA1, x2: XA2, y2: YA2, x: XA3, y: YA3, prev, next, list },
+      { ...item, name: 'C', x1: XB1, y1: YB1, x2: XB2, y2: YB2, x: XB3, y: YB3, prev, next, list },
+    ];
+  } else if (Path.isQCurveTo(item) || Path.isSmoothQCurveTo(item)) {
+    const X0 = Path.getX(item.prev);
+    const Y0 = Path.getY(item.prev);
+
+    const X1 = Path.getFirstControlX(item);
+    const Y1 = Path.getFirstControlY(item);
+
+    const XB2 = item.x;
+    const YB2 = item.y;
+    const XB1 = lerp(X1, XB2, t);
+    const YB1 = lerp(Y1, YB2, t);
+
+    const XA1 = lerp(X0, X1, t);
+    const YA1 = lerp(Y0, Y1, t);
+    const XA2 = lerp(XA1, XB1, t);
+    const YA2 = lerp(YA1, YB1, t);
+
+    return [
+      { ...item, name: 'Q', x1: XA1, y1: YA1, x: XA2, y: YA2, prev, next, list },
+      { ...item, name: 'Q', x1: XB1, y1: YB1, x: XB2, y: YB2, prev, next, list },
+    ];
+  } else if (Path.isEllipticalArc(item)) {
+    const { cx, cy, rx, ry, phi, theta, deltaTheta } = Path.getCenterParams(item);
+    // console.log({ cx, cy, rx, ry, phi, theta, deltaTheta });
+    if (typeof theta === 'number') {
+      const deltaTheta1 = lerp(0, deltaTheta, t);
+      const p1 = Path.getEllipticalArcPoint(cx, cy, rx, ry, phi, theta + deltaTheta1);
+      const largeArcFlag1 = Math.abs(deltaTheta1) > Math.PI;
+      const largeArcFlag2 = Math.abs(deltaTheta - deltaTheta1) > Math.PI;
+      return [
+        { ...item, rx, ry, largeArcFlag: largeArcFlag1, x: p1.x, y: p1.y, prev, next, list },
+        { ...item, rx, ry, largeArcFlag: largeArcFlag2, prev, next, list },
+      ];
+    } else {
+      // Treat this as a straight line from (x1, y1) to (x2, y2).
+      const x = lerp(Path.getX(item.prev), item.x, t);
+      const y = lerp(Path.getY(item.prev), item.y, t);
+      return [{ ...item, x, y, prev, next, list }, copy(item)];
+    }
+  }
+  return [copy(item)];
+}
+
 function connected(items: PathItem[]): PathItem[] {
   connect(...items);
   return items;
@@ -352,6 +443,22 @@ export function createReveresed(items: PathView): PathItem[] {
     }
   }
   return connected(reveresed);
+}
+
+export function bisectAll(items: PathView, t: number = 0.5): PathItem[] {
+  return connected(items.map(item => bisect(item, t)).reduce((path, x) => path.concat(x), []));
+}
+
+export function bisectSelection(items: PathView, t: number = 0.5): PathItem[] {
+  const path: PathItem[] = [];
+  for (const item of items) {
+    if (item.selected) {
+      path.push(...bisect(item, t));
+    } else {
+      path.push(extract(item));
+    }
+  }
+  return connected(path);
 }
 
 // In place changes.

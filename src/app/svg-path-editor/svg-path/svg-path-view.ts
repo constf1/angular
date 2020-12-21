@@ -1,5 +1,5 @@
 import { asString, CurveTo, EllipticalArc, isCurveTo, isSmoothCurveTo, QCurveTo, SmoothCurveTo } from './svg-path-commands';
-import { getCenterPoint, getReflectedX1, getReflectedY1, getX, getY, PathNode, SmoothCurveNode } from './svg-path-node';
+import { getCenterParams, getReflectedX1, getReflectedY1, getX, getY, PathNode, SmoothCurveNode } from './svg-path-node';
 
 export function getCurveControlHandles(node: Readonly<PathNode & (CurveTo | QCurveTo | SmoothCurveTo)>): string {
   if (isCurveTo(node)) {
@@ -21,22 +21,21 @@ export function getReflectedCurveTangentLines(node: Readonly<SmoothCurveNode>): 
 }
 
 export function getReflectedEllipticalArc(node: Readonly<PathNode & EllipticalArc>) {
-  const center = getCenterPoint(node);
+  const { cx, cy, phi } = getCenterParams(node);
 
-  const sa = `M${node.x} ${node.y}L${center.x} ${center.y}L${getX(node.prev)} ${getY(node.prev)}`
-    + asString({ ...node, largeArcFlag: !node.largeArcFlag, sweepFlag: !node.sweepFlag});
+  const sa = `M${node.x} ${node.y}L${cx} ${cy}L${getX(node.prev)} ${getY(node.prev)}`
+    + asString({ ...node, largeArcFlag: !node.largeArcFlag, sweepFlag: !node.sweepFlag}, -1);
 
-  const phi = node.angle * Math.PI / 180;
   const cosPhi = Math.cos(phi);
   const sinPhi = Math.sin(phi);
 
   let dx = cosPhi * node.rx;
   let dy = sinPhi * node.rx;
-  const sb = `M${center.x - dx} ${center.y - dy}l${2 * dx} ${2 * dy}`;
+  const sb = `M${cx - dx} ${cy - dy}l${2 * dx} ${2 * dy}`;
 
   dx = -sinPhi * node.ry;
   dy = cosPhi * node.ry;
-  const sc = `M${center.x - dx} ${center.y - dy}l${2 * dx} ${2 * dy}`;
+  const sc = `M${cx - dx} ${cy - dy}l${2 * dx} ${2 * dy}`;
 
   return sa + sb + sc;
 }

@@ -68,7 +68,23 @@ export function getY(item?: Readonly<PathNode>): number {
   return 0;
 }
 
-function getLastControlX(node: Readonly<CurveNode>): number {
+export function getFirstControlX(node: Readonly<CurveNode>): number {
+  if (Path.hasControlPoint1(node)) {
+    return node.x1;
+  } else {
+    return getReflectedX1(node);
+  }
+}
+
+export function getFirstControlY(node: Readonly<CurveNode>): number {
+  if (Path.hasControlPoint1(node)) {
+    return node.y1;
+  } else {
+    return getReflectedY1(node);
+  }
+}
+
+export function getLastControlX(node: Readonly<CurveNode>): number {
   if (Path.hasControlPoint2(node)) {
     return node.x2;
   } else if (Path.isQCurveTo(node)) {
@@ -78,7 +94,7 @@ function getLastControlX(node: Readonly<CurveNode>): number {
   }
 }
 
-function getLastControlY(node: Readonly<CurveNode>): number {
+export function getLastControlY(node: Readonly<CurveNode>): number {
   if (Path.hasControlPoint2(node)) {
     return node.y2;
   } else if (Path.isQCurveTo(node)) {
@@ -126,8 +142,26 @@ export function getReflectedY1(node: Readonly<SmoothCurveNode>): number {
   return y;
 }
 
+// In general, the angle between two vectors (ux, uy) and (vx, vy) can be computed as
+// +- arccos(dot(u, v) / (u.length * v.length),
+// where the +- sign is the sign of (ux * vy − uy * vx).
+function twoVectorsAngle(ux: number, uy: number, vx: number, vy: number): number {
+  // const ul = Math.sqrt(ux * ux + uy * uy);
+  // const vl = Math.sqrt(vx * vx + vy * vy);
+  // const dot = ux * vx + uy * vy;
+  // const sign = ux * vy - uy * vx < 0 ? -1 : 1;  // Math.sign(0) returns 0
+  // return sign * Math.acos(Math.max(-1, Math.min(1, dot / (ul * vl))));
+
+  const a2 = Math.atan2(uy, ux);
+  const a1 = Math.atan2(vy, vx);
+  const sign = a1 > a2 ? -1 : 1;
+  const angle1 = a1 - a2;
+  const angle2 = angle1 + sign * Math.PI * 2;
+  return (Math.abs(angle2) < Math.abs(angle1)) ? angle2 : angle1;
+}
+
 // Specification: https://www.w3.org/TR/SVG/implnote.html#ArcConversionEndpointToCenter
-export function getCenterPoint(node: Readonly<PathNode & Path.EllipticalArc>): { x: number, y: number } {
+export function getCenterParams(node: Readonly<PathNode & Path.EllipticalArc>) {
   // Given the following variables:
   // x1 y1 x2 y2 fA fS rx ry phi
   const x1 = getX(node.prev);
@@ -138,17 +172,18 @@ export function getCenterPoint(node: Readonly<PathNode & Path.EllipticalArc>): {
   const fA = node.largeArcFlag;
   const fB = node.sweepFlag;
 
+  const phi = node.angle * Math.PI / 180;
+
   // Correction Step 1: Ensure radii are positive
   let rx = Math.abs(node.rx);
   let ry = Math.abs(node.ry);
   // Correction Step 2: Ensure radii are non-zero
   // If rx = 0 or ry = 0, then treat this as a straight line from (x1, y1) to (x2, y2) and stop.
   if (rx === 0 || ry === 0) {
-    return { x: (x1 + x2) / 2, y: (y1 + y2) / 2 };
+    return { cx: (x1 + x2) / 2, cy: (y1 + y2) / 2, rx, ry, phi };
   }
 
   // Step 1: Compute (x1′, y1′)
-  const phi = node.angle * Math.PI / 180;
   const cosPhi = Math.cos(phi);
   const sinPhi = Math.sin(phi);
   const dx = (x1 - x2) / 2;
@@ -175,7 +210,46 @@ export function getCenterPoint(node: Readonly<PathNode & Path.EllipticalArc>): {
   // Step 3: Compute (cx, cy) from (cx′, cy′)
   const cx = (cosPhi * cx_ - sinPhi * cy_) || 0;
   const cy = (sinPhi * cx_ + cosPhi * cy_) || 0;
-  return { x: cx + (x1 + x2) / 2, y: cy + (y1 + y2) / 2};
+
+  // Step 4: Compute theta and deltaTheta
+  const ux = (x1_ - cx_) / rx;
+  const uy = (y1_ - cy_) / ry;
+  const vx = -(x1_ + cx_) / rx;
+  const vy = -(y1_ + cy_) / ry;
+  const theta = twoVectorsAngle(1, 0, ux, uy);
+
+  let deltaTheta = twoVectorsAngle(ux, uy, vx, vy);
+  if (fB) {
+    // deltaTheta should be >= 0
+    if (deltaTheta < 0) {
+      deltaTheta += 2 * Math.PI;
+    }
+  } else {
+    // deltaTheta should be <= 0
+    if (deltaTheta > 0) {
+      deltaTheta -= 2 * Math.PI;
+    }
+  }
+
+  return { cx: cx + (x1 + x2) / 2, cy: cy + (y1 + y2) / 2, rx, ry, phi, theta, deltaTheta };
+}
+
+export function getEllipticalArcPoint(cx: number, cy: number, rx: number, ry: number, phi: number, theta: number) {
+  // An arbitrary point (x, y) on the elliptical arc can be described by the 2-dimensional matrix equation
+  // https://www.w3.org/TR/SVG/implnote.html#ArcParameterizationAlternatives
+  const cosPhi = Math.cos(phi);
+  const sinPhi = Math.sin(phi);
+
+  const x1 = rx * Math.cos(theta);
+  const y1 = ry * Math.sin(theta);
+
+  const x1_ = cosPhi * x1 - sinPhi * y1;
+  const y1_ = sinPhi * x1 + cosPhi * y1;
+
+  const x = x1_ + cx;
+  const y = y1_ + cy;
+
+  return { x, y };
 }
 
 export function asRelativeString(item: Readonly<PathNode>, fractionDigits?: number): string {

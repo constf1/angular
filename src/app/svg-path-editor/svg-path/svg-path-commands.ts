@@ -207,7 +207,7 @@ export function formatParams(item: Readonly<DrawTo>, x0: number, y0: number, fra
  * @param item SVG path single draw command
  * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
  */
-export function asString(item: Readonly<DrawTo>, fractionDigits?: number): string {
+export function asString(item: Readonly<DrawTo>, fractionDigits = -1): string {
   return item.name + formatParams(item, 0, 0, fractionDigits);
 }
 

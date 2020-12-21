@@ -343,6 +343,17 @@ export class EditorComponent implements OnInit {
     this.onPathModelChange();
   }
 
+  onSplit() {
+    const path = this.path;
+    const index = Path.getFirstSelectionIndex(path);
+
+    this.path =  index >= 0 ? Path.bisectSelection(path) : Path.bisectAll(path);
+    if (this.editMode === EditMode.Single) {
+      Path.selectDistinct(this.path, this.singleSelectionIndex = index, true);
+    }
+    this.onPathModelChange();
+  }
+
   onClone(reversed?: boolean) {
     const path = this.path;
 
