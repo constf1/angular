@@ -53,10 +53,18 @@
         <!-- Input -->
         <app-tab-group items="Raw Data|Selector|Inspector" [selection]="editMode" (selectionChange)="selectTab($event)">
           <div style="padding-top: 1em;">
-            <div style="padding-left: 16px;" [style.display]="editMode === 0 ? 'block' : 'none'">
+            <div style="padding: 0 0.5em;" [style.display]="editMode === 0 ? 'block' : 'none'">
               <mat-form-field style="width: 100%;">
                 <mat-label>SVG path data:</mat-label>
-                <textarea matInput rows="15" style="resize: none;" placeholder="Place any SVG path data here"
+                <!--
+                  FF textarea workarounds:
+                  1) Extra height. FF reserves space for scroll-bars. We'll disable horizontal scroll bar.
+                  FIX: overflow-x: hidden;
+                  2) Horizontal caret navigation can be extremely slow (in the presence of vertical scroll-bar).
+                  FIX: padding: 0; margin: 0;
+                -->
+                <textarea matInput rows="15" style="resize: none;overflow-x: hidden;padding: 0;margin: 0;"
+                  placeholder="Place any SVG path data here"
                   [ngModel]="pathInput" (ngModelChange)="onInputChange($event)"></textarea>
               </mat-form-field>
             </div>
