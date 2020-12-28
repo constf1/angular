@@ -73,6 +73,30 @@ export function multiply(A: ReadonlyMatrix, B: ReadonlyMatrix): Matrix {
   };
 }
 
+/**
+ * Returns an inverted version of the matrix.
+ * @param m the given matrix
+ */
+export function invert(m: ReadonlyMatrix): Matrix {
+  const x = m.a * m.d - m.b * m.c;
+  return {
+    a: m.d / x,
+    b: -m.b / x,
+    c: -m.c / x,
+    d: m.a / x,
+    e: (m.c * m.f - m.d * m.e) / x,
+    f: (m.b * m.e - m.a * m.f) / x
+  };
+}
+
+export function toArray(m: ReadonlyMatrix): number[] {
+  return [m.a, m.b, m.c, m.d, m.e, m.f];
+}
+
+export function toString(m: ReadonlyMatrix): string {
+  return 'matrix(' + toArray(m).join(', ') + ')';
+}
+
 // from http://math.stackexchange.com/questions/861674/decompose-a-2d-arbitrary-transform-into-only-scaling-and-rotation
 export function decompose(m: ReadonlyMatrix) {
   const E = (m.a + m.d) / 2;
