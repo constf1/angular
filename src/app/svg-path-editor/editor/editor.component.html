@@ -106,12 +106,16 @@
             style="float: right;">
             <mat-icon>{{menuTrigger.menuOpen ? 'menu_open' : 'menu' }}</mat-icon>
           </button>
+          <mat-menu #menuReplace="matMenu">
+            <button mat-menu-item [disabled]="!hasArc" (click)="onEllipticalArcAppriximation()">Arc to Curves Approximation</button>
+          </mat-menu>
           <mat-menu #menuConvert="matMenu">
             <button mat-menu-item (click)="convertInput(false)">Convert to Absolute</button>
             <button mat-menu-item (click)="convertInput(true)">Convert to Relative</button>
             <button mat-menu-item (click)="onClone(false)">Clone</button>
             <button mat-menu-item (click)="onClone(true)">Clone Reversed</button>
             <button mat-menu-item (click)="onSplit()">Bisect</button>
+            <button mat-menu-item [matMenuTriggerFor]="menuReplace">Replace</button>
             <mat-divider></mat-divider>
             <button mat-menu-item (click)="onDelete()">
               <mat-icon>clear</mat-icon><span>Delete</span>

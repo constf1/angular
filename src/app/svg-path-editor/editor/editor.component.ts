@@ -101,6 +101,11 @@ export class EditorComponent implements OnInit {
     return Path.getFirstSelectionIndex(this.path);
   }
 
+  get hasArc() {
+    const all = !Path.hasSelection(this.path);
+    return !!this.path.find(item => (all || item.selected) && Path.isEllipticalArc(item));
+  }
+
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
@@ -348,6 +353,18 @@ export class EditorComponent implements OnInit {
     const index = Path.getFirstSelectionIndex(path);
 
     this.path =  index >= 0 ? Path.bisectSelection(path) : Path.bisectAll(path);
+    if (this.editMode === EditMode.Single) {
+      Path.selectDistinct(this.path, this.singleSelectionIndex = index, true);
+    }
+    this.onPathModelChange();
+  }
+
+  onEllipticalArcAppriximation() {
+    const path = this.path;
+    const index = Path.getFirstSelectionIndex(path);
+
+    this.path = Path.approximateEllipticalArcs(path, index >= 0);
+    // this.path = Path.replaceQCurves(path);
     if (this.editMode === EditMode.Single) {
       Path.selectDistinct(this.path, this.singleSelectionIndex = index, true);
     }
