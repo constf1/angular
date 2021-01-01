@@ -281,10 +281,9 @@ function bisect(item: Readonly<PathItem>, t: number): PathItem[] {
     ];
   } else if (Path.isEllipticalArc(item)) {
     const { cx, cy, rx, ry, phi, theta, deltaTheta } = Path.getCenterParams(item);
-    // console.log({ cx, cy, rx, ry, phi, theta, deltaTheta });
-    if (typeof theta === 'number') {
+    if (deltaTheta) {
       const deltaTheta1 = lerp(0, deltaTheta, t);
-      const p1 = Path.getEllipticalArcPoint(cx, cy, rx, ry, phi, theta + deltaTheta1);
+      const p1 = Path.getEllipsePoint({ cx, cy, rx, ry, phi }, theta + deltaTheta1);
       const largeArcFlag1 = Math.abs(deltaTheta1) > Math.PI;
       const largeArcFlag2 = Math.abs(deltaTheta - deltaTheta1) > Math.PI;
       return [
@@ -454,6 +453,41 @@ export function bisectSelection(items: PathView, t: number = 0.5): PathItem[] {
   for (const item of items) {
     if (item.selected) {
       path.push(...bisect(item, t));
+    } else {
+      path.push(extract(item));
+    }
+  }
+  return connected(path);
+}
+
+export function approximateEllipticalArcs(items: PathView, selectionOnly = false): PathItem[] {
+  const path: PathItem[] = [];
+  for (const item of items) {
+    if (Path.isEllipticalArc(item) && (!selectionOnly || item.selected)) {
+      const dest = Path.approximateEllipticalArc(item) as PathItem[];
+      for (const node of dest) {
+        node.selected = item.selected;
+        node.outputAsRelative = item.outputAsRelative;
+        path.push(node);
+      }
+    } else {
+      path.push(copy(item));
+    }
+  }
+  return connected(path);
+}
+
+export function replaceQCurves(items: PathView): PathItem[] {
+  const path: PathItem[] = [];
+  for (const item of items) {
+    if (Path.isQCurveTo(item)) {
+      // 1/3rd start + 2/3rd control
+      const x1 = (Path.getX(item.prev) + 2 * item.x1) / 3;
+      const y1 = (Path.getY(item.prev) + 2 * item.y1) / 3;
+      // 2/3rd control + 1/3rd end
+      const x2 = (item.x + 2 * item.x1) / 3;
+      const y2 = (item.y + 2 * item.y1) / 3;
+      path.push({ name: 'C', x1, y1, x2, y2, x: item.x, y: item.y });
     } else {
       path.push(extract(item));
     }
