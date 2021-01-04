@@ -1,4 +1,5 @@
 import { randomItem } from 'src/app/common/array-utils';
+import { commonPrefix, commonSuffix } from 'src/app/common/string-utils';
 
 const MESSAGES = {
   // Excellent
@@ -330,8 +331,15 @@ export class ChatBot {
     this.addTeacher(randomItem(MESSAGES.MISTAKE_EMPHASIS));
     for (const a of answers) {
       if (a.userAnswer !== a.realAnswer) {
-        this.addTeacher(`<mark>${a.realAnswer}</mark>`);
-        this.addStudent(`<strong>${a.realAnswer}</strong>`);
+        const { realAnswer, userAnswer } = a;
+        this.addTeacher(`<mark>${realAnswer}</mark>`);
+
+        const prefix = commonPrefix(realAnswer, userAnswer);
+        const start = prefix.length;
+        const suffix = commonSuffix(realAnswer, userAnswer, start);
+        const end = suffix.length;
+
+        this.addStudent(`<strong>${prefix}<mark>${realAnswer.substring(start, realAnswer.length - end)}</mark>${suffix}</strong>`);
       }
     }
     this.addTeacher(randomItem(MESSAGES.REMEMBER_EMPHASIS));
