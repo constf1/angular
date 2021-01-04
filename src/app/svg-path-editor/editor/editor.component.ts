@@ -106,6 +106,16 @@ export class EditorComponent implements OnInit {
     return !!this.path.find(item => (all || item.selected) && Path.isEllipticalArc(item));
   }
 
+  get canPromoteToCurve() {
+    const all = !Path.hasSelection(this.path);
+    return !!this.path.find(item => (all || item.selected) && Path.canPromoteToCurve(item));
+  }
+
+  get canPromoteToQCurve() {
+    const all = !Path.hasSelection(this.path);
+    return !!this.path.find(item => (all || item.selected) && Path.canPromoteToQCurve(item));
+  }
+
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
@@ -364,10 +374,19 @@ export class EditorComponent implements OnInit {
     const index = Path.getFirstSelectionIndex(path);
 
     this.path = Path.approximateEllipticalArcs(path, index >= 0);
-    // this.path = Path.replaceQCurves(path);
     if (this.editMode === EditMode.Single) {
       Path.selectDistinct(this.path, this.singleSelectionIndex = index, true);
     }
+    this.onPathModelChange();
+  }
+
+  onPromoteToCurve() {
+    this.path = Path.promoteToCurves(this.path, Path.hasSelection(this.path));
+    this.onPathModelChange();
+  }
+
+  onPromoteToQCurve() {
+    this.path = Path.promoteToQCurves(this.path, Path.hasSelection(this.path));
     this.onPathModelChange();
   }
 

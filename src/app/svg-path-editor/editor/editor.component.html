@@ -108,6 +108,8 @@
           </button>
           <mat-menu #menuReplace="matMenu">
             <button mat-menu-item [disabled]="!hasArc" (click)="onEllipticalArcAppriximation()">Arc to Curves Approximation</button>
+            <button mat-menu-item [disabled]="!canPromoteToCurve" (click)="onPromoteToCurve()">Promote to Cubic Bézier Curve</button>
+            <button mat-menu-item [disabled]="!canPromoteToQCurve" (click)="onPromoteToQCurve()">Promote to Quadratic Bézier Curve</button>
           </mat-menu>
           <mat-menu #menuConvert="matMenu">
             <button mat-menu-item (click)="convertInput(false)">Convert to Absolute</button>

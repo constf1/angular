@@ -192,6 +192,8 @@ export function createFromString(pathData: string): PathItem[] {
   return nodes;
 }
 
+// Conversion and substitution.
+
 function copy(item: Readonly<PathItem>): PathItem {
   return { ...item, prev: undefined, next: undefined, list: undefined };
 }
@@ -460,10 +462,11 @@ export function bisectSelection(items: PathView, t: number = 0.5): PathItem[] {
   return connected(path);
 }
 
-export function approximateEllipticalArcs(items: PathView, selectionOnly = false): PathItem[] {
+export function approximateEllipticalArcs(items: PathView, selectionOnly?: boolean): PathItem[] {
   const path: PathItem[] = [];
+  const all = !selectionOnly;
   for (const item of items) {
-    if (Path.isEllipticalArc(item) && (!selectionOnly || item.selected)) {
+    if (Path.isEllipticalArc(item) && (all || item.selected)) {
       const dest = Path.approximateEllipticalArc(item) as PathItem[];
       for (const node of dest) {
         node.selected = item.selected;
@@ -477,19 +480,82 @@ export function approximateEllipticalArcs(items: PathView, selectionOnly = false
   return connected(path);
 }
 
-export function replaceQCurves(items: PathView): PathItem[] {
+export function canPromoteToLine(item: Readonly<Path.DrawTo>): boolean {
+  return Path.isHLineTo(item) || Path.isVLineTo(item);
+}
+
+export function canPromoteToQCurve(item: Readonly<Path.DrawTo>): boolean {
+  return canPromoteToLine(item) || Path.isLineTo(item) || Path.isSmoothQCurveTo(item);
+}
+
+export function canPromoteToCurve(item: Readonly<Path.DrawTo>): boolean {
+  return canPromoteToQCurve(item) || Path.isQCurveTo(item) || Path.isSmoothCurveTo(item);
+}
+
+export function promoteToQCurves(items: PathView, selectionOnly?: boolean): PathItem[] {
   const path: PathItem[] = [];
+  const all = !selectionOnly;
   for (const item of items) {
-    if (Path.isQCurveTo(item)) {
-      // 1/3rd start + 2/3rd control
-      const x1 = (Path.getX(item.prev) + 2 * item.x1) / 3;
-      const y1 = (Path.getY(item.prev) + 2 * item.y1) / 3;
-      // 2/3rd control + 1/3rd end
-      const x2 = (item.x + 2 * item.x1) / 3;
-      const y2 = (item.y + 2 * item.y1) / 3;
-      path.push({ name: 'C', x1, y1, x2, y2, x: item.x, y: item.y });
+    if (canPromoteToQCurve(item) && (all || item.selected)) {
+      const { outputAsRelative, selected } = item;
+      if (Path.isSmoothQCurveTo(item)) {
+        const x1 = Path.getReflectedX1(item);
+        const y1 = Path.getReflectedY1(item);
+        path.push({ name: 'Q', x1, y1, x: item.x, y: item.y, outputAsRelative, selected });
+      } else {
+        // Treat it as a line.
+        const x0 = Path.getX(item.prev);
+        const y0 = Path.getY(item.prev);
+        const x = Path.getX(item);
+        const y = Path.getY(item);
+        const x1 = (x0 + x) / 2;
+        const y1 = (y0 + y) / 2;
+        path.push({ name: 'Q', x1, y1, x, y, outputAsRelative, selected });
+      }
     } else {
-      path.push(extract(item));
+      path.push(copy(item));
+    }
+  }
+  return connected(path);
+}
+
+export function promoteToCurves(items: PathView, selectionOnly?: boolean): PathItem[] {
+  const path: PathItem[] = [];
+  const all = !selectionOnly;
+  for (const item of items) {
+    if (canPromoteToCurve(item) && (all || item.selected)) {
+      const { outputAsRelative, selected } = item;
+      if (Path.isSmoothCurveTo(item)) {
+        const x1 = Path.getReflectedX1(item);
+        const y1 = Path.getReflectedY1(item);
+        path.push({ name: 'C', x1, y1, x2: item.x2, y2: item.y2, x: item.x, y: item.y, outputAsRelative, selected });
+      } else {
+        const x0 = Path.getX(item.prev);
+        const y0 = Path.getY(item.prev);
+        if (Path.isQCurveTo(item) || Path.isSmoothQCurveTo(item)) {
+          const control2x = 2 * Path.getFirstControlX(item);
+          const control2y = 2 * Path.getFirstControlY(item);
+          // 1/3rd start + 2/3rd control
+          const x1 = (x0 + control2x) / 3;
+          const y1 = (y0 + control2y) / 3;
+          // 1/3rd stop + 2/3rd control
+          const x2 = (item.x + control2x) / 3;
+          const y2 = (item.y + control2y) / 3;
+          path.push({ name: 'C', x1, y1, x2, y2, x: item.x, y: item.y, outputAsRelative, selected });
+        } else {
+          // Treat it as a line.
+          const x = Path.getX(item);
+          const y = Path.getY(item);
+
+          const x1 = x0 + (x - x0) / 4; // (x + 2 * x0) / 3
+          const y1 = y0 + (y - y0) / 4; // (y + 2 * y0) / 3
+          const x2 = x0 + 3 * (x - x0) / 4; // (x0 + 2 * x) / 3
+          const y2 = y0 + 3 * (y - y0) / 4; // (y0 + 2 * y) / 3
+          path.push({ name: 'C', x1, y1, x2, y2, x, y, outputAsRelative, selected });
+        }
+      }
+    } else {
+      path.push(Path.isSmoothQCurveTo(item) ? extract(item) : copy(item));
     }
   }
   return connected(path);
