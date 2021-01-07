@@ -80,3 +80,27 @@ export function makePath(items: DrawTo[]): PathNode[] {
   }
   return items;
 }
+
+// Split into logic groups
+export function getGroups(items: PathNode[]): PathNode[][]  {
+  const groups: PathNode[][] = [];
+  let next: PathNode[];
+  for (const item of items) {
+    if (!next || isMoveTo(item)) {
+      if (next) {
+        groups.push(next);
+      }
+      next = [item];
+    } else {
+      next.push(item);
+    }
+    if (isClosePath(item)) {
+      groups.push(next);
+      next = undefined;
+    }
+  }
+  if (next) {
+    groups.push(next);
+  }
+  return groups;
+}
