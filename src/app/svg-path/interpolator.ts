@@ -26,7 +26,7 @@ function stretch(pathGroup: PathNode[], size: number): PathNode[] {
       const node = pathGroup[i];
       const x = (i <= r ? n + 1 : n);
       if (x > 1) {
-        items.concat(split(node, x));
+        items.push(...split(node, x));
       } else {
         items.push({ ...node });
       }
@@ -100,7 +100,7 @@ function normalize(path: PathNode[]): NormalizedNode[] {
   // Get rid of EllipticalArcs and ClosePaths.
   for (const node of path) {
     if (isEllipticalArc(node)) {
-      items.concat(approximateEllipticalArc(node));
+      items.push(...approximateEllipticalArc(node));
     } else if (isClosePath(node)) {
       const prev = node.prev;
       const x0 = getX(prev);
@@ -134,8 +134,8 @@ export function interpolate(src: PathNode[], dst: PathNode[]) {
   const itemsB: PathNode[] = [];
   for (let i = 0; i < srcGroups.length; i++) {
     const [a, b] = align(srcGroups[i], dstGroups[i]);
-    itemsA.concat(a);
-    itemsB.concat(b);
+    itemsA.push(...a);
+    itemsB.push(...b);
   }
 
   return [makePath(itemsA), makePath(itemsB)];

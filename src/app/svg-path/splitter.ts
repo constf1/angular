@@ -112,7 +112,7 @@ export function bisect(item: Readonly<PathNode>, t = 1 / 2): PathNode[] {
 export function trisect(item: Readonly<PathNode>, t = 1 / 3): PathNode[] {
   const arr = bisect(item, t);
   if (arr.length > 1) {
-    return [arr[0]].concat(bisect(arr[1]));
+    return [arr[0], ...bisect(arr[1])];
   }
   return arr;
 }
@@ -134,7 +134,7 @@ export function split(item: Readonly<PathNode>, count: number): PathNode[] {
   } else {
     const arr = bisect(item, 1 / count);
     if (arr.length > 1) {
-      return [arr[0]].concat(split(arr[1], count - 1));
+      return [arr[0], ...split(arr[1], count - 1)];
     }
     return arr;
   }
