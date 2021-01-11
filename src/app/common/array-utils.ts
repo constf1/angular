@@ -58,6 +58,10 @@ export function randomItem<T>(arr: Readonly<T[]>): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+export function lastItem<T>(arr: Readonly<T[]>): T {
+  return arr[arr.length - 1];
+}
+
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
 export function shuffle<T>(arr: Array<T>): Array<T> {
   for (let i = arr.length; --i > 0; ) {

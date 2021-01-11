@@ -348,7 +348,7 @@ export class EditorComponent implements OnInit {
     const last = this.path[lastIndex];
     const next: Path.PathItem = Path.createPathNode(command, SAMPLE_PATH_ITEMS[command]);
     Path.translate(next, Path.getX(last), Path.getY(last));
-    next.outputAsRelative = true;
+    next.outputAsRelative = last?.outputAsRelative;
 
     const nextIndex = lastIndex + 1;
     this.path = Path.appendAt(this.path, nextIndex, next);
