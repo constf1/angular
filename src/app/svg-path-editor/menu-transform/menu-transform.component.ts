@@ -2,7 +2,9 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import {
   createIdentity,
   createRotate,
+  createRotateAt,
   createScale,
+  createScaleAt,
   createSkew,
   createTranslate,
   isIdentity,
@@ -129,21 +131,14 @@ export class MenuTransformComponent implements OnInit {
     switch (this.selection) {
       case 'move': return createTranslate(this.translateX, this.translateY);
       case 'scale':
-        if (this.scaleX !== 0 || this.scaleY !== 0) {
-          // transform="translate(cx, cy) scale(sx, sy) translate(-cx, -cy)"
-          return multiply(createTranslate(this.scaleX, this.scaleY),
-            multiply(createScale(this.scaleFactorX / 100, this.scaleFactorY / 100), createTranslate(-this.scaleX, -this.scaleY)));
-        } else {
-          return createScale(this.scaleFactorX / 100, this.scaleFactorY / 100);
-        }
+        return (this.scaleX || this.scaleY)
+            ? createScaleAt(this.scaleFactorX / 100, this.scaleFactorY / 100, this.scaleX, this.scaleY)
+            : createScale(this.scaleFactorX / 100, this.scaleFactorY / 100);
       case 'skew': return createSkew(this.skewXAngle * Math.PI / 180, this.skewYAngle * Math.PI / 180);
-      case 'rotate': if (this.rotateX !== 0 || this.rotateY !== 0) {
-        // transform="translate(cx, cy) rotate(deg) translate(-cx, -cy)"
-        return multiply(createTranslate(this.rotateX, this.rotateY),
-          multiply(createRotate(this.rotateAngle * Math.PI / 180), createTranslate(-this.rotateX, -this.rotateY)));
-      } else {
-        return createRotate(this.rotateAngle * Math.PI / 180);
-      }
+      case 'rotate':
+        return (this.rotateX || this.rotateY)
+          ? createRotateAt(this.rotateAngle * Math.PI / 180, this.rotateX, this.rotateY)
+          : createRotate(this.rotateAngle * Math.PI / 180);
     }
     return { ...this.matrix };
   }
