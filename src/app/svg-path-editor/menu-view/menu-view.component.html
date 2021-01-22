@@ -51,16 +51,26 @@
     </mat-form-field>
     <mat-form-field>
       <mat-label>width:</mat-label>
-      <input matInput type="number" step="any" [ngModel]="settings.state.width" (ngModelChange)="settings.set({ width: +$event })">
+      <input matInput type="number" step="any" [ngModel]="settings.state.width"
+        (ngModelChange)="settings.set({ width: +$event })">
     </mat-form-field>
     <mat-form-field>
       <mat-label>height:</mat-label>
       <input matInput type="number" step="any" [ngModel]="settings.state.height"
         (ngModelChange)="settings.set({ height: +$event })">
     </mat-form-field>
-    <button mat-stroked-button (click)="requestSmallestViewBox.emit()">
+
+    <button mat-stroked-button (click)="requestSmallestViewBox.emit(false)">
       <mat-icon>border_outer</mat-icon>Fit In
     </button>
+    <button mat-stroked-button (click)="requestSmallestViewBox.emit(true)">
+      <mat-icon>border_inner</mat-icon>Fit Controls
+    </button>
+    <mat-form-field>
+      <mat-label>padding:</mat-label>
+      <input matInput type="number" step="any" [ngModel]="settings.state.viewBoxPadding"
+        (ngModelChange)="settings.set({ viewBoxPadding: +$event })">
+    </mat-form-field>
   </div>
 
   <div class="menu-view-background" *ngIf="tabSelection === 2">

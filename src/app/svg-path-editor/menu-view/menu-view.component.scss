@@ -34,6 +34,10 @@ div.menu-view-viewbox {
     max-width: 40%;
     margin-right: 1em;
   }
+
+  >button+mat-form-field {
+    margin-top: 1em;
+  }
 }
 
 div.menu-view-background {

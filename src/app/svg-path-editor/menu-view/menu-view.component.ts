@@ -8,7 +8,7 @@ import { BackgroundImageService } from '../services/background-image.service';
   styleUrls: ['./menu-view.component.scss']
 })
 export class MenuViewComponent implements OnInit {
-  @Output() requestSmallestViewBox = new EventEmitter<void>();
+  @Output() requestSmallestViewBox = new EventEmitter<boolean>();
 
   tabSelection = 0;
 
