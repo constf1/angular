@@ -1,6 +1,8 @@
 // tslint:disable: variable-name
 
 import { Linkable } from '../../common/linkable';
+import { clamp, bezier2, bezier3 } from '../../common/math-utils';
+import { addPoint, addRect, addX, addY, fromPoint, isPointOut, Rect, twoVectorsAngle } from '../../common/math2d';
 import * as Path from './svg-path-commands';
 
 // reexport
@@ -140,25 +142,6 @@ export function getReflectedY1(node: Readonly<SmoothCurveNode>): number {
     y += y - getLastControlY(prev);
   }
   return y;
-}
-
-// In general, the angle between two vectors (ux, uy) and (vx, vy) can be computed as
-// +- arccos(dot(u, v) / (u.length * v.length),
-// where the +- sign is the sign of (ux * vy − uy * vx).
-function twoVectorsAngle(ux: number, uy: number, vx: number, vy: number): number {
-  // const ul = Math.sqrt(ux * ux + uy * uy);
-  // const vl = Math.sqrt(vx * vx + vy * vy);
-  // const dot = ux * vx + uy * vy;
-  // const sign = ux * vy - uy * vx < 0 ? -1 : 1;  // Math.sign(0) returns 0
-  // return sign * Math.acos(Math.max(-1, Math.min(1, dot / (ul * vl))));
-
-  const a2 = Math.atan2(uy, ux);
-  const a1 = Math.atan2(vy, vx);
-  const sign = a1 > a2 ? -1 : 1;
-  const angle1 = a1 - a2;
-  const angle2 = angle1 + sign * Math.PI * 2;
-
-  return (Math.abs(angle2) < Math.abs(angle1)) ? angle2 : angle1;
 }
 
 export type EllipseParams = {
@@ -350,4 +333,173 @@ export function approximateEllipticalArc(node: Readonly<PathNode & Path.Elliptic
 
 export function asRelativeString(item: Readonly<PathNode>, fractionDigits?: number): string {
   return item.name.toLowerCase() + Path.formatParams(item, getX(item.prev), getY(item.prev), fractionDigits);
+}
+
+export function getEllipticalArcBoundingRect(node: Readonly<PathNode & Path.EllipticalArc>): Rect {
+  const rc = fromPoint(node.x, node.y);
+  addPoint(rc, getX(node.prev), getY(node.prev));
+
+  const cp = getCenterParams(node);
+  if (cp.rx === 0 || cp.ry === 0 || cp.deltaTheta === 0) {
+    // It's a straight line.
+    return rc;
+  }
+
+  const thetaMin = cp.theta + Math.min(cp.deltaTheta, 0);
+  const thetaMax = cp.theta + Math.max(cp.deltaTheta, 0);
+
+  // Compute extremes using parametric description of ellipse:
+  // x(theta) = cx + rx * cos(theta) * cos(phi) - ry * sin(theta) * sin(phi)
+  // y(theta) = cy + rx * cos(theta) * sin(phi) + ry * sin(theta) * cos(phi)
+  // To compute the bounding box of the whole ellipse we need to find for which value of theta the above mentioned
+  // functions reach the local extremes. It means where the first derivatives of x and y according to theta are zero.
+  // We will get this two equations:
+  // 0 = -rx * sin(theta) * cos(phi) - ry * cos(theta) * sin(phi)
+  // 0 = -rx * sin(theta) * sin(phi) - ry * cos(theta) * cos(phi)
+  // which give the solution for x:
+  // theta = -atan(ry * tan(phi) / rx) + PI * n
+  // and for y:
+  // theta = atan(ry / (tan(phi) * rx)) + PI * n
+  let thetaX = -Math.atan2(cp.ry * Math.tan(cp.phi), cp.rx);
+
+  // rolling back
+  for (; thetaX > thetaMin; thetaX -= Math.PI) { }
+  // testing
+  for (; thetaX < thetaMax; thetaX += Math.PI) {
+    if (thetaX > thetaMin) {
+      const point = getEllipsePoint(cp, thetaX);
+      addPoint(rc, point.x, point.y);
+    }
+  }
+
+  let thetaY = Math.atan2(cp.ry, Math.tan(cp.phi) * cp.rx);
+
+  // rolling back
+  for (; thetaY > thetaMin; thetaY -= Math.PI) { }
+  // testing
+  for (; thetaY < thetaMax; thetaY += Math.PI) {
+    if (thetaY > thetaMin) {
+      const point = getEllipsePoint(cp, thetaY);
+      addPoint(rc, point.x, point.y);
+    }
+  }
+
+  return rc;
+}
+
+export function getQCurveBoundingRect(node: Readonly<PathNode & (Path.QCurveTo | Path.SmoothQCurveTo)>): Rect {
+  const x0 = getX(node.prev);
+  const y0 = getY(node.prev);
+
+  const x1 = getFirstControlX(node);
+  const y1 = getFirstControlY(node);
+
+  const x2 = node.x;
+  const y2 = node.y;
+
+  const rc = fromPoint(x0, y0);
+  addPoint(rc, x2, y2);
+
+  if (isPointOut(rc, x1, y1)) {
+    // p(t) = (1 - t)^2 * p0 + 2 * (1 - t) * t * p1 + t^2 * p2, where t is in the range of [0,1]
+    // When the first derivative is 0, the point is the location of a local minimum or maximum.
+    // p'(t) = 2 * (t - 1) * p0 + 2 * (1 - 2 * t) * p1 + 2 * t * p2
+    //       = t * (2 * p0 - 4 * p1 + 2 * p2) + 2 * (p1-p0)
+    //       = 0 =>
+    // t * (p0 - 2 * p1 + p2) = (p0 - p1)
+    // t = (p0 - p1) / (p0 - 2 * p1 + p2)
+    const tx = clamp((x0 - x1) / (x0 - 2 * x1 + x2) || 0, 0, 1);
+    const px = bezier2(x0, x1, x2, tx);
+
+    const ty = clamp((y0 - y1) / (y0 - 2 * y1 + y2) || 0, 0, 1);
+    const py = bezier2(y0, y1, y2, ty);
+
+    addPoint(rc, px, py);
+  }
+
+  return rc;
+}
+
+export function getCurveBoundingRect(node: Readonly<PathNode & (Path.CurveTo | Path.SmoothCurveTo)>): Rect {
+  const x0 = getX(node.prev);
+  const y0 = getY(node.prev);
+  const x1 = getFirstControlX(node);
+  const y1 = getFirstControlY(node);
+  const x2 = node.x2;
+  const y2 = node.y2;
+  const x3 = node.x;
+  const y3 = node.y;
+
+  const rc = fromPoint(x0, y0);
+  addPoint(rc, x3, y3);
+
+  const kx0 = -x0 + x1;
+  const kx1 = x0 - 2 * x1 + x2;
+  const kx2 = -x0 + 3 * x1 - 3 * x2 + x3;
+
+  let hx = kx1 * kx1 - kx0 * kx2;
+  if (hx > 0) {
+    hx = Math.sqrt(hx);
+    let t = -kx0 / (kx1 + hx);
+    if (t > 0 && t < 1) {
+      addX(rc, bezier3(x0, x1, x2, x3, t));
+    }
+
+    t = -kx0 / (kx1 - hx);
+    if (t > 0 && t < 1) {
+      addX(rc, bezier3(x0, x1, x2, x3, t));
+    }
+  }
+
+  const ky0 = -y0 + y1;
+  const ky1 = y0 - 2 * y1 + y2;
+  const ky2 = -y0 + 3 * y1 - 3 * y2 + y3;
+
+  let hy = ky1 * ky1 - ky0 * ky2;
+  if (hy > 0) {
+    hy = Math.sqrt(hy);
+    let t = -ky0 / (ky1 + hy);
+    if (t > 0 && t < 1) {
+      addY(rc, bezier3(y0, y1, y2, y3, t));
+    }
+
+    t = -ky0 / (ky1 - hy);
+    if (t > 0 && t < 1) {
+      addY(rc, bezier3(y0, y1, y2, y3, t));
+    }
+  }
+
+  return rc;
+}
+
+export function getItemBoundingRect(item: Readonly<PathNode>): Rect {
+  if (Path.isEllipticalArc(item)) {
+    return getEllipticalArcBoundingRect(item);
+  } else if (Path.isQCurveTo(item) || Path.isSmoothQCurveTo(item)) {
+    return getQCurveBoundingRect(item);
+  } else if (Path.isCurveTo(item) || Path.isSmoothCurveTo(item)) {
+    return getCurveBoundingRect(item);
+  } else {
+    const rc = fromPoint(getX(item), getY(item));
+    if (!Path.isMoveTo(item)) {
+      // Treat everything else as a line segment.
+      addPoint(rc, getX(item.prev), getY(item.prev));
+    }
+    return rc;
+  }
+}
+
+export function getBoundingRect(items: ReadonlyArray<Readonly<PathNode>>, rect?: Rect): Rect {
+  if (!rect) {
+    rect = {
+      left: Number.POSITIVE_INFINITY,
+      top: Number.POSITIVE_INFINITY,
+      right: Number.NEGATIVE_INFINITY,
+      bottom: Number.NEGATIVE_INFINITY,
+    };
+  }
+  for (const item of items) {
+    addRect(rect, getItemBoundingRect(item));
+  }
+  return rect;
 }
