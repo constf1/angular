@@ -40,6 +40,7 @@ export const DECIMAL_FORMAT_LABELS = ['to integer', '#.#', '#.##', '#.###', '%.4
 const SAVE_DELAY_MS = 1000;
 
 export interface EditorSettingsState {
+  viewBoxPadding: number;
   xOffset: number;
   yOffset: number;
   width: number;
@@ -68,6 +69,7 @@ export interface EditorSettingsState {
 }
 
 export const initialState: Readonly<EditorSettingsState> = {
+  viewBoxPadding: 1,
   xOffset: 0,
   yOffset: 0,
   width: 1024,
@@ -96,6 +98,7 @@ export const initialState: Readonly<EditorSettingsState> = {
 };
 
 export const minState: Readonly<SubType<EditorSettingsState, number>> = {
+  viewBoxPadding: 0,
   xOffset: Number.MIN_SAFE_INTEGER,
   yOffset: Number.MIN_SAFE_INTEGER,
   width: 1,
@@ -106,6 +109,7 @@ export const minState: Readonly<SubType<EditorSettingsState, number>> = {
 };
 
 export const maxState: Readonly<SubType<EditorSettingsState, number>> = {
+  viewBoxPadding: Number.MAX_SAFE_INTEGER,
   xOffset: Number.MAX_SAFE_INTEGER,
   yOffset: Number.MAX_SAFE_INTEGER,
   width: Number.MAX_SAFE_INTEGER,
