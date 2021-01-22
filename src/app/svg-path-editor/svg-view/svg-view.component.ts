@@ -3,6 +3,7 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, 
 import { Subscription } from 'rxjs';
 
 import { DragListener, DragEvent } from 'src/app/common/drag-listener';
+import { addPoint, Rect } from 'src/app/common/math2d';
 import { isIdentity, ReadonlyMatrix } from 'src/app/common/matrix-math';
 
 import { BackgroundImageService } from '../services/background-image.service';
@@ -187,6 +188,15 @@ export class SvgViewComponent implements OnInit, OnDestroy {
     return this._dragListener.isDragging;
   }
 
+  get boundingRect(): Rect {
+    const elem = this.pathRef.nativeElement;
+    if (elem && typeof elem.getBBox === 'function') {
+      const svgRect: SVGRect = elem.getBBox();
+      return { left: svgRect.x, top: svgRect.y, right: svgRect.x + svgRect.width, bottom: svgRect.y + svgRect.height };
+    }
+    return Path.getBoundingRect(Path.createFromString(this.pathData));
+  }
+
   constructor(
     public settings: EditorSettingsService,
     public background: BackgroundImageService,
@@ -239,18 +249,22 @@ export class SvgViewComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  adjustViewBox(pad = 1) {
+  adjustViewBox(includeControls = false) {
     setTimeout(() => {
-      const path = this.pathRef.nativeElement;
-      if (path && typeof path.getBBox === 'function') {
-        const rc = path.getBBox();
-        const xOffset = Math.floor(rc.x) - pad;
-        const yOffset = Math.floor(rc.y) - pad;
-        const width = Math.ceil(rc.width) + 2 * pad;
-        const height = Math.ceil(rc.height) + 2 * pad;
-        if (width > 0 && height > 0) {
-          this.settings.set({ xOffset, yOffset, width, height });
+      const rc = this.boundingRect;
+      if (includeControls) {
+        for (const control of this.controls) {
+          addPoint(rc, control.x, control.y);
         }
+      }
+
+      const pad = this.settings.state.viewBoxPadding;
+      const xOffset = Math.floor(rc.left) - pad;
+      const yOffset = Math.floor(rc.top) - pad;
+      const width = Math.ceil(rc.right) + pad - xOffset;
+      const height = Math.ceil(rc.bottom) + pad - yOffset;
+      if (width > 0 && height > 0) {
+        this.settings.set({ xOffset, yOffset, width, height });
       }
     }, 1);
   }
