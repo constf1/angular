@@ -149,7 +149,7 @@
           <mat-icon>visibility</mat-icon>View
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
-          <app-menu-view (requestSmallestViewBox)="svgView.adjustViewBox()"></app-menu-view>
+          <app-menu-view (requestSmallestViewBox)="svgView.adjustViewBox($event)"></app-menu-view>
         </ng-template>
       </mat-expansion-panel>
 
