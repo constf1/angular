@@ -1,7 +1,12 @@
+<ng-template #defaultLabel let-itemLabel>{{itemLabel}}</ng-template>
+
 <div class="tab-group" role="tabgroup">
   <ul role="tablist">
     <li role="presentation" *ngFor="let label of labels; index as i">
-      <button role="tab" [attr.aria-selected]="i === selection" (click)="selectionChange.emit(i)">{{label}}</button>
+      <button role="tab" [attr.aria-selected]="i === selection" (click)="selectionChange.emit(i)">
+        <ng-template [ngTemplateOutlet]="labelTemplate?.templateRef || defaultLabel"
+          [ngTemplateOutletContext]="{ $implicit: label }"></ng-template>
+      </button>
     </li>
   </ul>
   <div role="tabpanel">

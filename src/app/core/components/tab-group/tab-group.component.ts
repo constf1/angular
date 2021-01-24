@@ -1,6 +1,13 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ContentChild, Directive, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 
 export const TAB_SPLITTER = '|';
+
+@Directive({
+  selector: '[appTabGroupLabel]'
+})
+export class TabGroupLabelDirective {
+  constructor(public templateRef: TemplateRef<any>) {}
+}
 
 @Component({
   selector: 'app-tab-group',
@@ -19,6 +26,8 @@ export class TabGroupComponent {
   }
   @Input() selection = -1;
   @Output() selectionChange = new EventEmitter<number>();
+
+  @ContentChild(TabGroupLabelDirective, { static: false }) labelTemplate: TabGroupLabelDirective;
 
   constructor() { }
 }
