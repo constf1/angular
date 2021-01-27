@@ -9,6 +9,7 @@
 .menu-transform-function {
   display: flex;
   align-items: flex-start;
+
   >mat-form-field {
     width: 30%;
     flex-grow: 1;
@@ -21,27 +22,33 @@
 .menu-transform-angle,
 .menu-transform-skew,
 .menu-transform-matrix {
+  display: flex;
+  flex-wrap: wrap;
   height: 8.5em;
-  >mat-form-field {
-    max-width: 30%;
-  }
-
-  >span {
-    margin-left: 0.5em;
-  }
 }
 
-.menu-transform-space {
-  margin-right: 2em;
+.menu-transform-move,
+.menu-transform-scale,
+.menu-transform-angle,
+.menu-transform-skew {
+  flex-direction: row;
+  justify-content: space-between;
+
+  >mat-form-field {
+    max-width: 40%;
+  }
 }
 
 .menu-transform-matrix {
-  display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
-  // max-height: 10em;
 
   >mat-form-field {
+    max-width: 30%;
     flex: 1 1 4em;
   }
+}
+
+.label-units {
+  float: right;
+  // font-weight: 600;
 }
