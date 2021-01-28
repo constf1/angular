@@ -138,3 +138,20 @@ export function bezier3(p0: number, p1: number, p2: number, p3: number, t: numbe
   const s = 1 - t;
   return s * s * s * p0 + 3 * s * s * t * p1 + 3 * s * t * t * p2 + t * t * t * p3;
 }
+
+/**
+ * Tests if the number is near to 0.
+ * @param a the number
+ */
+export function isZero(a: number): boolean {
+  return Math.abs(a) <= Number.EPSILON;
+}
+
+/**
+ * Tests if the two numbers are near to each other.
+ * @param a first number
+ * @param b second number
+ */
+export function isNear(a: number, b: number): boolean {
+  return Math.abs(a - b) <= Number.EPSILON;
+}
