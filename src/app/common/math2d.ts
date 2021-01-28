@@ -1,3 +1,15 @@
+export enum Direction {
+  NorthWest,
+  North,
+  NorthEast,
+  West,
+  Center,
+  East,
+  SouthWest,
+  South,
+  SouthEast
+}
+
 export type Point = {
   x: number;
   y: number;
@@ -9,6 +21,45 @@ export type Rect = {
   right: number;
   bottom: number;
 };
+
+export function hasNorth(direction: Direction): boolean {
+  return direction === Direction.NorthWest || direction === Direction.North || direction === Direction.NorthEast;
+}
+
+export function hasSouth(direction: Direction): boolean {
+  return direction === Direction.SouthWest || direction === Direction.South || direction === Direction.SouthEast;
+}
+
+export function hasWest(direction: Direction): boolean {
+  return direction === Direction.NorthWest || direction === Direction.West || direction === Direction.SouthWest;
+}
+
+export function hasEast(direction: Direction): boolean {
+  return direction === Direction.NorthEast || direction === Direction.East || direction === Direction.SouthEast;
+}
+
+export function getPointAt(rect: Readonly<Rect>, direction: Direction): Point {
+  let x: number;
+  let y: number;
+
+  if (hasWest(direction)) {
+    x = rect.left;
+  } else if (hasEast(direction)) {
+    x = rect.right;
+  } else {
+    x = (rect.left + rect.right) / 2;
+  }
+
+  if (hasNorth(direction)) {
+    y = rect.top;
+  } else if (hasSouth(direction)) {
+    y = rect.bottom;
+  } else {
+    y = (rect.top + rect.bottom) / 2;
+  }
+
+  return { x, y };
+}
 
 export function isPointOut(rect: Readonly<Rect>, x: number, y: number): boolean {
   return x < rect.left || x > rect.right || y < rect.top || y > rect.bottom;
@@ -55,4 +106,8 @@ export function twoVectorsAngle(ux: number, uy: number, vx: number, vy: number):
   const angle2 = angle1 + sign * Math.PI * 2;
 
   return Math.abs(angle2) < Math.abs(angle1) ? angle2 : angle1;
+}
+
+export function distance(x1: number, y1: number, x2: number, y2: number): number {
+  return Math.sqrt((x2 - x1) * (x2 - x1) * (y2 - y1) * (y2 - y1));
 }
