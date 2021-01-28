@@ -1,3 +1,5 @@
+import { isNear, isZero } from './math-utils';
+
 /**
  * A 2D 3x2 matrix with six parameters a, b, c, d, e and f.
  * It is equivalent to applying the 3x3 transformation matrix:
@@ -21,6 +23,11 @@ export type ReadonlyMatrix = Readonly<Matrix>;
 
 export function isIdentity(m: ReadonlyMatrix): boolean {
   return m.a === 1 && m.b === 0 && m.c === 0 && m.d === 1 && m.e === 0 && m.f === 0;
+}
+
+export function isValid(m: ReadonlyMatrix): boolean {
+  const check = Number.isFinite || ((value) => (typeof value === 'number' && isFinite(value)));
+  return check(m.a) && check(m.b) && check(m.c) && check(m.d) && check(m.e) && check(m.f);
 }
 
 export function isTranslate(m: ReadonlyMatrix): boolean {
@@ -66,8 +73,31 @@ export function createScaleAt(scaleX: number, scaleY: number, centerX: number, c
   return { a: scaleX, b: 0, c: 0, d: scaleY, e: centerX * (1 - scaleX), f: centerY * (1 - scaleY) };
 }
 
+/**
+ * Creates a skew of the specified degrees in the x and y dimensions matrix.
+ * @param skewX The angle in the x dimension by which to skew.
+ * @param skewY The angle in the y dimension by which to skew.
+ */
 export function createSkew(skewX: number, skewY: number): Matrix {
   return { a: 1, b: Math.tan(skewY), c: Math.tan(skewX), d: 1, e: 0, f: 0 };
+}
+
+/**
+ * Creates a skew about the specified point matrix.
+ * @param skewX The angle in the x dimension by which to skew.
+ * @param skewY The angle in the y dimension by which to skew.
+ * @param centerX The x-coordinate of the skew operation's center point.
+ * @param centerY The x-coordinate of the skew operation's center point.
+ */
+export function createSkewAt(skewX: number, skewY: number, centerX: number, centerY: number): Matrix {
+  // Analog of:
+  // multiply(
+  //   createTranslate(centerX, centerY),
+  //   multiply(createSkew(skewX, skewY), createTranslate(-centerX, -centerY))
+  // );
+  const b = Math.tan(skewY);
+  const c = Math.tan(skewX);
+  return { a: 1, b, c, d: 1, e: -c * centerY, f: -b * centerX };
 }
 
 /**
@@ -163,4 +193,73 @@ export function decompose(
     scaleY: Q - R,
     skew: (-theta * 180) / Math.PI,
   };
+}
+
+/**
+ * Gets the point (if any exists) around which a transformation is applied.
+ * @param m Transformation matrix.
+ */
+export function getTransformOrigin(m: ReadonlyMatrix): { x?: number, y?: number } | undefined {
+  const { b, c, e, f } = m;
+  // a * x + c * y + e = x
+  // b * x + d * y + f = y
+  // =>
+  // (a - 1) * x + c * y + e = 0
+  // b * x + (d - 1) * y + f = 0
+  // or
+  // a * x + c * y + e = 0
+  // b * x + d * y + f = 0
+  // where a = a0 - 1 and d = d0 - 1
+
+  const a = m.a - 1;
+  const d = m.d - 1;
+  const det = (b * c - a * d);
+  if (!isZero(det)) {
+    const x = (d * e - c * f) / (b * c - a * d);
+    const y = (a * f - b * e) / (b * c - a * d);
+    return { x, y };
+  } else {
+    // b * c - a * d = 0
+    if (isZero(a) && isZero(b)) {
+      // c * y + e = 0
+      // d * y + f = 0
+      if (isZero(c)) {
+        if (!isZero(d)) {
+          return { x: NaN, y: -f / d };
+        }
+      } else if (isZero(d)) {
+        if (!isZero(c)) {
+          return { x: NaN, y: -e / c };
+        }
+      } else {
+        const y1 = -e / c;
+        const y2 = -f / d;
+        if (isNear(y1, y2)) {
+          return { x: NaN, y: y1 };
+        }
+      }
+    }
+
+    if (isZero(c) && isZero(d)) {
+      // a * x + e = 0
+      // b * x + f = 0
+      if (isZero(a)) {
+        if (!isZero(b)) {
+          return { x: -f / b, y: NaN };
+        }
+      } else if (isZero(b)) {
+        if (!isZero(a)) {
+          return { x: -e / a, y: NaN };
+        }
+      } else {
+        const x1 = -e / a;
+        const x2 = -f / b;
+        if (isNear(x1, x2)) {
+          return { x: x1, y: NaN };
+        }
+      }
+    }
+  }
+
+  return undefined;
 }
