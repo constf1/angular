@@ -2,7 +2,7 @@
 
 import { Linkable } from '../../common/linkable';
 import { clamp, bezier2, bezier3 } from '../../common/math-utils';
-import { addPoint, addRect, addX, addY, fromPoint, isPointOut, Rect, twoVectorsAngle } from '../../common/math2d';
+import { addPoint, addX, addY, fromPoint, isPointOut, Rect, twoVectorsAngle } from '../../common/math2d';
 import * as Path from './svg-path-commands';
 
 // reexport
@@ -487,19 +487,4 @@ export function getItemBoundingRect(item: Readonly<PathNode>): Rect {
     }
     return rc;
   }
-}
-
-export function getBoundingRect(items: ReadonlyArray<Readonly<PathNode>>, rect?: Rect): Rect {
-  if (!rect) {
-    rect = {
-      left: Number.POSITIVE_INFINITY,
-      top: Number.POSITIVE_INFINITY,
-      right: Number.NEGATIVE_INFINITY,
-      bottom: Number.NEGATIVE_INFINITY,
-    };
-  }
-  for (const item of items) {
-    addRect(rect, getItemBoundingRect(item));
-  }
-  return rect;
 }

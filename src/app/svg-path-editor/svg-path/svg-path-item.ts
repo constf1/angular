@@ -5,6 +5,7 @@ import { transformedNode } from './svg-path-transform';
 import * as Path from './svg-path-node';
 import * as Select from 'src/app/common/selectable';
 import { lerp } from 'src/app/common/math-utils';
+import { addRect, Rect } from 'src/app/common/math2d';
 
 // reexport
 export * from './svg-path-node';
@@ -190,6 +191,24 @@ export function createFromString(pathData: string): PathItem[] {
     }
   }
   return nodes;
+}
+
+export function getBoundingRect(items: PathView, selectionOnly?: boolean, rect?: Rect): Rect {
+  if (!rect) {
+    rect = {
+      left: Number.POSITIVE_INFINITY,
+      top: Number.POSITIVE_INFINITY,
+      right: Number.NEGATIVE_INFINITY,
+      bottom: Number.NEGATIVE_INFINITY,
+    };
+  }
+  const all = !selectionOnly;
+  for (const item of items) {
+    if (all || item.selected) {
+      addRect(rect, Path.getItemBoundingRect(item));
+    }
+  }
+  return rect;
 }
 
 // Conversion and substitution.
