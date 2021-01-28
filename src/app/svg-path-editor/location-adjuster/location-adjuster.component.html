@@ -1,0 +1,13 @@
+<button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="disabled">
+  <mat-icon>pin_drop</mat-icon>
+</button>
+
+<mat-menu #menu="matMenu">
+  <div class="location-adjuster-menu">
+    <div *ngFor="let icons of locationIcons; index as row">
+      <button mat-icon-button *ngFor="let name of icons; index as col" (click)="requestLocation(row, col)">
+        <mat-icon>{{name}}</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-menu>
