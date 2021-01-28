@@ -48,6 +48,7 @@
     <input matInput type="number" step="any" [ngModel]="scaleX"
       (ngModelChange)="setScale(scaleFactorX, scaleFactorY, +$event, scaleY)">
   </mat-form-field>
+  <app-location-adjuster [disabled]="!boundingRect" (locationChange)="setScaleOrigin($event)"></app-location-adjuster>
   <mat-form-field>
     <mat-label>Center y <span class="label-units">px</span></mat-label>
     <input matInput type="number" step="any" [ngModel]="scaleY"
@@ -65,6 +66,7 @@
     <mat-label>Center x <span class="label-units">px</span></mat-label>
     <input matInput type="number" step="any" [ngModel]="rotateX" (ngModelChange)="setRotate(rotateAngle, +$event, rotateY)">
   </mat-form-field>
+  <app-location-adjuster [disabled]="!boundingRect" (locationChange)="setRotateOrigin($event)"></app-location-adjuster>
   <mat-form-field>
     <mat-label>Center y <span class="label-units">px</span></mat-label>
     <input matInput type="number" step="any" [ngModel]="rotateY" (ngModelChange)="setRotate(rotateAngle, rotateX, +$event)">
@@ -74,11 +76,20 @@
 <div class="menu-transform-skew" *ngIf="selection === 'skew'">
   <mat-form-field>
     <mat-label>Horizontal ⇆ <span class="label-units">°</span></mat-label>
-    <input matInput type="number" step="any" [ngModel]="skewXAngle" (ngModelChange)="setSkew(+$event, skewYAngle)">
+    <input matInput type="number" step="any" [ngModel]="skewXAngle" (ngModelChange)="setSkew(+$event, skewYAngle, skewX, skewY)">
   </mat-form-field>
   <mat-form-field>
     <mat-label>Vertical ⇅ <span class="label-units">°</span></mat-label>
-    <input matInput type="number" step="any" [ngModel]="skewYAngle" (ngModelChange)="setSkew(skewXAngle, +$event)">
+    <input matInput type="number" step="any" [ngModel]="skewYAngle" (ngModelChange)="setSkew(skewXAngle, +$event, skewX, skewY)">
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Center x <span class="label-units">px</span></mat-label>
+    <input matInput type="number" step="any" [ngModel]="skewX" (ngModelChange)="setSkew(skewXAngle, skewYAngle, +$event, skewY)">
+  </mat-form-field>
+  <app-location-adjuster [disabled]="!boundingRect" (locationChange)="setSkewOrigin($event)"></app-location-adjuster>
+  <mat-form-field>
+    <mat-label>Center y <span class="label-units">px</span></mat-label>
+    <input matInput type="number" step="any" [ngModel]="skewY" (ngModelChange)="setSkew(skewXAngle, skewYAngle, skewX, +$event)">
   </mat-form-field>
 </div>
 

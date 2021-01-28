@@ -1,4 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Direction, getPointAt, Rect } from 'src/app/common/math2d';
 import {
   createIdentity,
   createRotate,
@@ -6,8 +7,10 @@ import {
   createScale,
   createScaleAt,
   createSkew,
+  createSkewAt,
   createTranslate,
   isIdentity,
+  isValid,
   Matrix,
   multiply
 } from 'src/app/common/matrix-math';
@@ -34,6 +37,7 @@ export interface TransformChangeEvent {
   styleUrls: ['./menu-transform.component.scss']
 })
 export class MenuTransformComponent implements OnInit {
+  @Input() boundingRect: Rect | undefined;
   @Output() transformChange = new EventEmitter<TransformChangeEvent>();
 
   preview = false;
@@ -48,6 +52,8 @@ export class MenuTransformComponent implements OnInit {
   scaleProportionally = false;
   skewXAngle = 0;
   skewYAngle = 0;
+  skewX = 0;
+  skewY = 0;
   rotateAngle = 0;
   rotateX = 0;
   rotateY = 0;
@@ -93,11 +99,27 @@ export class MenuTransformComponent implements OnInit {
     }
   }
 
-  setSkew(x: number, y: number) {
-    if (x !== this.skewXAngle || y !== this.skewYAngle) {
-      this.skewXAngle = x;
-      this.skewYAngle = y;
+  setScaleOrigin(direction: Direction) {
+    if (this.boundingRect) {
+      const point = getPointAt(this.boundingRect, direction);
+      this.setScale(this.scaleFactorX, this.scaleFactorY, point.x, point.y);
+    }
+  }
+
+  setSkew(xAngle: number, yAngle: number, x: number, y: number) {
+    if (xAngle !== this.skewXAngle || yAngle !== this.skewYAngle || x !== this.skewX || y !== this.skewY) {
+      this.skewXAngle = xAngle;
+      this.skewYAngle = yAngle;
+      this.skewX = x;
+      this.skewY = y;
       this.updatePreview();
+    }
+  }
+
+  setSkewOrigin(direction: Direction) {
+    if (this.boundingRect) {
+      const point = getPointAt(this.boundingRect, direction);
+      this.setSkew(this.skewXAngle, this.skewYAngle, point.x, point.y);
     }
   }
 
@@ -110,6 +132,13 @@ export class MenuTransformComponent implements OnInit {
     }
   }
 
+  setRotateOrigin(direction: Direction) {
+    if (this.boundingRect) {
+      const point = getPointAt(this.boundingRect, direction);
+      this.setRotate(this.rotateAngle, point.x, point.y);
+    }
+  }
+
   setMatrix(name: string, value: number) {
     if (name in this.matrix && this.matrix[name] !== value) {
       this.matrix[name] = value;
@@ -118,12 +147,21 @@ export class MenuTransformComponent implements OnInit {
   }
 
   emitTransform() {
-    this.preview = false;
-    this.transformChange.emit({ transformName: this.selection, matrix: this.getSelectedMatrix() });
+    const matrix = this.getSelectedMatrix();
+    if (isValid(matrix)) {
+      this.preview = false;
+      this.transformChange.emit({ transformName: this.selection, matrix });
+    }
   }
 
   emitPreview() {
-    const matrix = this.preview ? this.getSelectedMatrix() : undefined;
+    let matrix: Matrix | undefined;
+    if (this.preview) {
+      const m = this.getSelectedMatrix();
+      if (isValid(m)) {
+        matrix = m;
+      }
+    }
     this.transformChange.emit({ transformName: this.selection, matrix, preview: true });
   }
 
@@ -134,7 +172,9 @@ export class MenuTransformComponent implements OnInit {
         return (this.scaleX || this.scaleY)
             ? createScaleAt(this.scaleFactorX / 100, this.scaleFactorY / 100, this.scaleX, this.scaleY)
             : createScale(this.scaleFactorX / 100, this.scaleFactorY / 100);
-      case 'skew': return createSkew(this.skewXAngle * Math.PI / 180, this.skewYAngle * Math.PI / 180);
+      case 'skew': return (this.skewX || this.skewY)
+            ? createSkewAt(this.skewXAngle * Math.PI / 180, this.skewYAngle * Math.PI / 180, this.skewX, this.skewY)
+            : createSkew(this.skewXAngle * Math.PI / 180, this.skewYAngle * Math.PI / 180);
       case 'rotate':
         return (this.rotateX || this.rotateY)
           ? createRotateAt(this.rotateAngle * Math.PI / 180, this.rotateX, this.rotateY)
@@ -151,7 +191,10 @@ export class MenuTransformComponent implements OnInit {
   }
 
   addTransform() {
-    this.matrix = multiply(this.getSelectedMatrix(), this.matrix);
+    const m = multiply(this.getSelectedMatrix(), this.matrix);
+    if (isValid(m)) {
+      this.matrix = m;
+    }
     if (this.selection !== 'matrix') {
       this.setSelection('matrix');
     } else {
@@ -168,7 +211,7 @@ export class MenuTransformComponent implements OnInit {
         this.setScale(100, 100, 0, 0);
         break;
       case 'skew':
-        this.setSkew(0, 0);
+        this.setSkew(0, 0, 0, 0);
         break;
       case 'rotate':
         this.setRotate(0, 0, 0);
