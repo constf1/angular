@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { DragListener, DragEvent } from 'src/app/common/drag-listener';
 import { addPoint, Rect } from 'src/app/common/math2d';
-import { isIdentity, ReadonlyMatrix } from 'src/app/common/matrix-math';
+import { isIdentity, ReadonlyMatrix, getTransformOrigin } from 'src/app/common/matrix-math';
 
 import { BackgroundImageService } from '../services/background-image.service';
 import { EditorSettingsService, initialState } from '../services/editor-settings.service';
@@ -150,6 +150,27 @@ export class SvgViewComponent implements OnInit, OnDestroy {
       return this.format(Path.createTransformed(this._items, m));
     }
     return '';
+  }
+
+  get pathTransformOrigin() {
+    let path = '';
+    if (this.previewMatrix) {
+      const origin = getTransformOrigin(this.previewMatrix);
+      if (origin) {
+        const s = this.settingsState;
+
+        // Add a vertical line.
+        if (isFinite(origin.x)) {
+          path += `M${origin.x} ${s.yOffset}v${s.height}`;
+        }
+
+        // Add a horizontal line.
+        if (isFinite(origin.y)) {
+          path += `M${s.xOffset} ${origin.y}h${s.width}`;
+        }
+      }
+    }
+    return path;
   }
 
   get pathDragData() {

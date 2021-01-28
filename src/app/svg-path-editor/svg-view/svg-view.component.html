@@ -20,6 +20,7 @@
     <g opacity="0.6" stroke-width="0.8" stroke="lightgrey" fill="none">
       <path [attr.d]="curveControlHandles"></path>
       <path stroke-dasharray="2" [attr.d]="reflectedControlHandles"></path>
+      <path stroke-dasharray="10 4 2 4" [attr.d]="pathTransformOrigin"></path>
       <path stroke-dasharray="2" [attr.d]="pathDragData" [attr.stroke]="settingsState.controlPointsFillColor"></path>
     </g>
 
