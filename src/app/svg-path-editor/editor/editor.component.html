@@ -140,7 +140,7 @@
             </mat-panel-title>
             <mat-panel-description>Transform</mat-panel-description>
           </mat-expansion-panel-header>
-          <app-menu-transform (transformChange)="applyTransform($event)"></app-menu-transform>
+          <app-menu-transform [boundingRect]="selectionBoundingRect" (transformChange)="applyTransform($event)"></app-menu-transform>
         </mat-expansion-panel>
       </mat-expansion-panel>
 

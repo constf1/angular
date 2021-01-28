@@ -116,6 +116,11 @@ export class EditorComponent implements OnInit {
     return !!this.path.find(item => (all || item.selected) && Path.canPromoteToQCurve(item));
   }
 
+  get selectionBoundingRect() {
+    const path = this.path;
+    return path.length > 0 ? Path.getBoundingRect(path, Path.hasSelection(path)) : undefined;
+  }
+
   constructor(
     public settings: EditorSettingsService,
     public history: PathDataService,
