@@ -21,6 +21,10 @@ export function transformedY(m: ReadonlyMatrix, x: number, y: number) {
   return m.b * x + m.d * y + m.f;
 }
 
+export function transformedPoint(m: ReadonlyMatrix, x: number, y: number) {
+  return { x: m.a * x + m.c * y + m.e, y: m.b * x + m.d * y + m.f };
+}
+
 export function transformedEllipse(m: ReadonlyMatrix, ellipse: Readonly<EllipseShape>): EllipseShape {
   // Step 1. Rotate ellipse.
   // The standard equation for an ellipse:
