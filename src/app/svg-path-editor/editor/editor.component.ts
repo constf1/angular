@@ -231,7 +231,23 @@ export class EditorComponent implements OnInit {
   }
 
   compactInput() {
-    this.pathInput = compact(this.pathInput);
+    const digits = this.settings.state.maximumFractionDigits;
+    const data = this.path
+      .map(item => ({ abs: compact(Path.asString(item, digits)), rel: compact(Path.asRelativeString(item, digits)) }));
+
+    for (let i = this.path.length; i-- > 1;) {
+      const item = this.path[i];
+      const prev = this.path[i - 1];
+      if (item.name === prev.name || (Path.isMoveTo(prev) && Path.isLineTo(item))) {
+        data[i - 1].abs = compact(data[i - 1].abs + ' ' + data[i].abs.substring(1));
+        data[i - 1].rel = compact(data[i - 1].rel + ' ' + data[i].rel.substring(1));
+        data.splice(i, 1);
+      }
+    }
+
+    const pathArray = data.map(item => (item.rel.length < item.abs.length ? item.rel : item.abs));
+    this.pathInput = compact(pathArray.join(''));
+    // this.pathInput = compact(this.pathInput);
   }
 
   formatInput() {
