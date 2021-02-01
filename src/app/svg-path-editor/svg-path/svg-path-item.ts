@@ -277,7 +277,8 @@ function bisect(item: Readonly<PathItem>, t: number): PathItem[] {
 
     return [
       { ...item, name: 'C', x1: XA1, y1: YA1, x2: XA2, y2: YA2, x: XA3, y: YA3, prev, next, list },
-      { ...item, name: 'C', x1: XB1, y1: YB1, x2: XB2, y2: YB2, x: XB3, y: YB3, prev, next, list },
+      // { ...item, name: 'C', x1: XB1, y1: YB1, x2: XB2, y2: YB2, x: XB3, y: YB3, prev, next, list },
+      { ...item, name: 'S', x2: XB2, y2: YB2, x: XB3, y: YB3, prev, next, list },
     ];
   } else if (Path.isQCurveTo(item) || Path.isSmoothQCurveTo(item)) {
     const X0 = Path.getX(item.prev);
@@ -298,7 +299,8 @@ function bisect(item: Readonly<PathItem>, t: number): PathItem[] {
 
     return [
       { ...item, name: 'Q', x1: XA1, y1: YA1, x: XA2, y: YA2, prev, next, list },
-      { ...item, name: 'Q', x1: XB1, y1: YB1, x: XB2, y: YB2, prev, next, list },
+      // { ...item, name: 'Q', x1: XB1, y1: YB1, x: XB2, y: YB2, prev, next, list },
+      { ...item, name: 'T', x: XB2, y: YB2, prev, next, list },
     ];
   } else if (Path.isEllipticalArc(item)) {
     const { cx, cy, rx, ry, phi, theta, deltaTheta } = Path.getCenterParams(item);

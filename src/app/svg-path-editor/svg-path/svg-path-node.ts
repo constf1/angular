@@ -275,7 +275,8 @@ export function ellipticalArcToCurve(
   x0: number, y0: number,
   x: number, y: number,
   ellipse: Readonly<EllipseParams>,
-  theta1: number, theta2: number): PathNode {
+  theta1: number, theta2: number,
+  smooth?: boolean): PathNode {
   const t1 = getEllipseTangent(ellipse, theta1);
   const t2 = getEllipseTangent(ellipse, theta2);
 
@@ -286,7 +287,7 @@ export function ellipticalArcToCurve(
   const x2 = x - t * t2.x;
   const y2 = y - t * t2.y;
 
-  return { name: 'C', x1, y1, x2, y2, x, y };
+  return smooth ? { name: 'S', x2, y2, x, y } : { name: 'C', x1, y1, x2, y2, x, y };
 }
 
 export function approximateEllipticalArc(node: Readonly<PathNode & Path.EllipticalArc>): PathNode[] {
@@ -312,8 +313,8 @@ export function approximateEllipticalArc(node: Readonly<PathNode & Path.Elliptic
 
     return [
       ellipticalArcToCurve(x0, y0, p1.x, p1.y, ellipse, theta, theta1),
-      ellipticalArcToCurve(p1.x, p1.y, p2.x, p2.y, ellipse, theta1, theta2),
-      ellipticalArcToCurve(p2.x, p2.y, node.x, node.y, ellipse, theta2, theta3)
+      ellipticalArcToCurve(p1.x, p1.y, p2.x, p2.y, ellipse, theta1, theta2, true),
+      ellipticalArcToCurve(p2.x, p2.y, node.x, node.y, ellipse, theta2, theta3, true)
     ];
   } else if (Math.abs(deltaTheta) > 2 * Math.PI / 3) {
     // Two-part split.
@@ -324,7 +325,7 @@ export function approximateEllipticalArc(node: Readonly<PathNode & Path.Elliptic
 
     return [
       ellipticalArcToCurve(x0, y0, p1.x, p1.y, ellipse, theta, theta1),
-      ellipticalArcToCurve(p1.x, p1.y, node.x, node.y, ellipse, theta1, theta2)
+      ellipticalArcToCurve(p1.x, p1.y, node.x, node.y, ellipse, theta1, theta2, true)
     ];
   } else {
     return [ellipticalArcToCurve(x0, y0, node.x, node.y, ellipse, theta, theta + deltaTheta)];
