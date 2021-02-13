@@ -8,48 +8,35 @@ import {
   OnChanges,
   OnDestroy,
   OnInit,
-  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import { randomInteger } from 'src/app/common/math-utils';
 
 import { SfxParticle } from './sfx-particle';
 
-// function clear(front: CanvasRenderingContext2D, back: CanvasRenderingContext2D, width: number, height: number) {
-//   // save our visible canvas, then clear it and draw back the saved image.
-//   back.clearRect(0, 0, width, height);
-//   back.drawImage(front.canvas, 0, 0);
-
-//   front.clearRect(0, 0, width, height);
-//   front.drawImage(back.canvas, 0, 0);
-// }
-
 @Component({
   selector: 'app-sfx-particles',
-  templateUrl: './sfx-particles.component.html',
-  styleUrls: ['./sfx-particles.component.scss']
+  template: '<canvas #canvasRef></canvas>'
 })
 export class SfxParticlesComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @Input() width = 320;
   @Input() height = 240;
   @Input() particleCount = 200;
   @Input() particleChance = 0.98765;
+  @Input() attractor?: { x: number, y: number };
 
   @ViewChild('canvasRef') canvasRef: ElementRef<HTMLCanvasElement>;
 
-  contextMain: CanvasRenderingContext2D;
-  // contextBack: CanvasRenderingContext2D;
+  context2D: CanvasRenderingContext2D;
 
   requestId = 0;
 
   particles: SfxParticle[] = [];
-  time = 0;
+  lastFrameTime = 0;
   nextBurstDelta = 3;
 
-  gravity?: { x: number, y: number };
-
   frameCallback: FrameRequestCallback = (time: number) => {
-    NgZone.assertNotInAngularZone();
+    // NgZone.assertNotInAngularZone();
 
     this.onUpdate(time);
     this.onPaint();
@@ -63,12 +50,9 @@ export class SfxParticlesComponent implements OnInit, OnChanges, AfterViewInit, 
   constructor(private _zone: NgZone) { }
 
   ngAfterViewInit(): void {
-    const canvasMain = this.canvasRef?.nativeElement;
-    if (canvasMain) {
-      // const canvasBack = canvasMain.cloneNode() as HTMLCanvasElement;
-
-      this.contextMain = canvasMain.getContext('2d');
-      // this.contextBack = canvasBack.getContext('2d');
+    const canvas = this.canvasRef?.nativeElement;
+    if (canvas) {
+      this.context2D = canvas.getContext('2d');
 
       this.onResize();
       this.startAnimation();
@@ -82,7 +66,7 @@ export class SfxParticlesComponent implements OnInit, OnChanges, AfterViewInit, 
   startAnimation() {
     this._zone.runOutsideAngular(() => {
       if (!this.requestId) {
-        this.time = 0;
+        this.lastFrameTime = 0;
         this.requestAnimationFrame();
       }
     });
@@ -95,7 +79,7 @@ export class SfxParticlesComponent implements OnInit, OnChanges, AfterViewInit, 
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.onResize();
 
     if (this.particles.length > this.particleCount) {
@@ -107,68 +91,69 @@ export class SfxParticlesComponent implements OnInit, OnChanges, AfterViewInit, 
   }
 
   onResize() {
-    if (this.contextMain) {
-      const canvasMain = this.contextMain.canvas;
-      // const canvasBack = this.contextBack.canvas;
+    const ctx = this.context2D;
+    if (ctx) {
+      const canvas = ctx.canvas;
 
-      if (canvasMain.width !== this.width || canvasMain.height !== this.height) {
-        // canvasMain.width = canvasBack.width = this.width;
-        // canvasMain.height = canvasBack.height = this.height;
-        canvasMain.width = this.width;
-        canvasMain.height = this.height;
+      if (canvas.width !== this.width || canvas.height !== this.height) {
+        canvas.width = this.width;
+        canvas.height = this.height;
 
-        this.contextMain.fillStyle = '#222222';
-        this.contextMain.fillRect(0, 0, this.width, this.height);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = '#222222';
+        ctx.fillRect(0, 0, this.width, this.height);
       }
     }
   }
 
   onPaint() {
-    if (this.contextMain) {
-      // this.contextBack.globalAlpha = 0.895;
-      // clear(this.contextMain, this.contextBack, this.width, this.height);
+    const ctx = this.context2D;
+    if (ctx) {
+      // clear
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+      ctx.fillRect(0, 0, this.width, this.height);
 
-      this.contextMain.globalCompositeOperation = 'source-over';
-      this.contextMain.fillStyle = 'rgba(0, 0, 0, 0.08)';
-      this.contextMain.fillRect(0, 0, this.width, this.height);
-
-      this.contextMain.globalCompositeOperation = 'lighter';
-      this.drawParticles(this.contextMain);
+      // draw
+      ctx.globalCompositeOperation = 'lighter';
+      this.drawParticles(ctx);
     }
   }
 
   onUpdate(time: number) {
+    if (this.lastFrameTime) {
+      const dt = (time - this.lastFrameTime) / 1000;
+      this.updateParticles(dt);
+    }
+    this.lastFrameTime = time;
+  }
+
+  updateParticles(dt: number) {
     let freeCount = this.particleCount - this.particles.length;
-
-    if (this.time) {
-      const dt = (time - this.time) / 1000;
-
-      // Update particles.
-      for (const particle of this.particles) {
-        particle.update(dt, this.gravity);
-        if (particle.age > particle.ttl) {
-          freeCount++;
-        }
-      }
-
-      // Spawn new particles.
-      this.nextBurstDelta -= dt;
-      if (freeCount > 0) {
-        if (this.nextBurstDelta <= 0) {
-          const maxCount = Math.min(50, Math.max(Math.floor(this.particleCount / 3), 1));
-          const count = Math.min(freeCount, maxCount);
-          this.spawnParticles(randomInteger(1 + Math.floor(count / 2), 1 + count));
-
-          this.nextBurstDelta = 3 + Math.random() * 5;
-        } else if (freeCount > this.particleCount / 2) {
-          if (Math.random() > this.particleChance) {
-            this.spawnParticles(1);
-          }
-        }
+    // Update particles.
+    for (const particle of this.particles) {
+      particle.update(dt, this.attractor);
+      if (particle.age > particle.ttl) {
+        freeCount++;
       }
     }
 
-    this.time = time;
+    // Spawn new particles.
+    this.nextBurstDelta -= dt;
+    if (freeCount > 0) {
+      if (this.nextBurstDelta <= 0) {
+        const maxCount = Math.min(50, Math.max(Math.floor(this.particleCount / 3), 1));
+        const count = Math.min(freeCount, maxCount);
+        this.spawnParticles(randomInteger(1 + Math.floor(count / 2), 1 + count));
+
+        this.nextBurstDelta = 3 + Math.random() * 5;
+      } else if (freeCount > this.particleCount / 2) {
+        if (Math.random() > this.particleChance) {
+          this.spawnParticles(1);
+        }
+      }
+    }
   }
 
   spawnParticles(count: number) {
@@ -196,13 +181,5 @@ export class SfxParticlesComponent implements OnInit, OnChanges, AfterViewInit, 
     for (const particle of this.particles) {
       particle.draw(ctx);
     }
-  }
-
-  onMouseMove(event: MouseEvent) {
-    this.gravity = { x: event.offsetX, y: event.offsetY };
-  }
-
-  onMouseOut(event: MouseEvent) {
-    this.gravity = undefined;
   }
 }
