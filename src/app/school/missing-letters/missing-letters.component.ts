@@ -48,6 +48,12 @@ export class MissingLettersComponent implements OnInit {
   readonly fontSizeMin = 12;
   readonly fontSizeMax = 40;
 
+  sfxAttractor?: { x: number, y: number };
+
+  get isVictory() {
+    return this.state === 'done' && countErrors(this.answers) === 0;
+  }
+
   constructor(private _http: HttpClient, private _route: ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -237,5 +243,16 @@ export class MissingLettersComponent implements OnInit {
       const src = ASSETS_URL + image.src;
       elem.src = src;
     }
+  }
+
+  onMouseMove(event: MouseEvent, board: HTMLElement) {
+    const rect = board.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    this.sfxAttractor = { x, y };
+  }
+
+  onMouseOut() {
+    this.sfxAttractor = undefined;
   }
 }

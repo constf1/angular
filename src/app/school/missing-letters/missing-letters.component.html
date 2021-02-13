@@ -1,5 +1,8 @@
 <div class="missing-letters-frame">
-  <div class="missing-letters-board" [style.font-size.px]="fontSize" #board>
+  <app-sfx-particles *ngIf="isVictory && !chatBot.currentItem" class="missing-letters-sfx" [attractor]="sfxAttractor"
+    [style.left.px]="board.offsetLeft" [style.top.px]="board.offsetTop"
+    [width]="board.offsetWidth" [height]="board.offsetHeight"></app-sfx-particles>
+  <div class="missing-letters-board" [style.font-size.px]="fontSize" #board (mousemove)="onMouseMove($event, board)" (mouseout)="onMouseOut()">
     <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer"
       [nextValue]="a.realAnswer"></app-simple-diff>
     <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered">

@@ -79,6 +79,11 @@ div.missing-letters-frame {
   background-repeat: no-repeat;
   background-size: 100% 100%;
 
+  .missing-letters-sfx {
+    position: absolute;
+    animation: keyframes-fade-in 1s ease 1;
+  }
+
   div.missing-letters-board {
     position: absolute;
     left: 226px;
