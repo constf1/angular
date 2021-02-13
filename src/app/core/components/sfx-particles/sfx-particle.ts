@@ -27,7 +27,7 @@ export class SfxParticle {
     this.radius = this.radius0 = randomInteger(6, 20);
 
     this.age = -3 * bezier3(0.8, 0, 0.2, 1, Math.random());
-    this.ttl = 3 + Math.random() * 3;
+    this.ttl = 4 + Math.random() * 6;
 
     this.x = w / 2;
     this.y = h;
