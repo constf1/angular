@@ -2,8 +2,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+
 import { randomItem } from 'src/app/common/array-utils';
 import { randomInteger } from 'src/app/common/math-utils';
+import { SfxAnimation, SfxLines, SfxParticles } from 'src/app/common/sfx-animation';
+
 import { Answer, ChatBot, countErrors } from './chat-bot';
 import { ASSETS_URL, IMAGES, WIN_AUDIOS } from './missing-letters-assets';
 
@@ -48,7 +51,7 @@ export class MissingLettersComponent implements OnInit {
   readonly fontSizeMin = 12;
   readonly fontSizeMax = 40;
 
-  sfxAttractor?: { x: number, y: number };
+  sfx?: SfxAnimation;
 
   get isVictory() {
     return this.state === 'done' && countErrors(this.answers) === 0;
@@ -73,6 +76,7 @@ export class MissingLettersComponent implements OnInit {
 
   onStart() {
     // this.chatBot.onStart(this.answers);
+    this.sfx = undefined;
     this.answers = [];
     this.quizes = Object.keys(this.gameData);
     this.state = 'active';
@@ -97,6 +101,11 @@ export class MissingLettersComponent implements OnInit {
     }
     this.state = 'done';
     this.chatBot.onEnd(this.answers);
+
+    if (countErrors(this.answers) === 0) {
+      this.sfx = Math.random() < 0.5 ? new SfxParticles() : new SfxLines();
+    }
+
     return false;
   }
 
@@ -246,13 +255,17 @@ export class MissingLettersComponent implements OnInit {
   }
 
   onMouseMove(event: MouseEvent, board: HTMLElement) {
-    const rect = board.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    this.sfxAttractor = { x, y };
+    if (this.sfx) {
+      const rect = board.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      this.sfx.mouse = { x, y };
+    }
   }
 
   onMouseOut() {
-    this.sfxAttractor = undefined;
+    if (this.sfx) {
+      this.sfx.mouse = undefined;
+    }
   }
 }

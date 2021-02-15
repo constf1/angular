@@ -6,21 +6,21 @@ import { XrangePipe } from './pipes/xrange.pipe';
 import { FocusDirective } from './directives/focus.directive';
 import { GestureDirective } from './directives/gesture.directive';
 
-import { SfxParticlesComponent } from './components/sfx-particles/sfx-particles.component';
 import { TabGroupComponent } from './components/tab-group/tab-group.component';
+import { CanvasAnimationDirective } from './directives/canvas-animation.directive';
 
 @NgModule({
   declarations: [
+    CanvasAnimationDirective,
     FocusDirective,
     GestureDirective,
-    SfxParticlesComponent,
     TabGroupComponent,
     XrangePipe,
   ],
   exports: [
+    CanvasAnimationDirective,
     FocusDirective,
     GestureDirective,
-    SfxParticlesComponent,
     TabGroupComponent,
     XrangePipe,
   ],

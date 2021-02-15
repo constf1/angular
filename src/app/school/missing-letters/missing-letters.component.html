@@ -1,7 +1,7 @@
 <div class="missing-letters-frame">
-  <app-sfx-particles *ngIf="isVictory && !chatBot.currentItem" class="missing-letters-sfx" [attractor]="sfxAttractor"
+  <canvas *ngIf="sfx && !chatBot.currentItem" class="missing-letters-sfx" appCanvasAnimation [animationCallback]="sfx.animation"
     [style.left.px]="board.offsetLeft" [style.top.px]="board.offsetTop"
-    [width]="board.offsetWidth" [height]="board.offsetHeight"></app-sfx-particles>
+    [width]="board.offsetWidth" [height]="board.offsetHeight"></canvas>
   <div class="missing-letters-board" [style.font-size.px]="fontSize" #board (mousemove)="onMouseMove($event, board)" (mouseout)="onMouseOut()">
     <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer"
       [nextValue]="a.realAnswer"></app-simple-diff>
