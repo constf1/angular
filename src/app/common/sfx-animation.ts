@@ -2,19 +2,19 @@ import { bezier3, randomInteger } from './math-utils';
 
 export type SfxAnimation = {
   animation: (time: number, context: CanvasRenderingContext2D) => void;
-  mouse?: { x: number, y: number };
+  mouse?: { x: number; y: number };
 };
 
 export abstract class SfxAbstractAnimation implements SfxAnimation {
   lastFrameTime = 0;
 
-  mouse?: { x: number, y: number };
+  mouse?: { x: number; y: number };
 
   animation = (time: number, ctx: CanvasRenderingContext2D) => {
     const { width, height } = ctx.canvas;
 
     if (this.lastFrameTime) {
-      const dt = (time - this.lastFrameTime) / 1000;
+      const dt = Math.min(time - this.lastFrameTime, 50) / 1000;
       this.update(dt, width, height);
       this.draw(ctx, width, height);
     } else {
@@ -62,7 +62,7 @@ export class SfxParticle {
     this.y = h;
 
     const angle = Math.atan2(w / 2, h) * Math.random();
-    const speed = Math.min(w, h) / 10 * (1 + 1.75 * Math.random());
+    const speed = (Math.min(w, h) / 10) * (1 + 1.75 * Math.random());
 
     this.vy = -speed * Math.cos(angle) - 2 * 10;
     this.vx = speed * Math.sin(angle);
@@ -76,11 +76,14 @@ export class SfxParticle {
     this.fy = 0;
   }
 
-  update(dt: number, attractor?: { x: number, y: number }) {
+  update(dt: number, attractor?: { x: number; y: number }) {
     this.age += dt;
     if (this.age >= 0 && this.age < this.ttl) {
       const t = this.age / this.ttl;
-      this.radius = Math.max(1, (1 - bezier3(.14, 0.68, 0.76, 0.94, t)) * this.radius0);
+      this.radius = Math.max(
+        1,
+        (1 - bezier3(0.14, 0.68, 0.76, 0.94, t)) * this.radius0
+      );
 
       this.x += this.vx * dt;
       this.y += this.vy * dt;
@@ -192,9 +195,16 @@ export class SfxParticles extends SfxAbstractAnimation {
     this.nextBurstDelta -= dt;
     if (freeCount > 0) {
       if (this.nextBurstDelta <= 0) {
-        const maxCount = Math.min(50, Math.max(Math.floor(this.particleCount / 3), 1));
+        const maxCount = Math.min(
+          50,
+          Math.max(Math.floor(this.particleCount / 3), 1)
+        );
         const count = Math.min(freeCount, maxCount);
-        this.spawnParticles(randomInteger(1 + Math.floor(count / 2), 1 + count), width, height);
+        this.spawnParticles(
+          randomInteger(1 + Math.floor(count / 2), 1 + count),
+          width,
+          height
+        );
 
         this.nextBurstDelta = 3 + Math.random() * 5;
       } else if (freeCount > this.particleCount / 2) {
@@ -222,11 +232,15 @@ export class SfxLine {
 
     this.x0 = this.x;
     this.y0 = this.y;
-
-    this.speed = 100;
   }
 
-  update(dt: number, width: number, height: number, attractor?: { x: number, y: number }) {
+  update(
+    dt: number,
+    speed: number,
+    width: number,
+    height: number,
+    attractor?: { x: number; y: number }
+  ) {
     this.x0 = this.x;
     this.y0 = this.y;
 
@@ -235,7 +249,8 @@ export class SfxLine {
     }
     this.angle += 0.11 * Math.PI * (Math.random() - 0.5); // 20 / 180 * Math.PI * (Math.random() - 0.5)
 
-    const d = dt * this.speed;
+    const ds = 0.25 * speed * (Math.random() - 0.5);
+    const d = dt * (speed + ds);
     this.x += d * Math.sin(this.angle);
     this.y += d * Math.cos(this.angle);
 
@@ -262,6 +277,7 @@ export class SfxLines extends SfxAbstractAnimation {
   particleCount = 250;
   particles: SfxLine[] = [];
   hue = Math.floor(360 * Math.random());
+  speed = 100;
 
   clear(ctx: CanvasRenderingContext2D, width: number, height: number) {
     ctx.fillStyle = '#222';
@@ -302,7 +318,7 @@ export class SfxLines extends SfxAbstractAnimation {
 
     // Update particles.
     for (const particle of this.particles) {
-      particle.update(dt, width, height, this.mouse);
+      particle.update(dt, this.speed, width, height, this.mouse);
     }
   }
 }
