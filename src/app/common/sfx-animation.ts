@@ -16,10 +16,12 @@ export abstract class SfxAbstractAnimation implements SfxAnimation {
     if (this.lastFrameTime) {
       const dt = Math.min(time - this.lastFrameTime, 50) / 1000;
       this.update(dt, width, height);
-      this.draw(ctx, width, height);
-    } else {
-      this.clear(ctx, width, height);
     }
+
+    ctx.save();
+    this.clear(ctx, width, height);
+    this.draw(ctx, width, height);
+    ctx.restore();
 
     this.lastFrameTime = time;
   }
@@ -119,16 +121,6 @@ export class SfxParticle {
       this.fy += drag * this.vy * Math.abs(this.vy);
     }
   }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    if (this.age >= 0 && this.age < this.ttl) {
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${this.hue}, 80%, 40%, 1)`;
-      ctx.fill();
-      ctx.closePath();
-    }
-  }
 }
 
 export class SfxParticles extends SfxAbstractAnimation {
@@ -139,22 +131,22 @@ export class SfxParticles extends SfxAbstractAnimation {
   nextBurstDelta = 3;
 
   clear(ctx: CanvasRenderingContext2D, width: number, height: number) {
-    ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = '#222';
+    // ctx.globalAlpha = 1;
+    ctx.fillStyle = this.lastFrameTime > 0 ? 'rgba(0, 0, 0, 0.08)' : '#222';
     ctx.fillRect(0, 0, width, height);
   }
 
   draw(ctx: CanvasRenderingContext2D, width: number, height: number) {
-    // clear
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
-    ctx.fillRect(0, 0, width, height);
-
-    // draw
     ctx.globalCompositeOperation = 'lighter';
     for (const particle of this.particles) {
-      particle.draw(ctx);
+      if (particle.age >= 0 && particle.age < particle.ttl) {
+        ctx.fillStyle = `hsla(${particle.hue}, 80%, 40%, 1)`;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+      }
     }
   }
 
@@ -217,28 +209,19 @@ export class SfxParticles extends SfxAbstractAnimation {
 }
 
 export class SfxLine {
-  x: number;
-  y: number;
   x0: number;
   y0: number;
   angle: number;
-  speed: number;
 
-  constructor(width: number, height: number) {
-    this.x = Math.random() < 0.5 ? 0 : width;
-    this.y = height;
-
-    this.angle = 2 * Math.PI * Math.random();
-
+  constructor(public x: number, public y: number) {
     this.x0 = this.x;
     this.y0 = this.y;
+    this.angle = 2 * Math.PI * Math.random();
   }
 
   update(
     dt: number,
     speed: number,
-    width: number,
-    height: number,
     attractor?: { x: number; y: number }
   ) {
     this.x0 = this.x;
@@ -253,22 +236,24 @@ export class SfxLine {
     const d = dt * (speed + ds);
     this.x += d * Math.sin(this.angle);
     this.y += d * Math.cos(this.angle);
+  }
 
-    // Check if the particle is out of the box.
-    if (this.x < 0) {
+  cage(xMin: number, yMin: number, xMax: number, yMax: number) {
+    // Checks if the particle is out of the box.
+    if (this.x < xMin) {
       // 0 + 10 > angle > 180 - 10
       this.angle = Math.PI * (0.05 + 0.9 * Math.random()); // randomInteger(10, 170 + 1) * Math.PI / 180;
-      this.x = 0;
-    } else if (this.x > width) {
+      this.x = xMin;
+    } else if (this.x > xMax) {
       this.angle = Math.PI * (1.05 + 0.9 * Math.random()); // (180 + randomInteger(10, 170 + 1)) * Math.PI / 180;
-      this.x = width;
-    } else if (this.y < 0) {
+      this.x = xMax;
+    } else if (this.y < yMin) {
       this.angle = Math.PI * (-0.45 + 0.9 * Math.random()); // randomInteger(-80, 80 + 1) * Math.PI / 180;
-      this.y = 0;
-    } else if (this.y > height) {
+      this.y = yMin;
+    } else if (this.y > yMax) {
       // Note: We'll stick to the bottom.
       this.angle = Math.PI * (-0.45 + 0.9 * Math.random()); // randomInteger(-82, 82 + 1) * Math.PI / 180;
-      this.y = height;
+      this.y = yMax;
     }
   }
 }
@@ -278,18 +263,16 @@ export class SfxLines extends SfxAbstractAnimation {
   particles: SfxLine[] = [];
   hue = Math.floor(360 * Math.random());
   speed = 100;
+  loose?: boolean;
 
   clear(ctx: CanvasRenderingContext2D, width: number, height: number) {
-    ctx.fillStyle = '#222';
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.fillStyle = this.lastFrameTime > 0 ? 'rgba(0, 0, 0, .035)' : '#222';
     ctx.fillRect(0, 0, width, height);
   }
 
   draw(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(0, 0, 0, .035)';
-    ctx.fillRect(0, 0, width, height);
-
-    ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.shadowBlur = 5;
     ctx.shadowColor = `hsl(${this.hue},100%,62%)`;
@@ -302,7 +285,6 @@ export class SfxLines extends SfxAbstractAnimation {
     }
     ctx.stroke();
     ctx.closePath();
-    ctx.restore();
   }
 
   update(dt: number, width: number, height: number): void {
@@ -311,14 +293,104 @@ export class SfxLines extends SfxAbstractAnimation {
     }
 
     if (this.particles.length < this.particleCount) {
-      this.particles.push(new SfxLine(width, height));
+      this.particles.push(this.spawn(width, height));
     } else if (this.particles.length > this.particleCount) {
       this.particles.length = this.particleCount;
     }
 
     // Update particles.
     for (const particle of this.particles) {
-      particle.update(dt, this.speed, width, height, this.mouse);
+      particle.update(dt, this.speed, this.mouse);
+      if (!this.loose) {
+        particle.cage(0, 0, width, height);
+      }
+    }
+  }
+
+  spawn(width: number, height: number): SfxLine {
+    const x = Math.random() < 0.5 ? 0 : width;
+    const y = height;
+    return new SfxLine(x, y);
+  }
+}
+
+export class SfxFireball {
+  attractor: SfxParticle;
+  lines: SfxLines;
+  speed: number;
+
+  constructor(width: number, height: number) {
+    this.attractor = new SfxParticle(width, height);
+
+    this.lines = new SfxLines();
+    this.lines.loose = true;
+    this.lines.spawn = (w: number, h: number) => new SfxLine(w / 2, h);
+
+    this.reset(width, height);
+  }
+
+  reset(width: number, height: number) {
+
+    this.attractor.spawn(width, height);
+
+    this.lines.mouse = undefined;
+    this.lines.particles.length = 0;
+    this.lines.particleCount = randomInteger(20, 30);
+
+    this.speed = randomInteger(800, 1600);
+  }
+
+  update(dt: number, width: number, height: number, mouse?: { x: number; y: number }) {
+    const attractor = this.attractor;
+
+    if (attractor.age < attractor.ttl) {
+      attractor.update(dt, mouse);
+    }
+
+    if (attractor.age > attractor.ttl) {
+      this.reset(width, height);
+    } else {
+
+      if (attractor.ttl - attractor.age > 0.25) {
+        this.lines.speed = Math.max(this.speed / this.attractor.radius, 500);
+        this.lines.mouse = attractor;
+      } else {
+        this.lines.mouse = mouse;
+        this.lines.speed = this.speed;
+      }
+      this.lines.update(dt, width, height);
+    }
+  }
+}
+
+export class SfxFireballs extends SfxAbstractAnimation {
+  particleCount = 5;
+  particles: SfxFireball[] = [];
+
+  clear(ctx: CanvasRenderingContext2D, width: number, height: number) {
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.fillStyle = this.lastFrameTime > 0 ? 'rgba(0, 0, 0, .035)' : '#222';
+    ctx.fillRect(0, 0, width, height);
+  }
+
+  draw(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+    for (const particle of this.particles) {
+      if (particle.attractor.age >= 0) {
+        particle.lines.draw(ctx, width, height);
+      }
+    }
+  }
+
+  update(dt: number, width: number, height: number): void {
+    if (this.particles.length < this.particleCount) {
+      this.particles.push(new SfxFireball(width, height));
+    } else if (this.particles.length > this.particleCount) {
+      this.particles.length = this.particleCount;
+    }
+
+    for (const particle of this.particles) {
+      particle.update(dt, width, height, this.mouse);
     }
   }
 }

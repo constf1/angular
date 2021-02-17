@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { randomItem } from 'src/app/common/array-utils';
 import { randomInteger } from 'src/app/common/math-utils';
-import { SfxAnimation, SfxLines, SfxParticles } from 'src/app/common/sfx-animation';
+import { SfxAnimation, SfxFireballs, SfxLines, SfxParticles } from 'src/app/common/sfx-animation';
 
 import { Answer, ChatBot, countErrors } from './chat-bot';
 import { ASSETS_URL, IMAGES, WIN_AUDIOS } from './missing-letters-assets';
@@ -103,7 +103,19 @@ export class MissingLettersComponent implements OnInit {
     this.chatBot.onEnd(this.answers);
 
     if (countErrors(this.answers) === 0) {
-      this.sfx = Math.random() < 0.5 ? new SfxParticles() : new SfxLines();
+      const chance = Math.random();
+      if (chance < 0.3) {
+        this.sfx = new SfxParticles();
+      } else if (chance < 0.7) {
+        const sfx = new SfxLines();
+        sfx.speed = randomInteger(100, 600);
+        sfx.particleCount = randomInteger(25, 350);
+        this.sfx = sfx;
+      } else {
+        const sfx = new SfxFireballs();
+        sfx.particleCount = randomInteger(3, 10);
+        this.sfx = sfx;
+      }
     }
 
     return false;
