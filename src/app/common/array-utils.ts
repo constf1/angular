@@ -69,3 +69,50 @@ export function shuffle<T>(arr: Array<T>): Array<T> {
   return arr;
 }
 
+export function groupBy<T>(
+  items: ReadonlyArray<T>,
+  mapper: (item: Readonly<T>) => string | number
+): { [key in string | number]: T[] } {
+  const map: { [key in string | number]: T[] } = {};
+
+  for (const item of items) {
+    const key = mapper(item);
+    if (!map[key]) {
+      map[key] = [item];
+    } else {
+      map[key].push(item);
+    }
+  }
+
+  return map;
+}
+
+export type Grader<T> = {
+  mapper: (item: Readonly<T>) => string | number,
+  picker: (keys: string[]) => (string | number)[],
+  fallback?: Grader<T>
+};
+
+export function pickSome<T>(items: T[], limit: number, grader: Grader<T>): T[] {
+  if (items.length > limit) {
+    const next = grader.fallback;
+    const groups = groupBy(items, grader.mapper);
+    items = [];
+    for (const key of grader.picker(Object.keys(groups))) {
+      const size = limit - items.length;
+      const group = groups[key];
+
+      // Note: Using spread operator for large arrays may give us nasty: "RangeError: Maximum call stack size exceeded"
+      // which we can avoid by using the concat operator.
+      // items.push(...groups[key]);
+      items = items.concat(
+        (next && group.length > size) ? pickSome(groups[key], size, next) : groups[key]);
+
+      if (items.length >= limit) {
+        break;
+      }
+    }
+  }
+
+  return items;
+}
