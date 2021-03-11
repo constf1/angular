@@ -1,0 +1,11 @@
+<app-squared-paper [colNum]="game.cols + 2" [rowNum]="game.rows + 2">
+  <svg appContentSvg>
+    <g transform="translate(1 1)">
+      <path [attr.d]="pathFrame" fill="rgba(0,0,0,0.25)" stroke="none"/>
+    </g>
+  </svg>
+  <div class="cw-grid">
+    <span class="cw-cell" *ngFor="let cell of game.cells; index as i" [style.left.px]="24 * cell.x"
+      [style.top.px]="24 * cell.y">{{cell.isHidden ? ' ' : cell.value}}</span>
+  </div>
+</app-squared-paper>
