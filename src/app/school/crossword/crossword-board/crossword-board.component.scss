@@ -20,12 +20,13 @@ $X: $squared-paper-square-side;
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: rgba(250, 250, 220, 0.9);
+  background-color: #fadc9a;
   border-radius: $X / 6;
 
   &.transition_deal {
     cursor: default;
     transition: transform 1.5s cubic-bezier(.6, -0.5, .25, 1.5);
+    background-color: #fafadc;
   }
 
   &.transition_norm {
@@ -36,13 +37,18 @@ $X: $squared-paper-square-side;
     transition: transform 0.25s linear;
   }
 
-  &.transition_grab {
-    cursor: grabing;
+  &.transition_grab,
+  &.transition_drag {
+    cursor: grabbing;
+    box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+  }
+
+  &.transition_grab,
+  &.transition_drag {
     transition: transform 0.15s ease-in-out;
   }
 
   &.transition_drag {
-    cursor: grabbing;
     transition: none;
     opacity: 0.75;
   }
@@ -69,7 +75,7 @@ path.crossword-fill {
   stroke: rgb(250, 0, 0);
   stroke-width: 0.04px;
   // stroke-dasharray: 100;
-  fill: rgba(0,0,0,0.25);
+  fill: rgba(0, 0, 0, 0.25);
 
   animation: keyframes-fade-in 1s ease 1;
 }

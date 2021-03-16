@@ -1,11 +1,14 @@
 // tslint:disable: variable-name
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+
 import { Autoplay } from 'src/app/common/autoplay';
+import { DragListener } from 'src/app/common/drag-listener';
 import { Point } from 'src/app/common/math2d';
-import { transform } from '../../squared-paper/squared-paper.component';
+
+import { SQUARE_SIDE, transform } from '../../squared-paper/squared-paper.component';
 import { CWItem, getItemHeight, getItemWidth } from '../crossword-model';
 
-type Cell =  Point & {
+type Cell = Point & {
   value: string;
   isActive?: boolean;
   // neighbours, if any
@@ -73,10 +76,14 @@ function makeLayout(cols: number, rows: number, charCount = 26) {
 
 type StaticLayout = Readonly<ReturnType<typeof makeLayout>>;
 
+type DragData = {
+  index: number;
+};
+
 function joinLines(a: string[], b: string[]): string[] | undefined {
   return a[a.length - 1] === b[0] ? a.concat(b.slice(1))
     : b[b.length - 1] === a[0] ? b.concat(a.slice(1))
-    : undefined;
+      : undefined;
 }
 
 function mergeLines(lines: string[][]) {
@@ -102,6 +109,7 @@ function mergeLines(lines: string[][]) {
   styleUrls: ['./crossword-board.component.scss']
 })
 export class CrosswordBoardComponent implements OnInit, OnDestroy {
+  private _dragListener = new DragListener<DragData>();
   private _play = new Autoplay();
   private _items: ReadonlyArray<CWItem>;
   cols: number;
@@ -121,11 +129,25 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return this._items;
   }
 
-  constructor() {
+  constructor(private _renderer: Renderer2) {
     this.items = [];
   }
 
   ngOnInit(): void {
+    // tslint:disable-next-line: deprecation
+    this._dragListener.dragChange.subscribe(event => {
+      switch (event) {
+        case 'DragStart':
+          this._onDragStart();
+          break;
+        case 'DragMove':
+          this._onDragMove();
+          break;
+        case 'DragStop':
+          this._onDragStop();
+          break;
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -143,7 +165,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       this.cols = Math.max(this.cols, item.x + getItemWidth(item));
       this.rows = Math.max(this.rows, item.y + getItemHeight(item));
 
-      for (let i = item.letters.length; i-- > 0; ) {
+      for (let i = item.letters.length; i-- > 0;) {
         const value = item.letters[i];
         const row = this.plan[value] || (this.plan[value] = []);
         let x: number;
@@ -173,17 +195,42 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     this.letters = Object.keys(this.plan).sort();
     this.layout = makeLayout(this.cols, this.rows, this.letters.length);
 
-    this._play.timeout = 2500;
+    this._play.timeout = 50;
     this._play.play(
       () => {
         this._makeTiles();
-        this._play.timeout = 2000;
+        this._play.timeout = 1000;
         this._play.play(() => {
           this._setBase();
           this._setFillPath();
         });
       }
     );
+  }
+
+  onMouseDown(event: MouseEvent, index: number) {
+    // console.log('Mousedown:', index);
+    if (event.button !== 0) {
+      return;
+    }
+    event.preventDefault();
+
+    const tile = this.tiles[index];
+    if (tile?.isActive) {
+      this._dragListener.mouseStart(event, this._renderer, { index });
+    }
+  }
+
+  moveTileToFront(index: number) {
+    const front = this.tiles[index];
+    if (front) {
+      for (const tile of this.tiles) {
+        if (tile.order > front.order) {
+          tile.order--;
+        }
+      }
+    }
+    front.order = this.tiles.length;
   }
 
   private _makeTiles() {
@@ -234,9 +281,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   private _setFillPath() {
     const lines = this._getLines();
-    // console.log('Line count:', lines.length);
     mergeLines(lines);
-    // console.log('Shape count:', lines.length);
 
     const pad = this.layout.pad;
     const left = this.layout.baseLeft - pad;
@@ -248,7 +293,6 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     for (const shape of lines) {
       path += 'M' + shape.join(' ') + (shape[0] === shape[shape.length - 1] ? 'z' : ' ');
     }
-    // console.log(path);
     this.fillPath = path;
   }
 
@@ -277,5 +321,42 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       }
     }
     return buf;
+  }
+
+  private _onDragStart() {
+    const data = this._dragListener.data;
+    this.moveTileToFront(data.index);
+    const tile = this.tiles[data.index];
+    if (tile) {
+      tile.className = 'transition_grab';
+    }
+  }
+
+  private _onDragMove() {
+    const data = this._dragListener.data;
+    const tile = this.tiles[data.index];
+    if (tile) {
+      const x = tile.x + this._dragListener.deltaX / SQUARE_SIDE;
+      const y = tile.y + this._dragListener.deltaY / SQUARE_SIDE;
+      tile.transform = transform(
+        Math.max(0, Math.min(this.layout.width - 1, x)),
+        Math.max(0, Math.min(this.layout.height - 1, y)));
+      tile.className = 'transition_drag';
+    }
+  }
+
+  private _onDragStop() {
+    const data = this._dragListener.data;
+    const tile = this.tiles[data.index];
+    if (tile) {
+      const x = Math.round(tile.x + this._dragListener.deltaX / SQUARE_SIDE);
+      const y = Math.round(tile.y + this._dragListener.deltaY / SQUARE_SIDE);
+
+      tile.x = Math.max(0, Math.min(this.layout.width - 1, x));
+      tile.y = Math.max(0, Math.min(this.layout.height - 1, y));
+      tile.transform = transform(tile.x, tile.y);
+
+      tile.className = 'transition_fast';
+    }
   }
 }
