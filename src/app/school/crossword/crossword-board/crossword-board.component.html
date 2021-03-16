@@ -1,0 +1,9 @@
+<div class="crossword-board">
+  <app-squared-paper [colNum]="layout.width" [rowNum]="layout.height">
+    <svg appContentSvg>
+      <!-- margin -->
+      <line stroke-width="0.1" stroke="#f00" fill="none" [attr.x1]="layout.marginLeft" [attr.x2]="layout.marginRight"
+        [attr.y1]="layout.marginTop" [attr.y2]="layout.marginBottom" />
+    </svg>
+  </app-squared-paper>
+</div>

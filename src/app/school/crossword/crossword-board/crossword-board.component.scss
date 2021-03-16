@@ -1,0 +1,7 @@
+@import 'src/app/school/squared-paper/squared-paper';
+$X: $squared-paper-square-side;
+
+.crossword-board {
+  display: inline-block;
+  position: relative;
+}
