@@ -5,3 +5,45 @@ $X: $squared-paper-square-side;
   display: inline-block;
   position: relative;
 }
+
+.crossword-tile {
+  position: absolute;
+  width: $X - 2px;
+  height: $X - 2px;
+
+  border: solid 1px rgba(0, 0, 0, 0.25);
+  color: rgba(0, 0, 0, 0.9);
+
+  cursor: grab;
+
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: rgba(250, 250, 220, 0.9);
+  border-radius: $X / 6;
+
+  &.transition_deal {
+    cursor: default;
+    transition: transform 1.5s cubic-bezier(.6, -0.5, .25, 1.5);
+  }
+
+  &.transition_norm {
+    transition: transform 0.5s ease-out;
+  }
+
+  &.transition_fast {
+    transition: transform 0.25s linear;
+  }
+
+  &.transition_grab {
+    cursor: grabing;
+    transition: transform 0.15s ease-in-out;
+  }
+
+  &.transition_drag {
+    cursor: grabbing;
+    transition: none;
+    opacity: 0.75;
+  }
+}

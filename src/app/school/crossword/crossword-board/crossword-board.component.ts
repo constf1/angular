@@ -1,6 +1,7 @@
 // tslint:disable: variable-name
 import { Component, Input, OnInit } from '@angular/core';
 import { Point } from 'src/app/common/math2d';
+import { transform } from '../../squared-paper/squared-paper.component';
 import { CWItem, getItemHeight, getItemWidth } from '../crossword-model';
 
 type Cell =  Point & {
@@ -14,6 +15,14 @@ type Cell =  Point & {
 
 type CellMap = {
   [key: string]: Cell[];
+};
+
+type Tile = Cell & {
+  order: number;
+  transform: string;
+  className: string;
+
+  isActive?: boolean;
 };
 
 function makeLayout(cols: number, rows: number, charCount = 26) {
@@ -76,6 +85,7 @@ export class CrosswordBoardComponent implements OnInit {
   plan: CellMap;
   letters: ReadonlyArray<string>;
   layout: StaticLayout;
+  tiles: Tile[];
 
   @Input() set items(value: ReadonlyArray<CWItem>) {
     this._items = value;
@@ -97,6 +107,7 @@ export class CrosswordBoardComponent implements OnInit {
     this.cols = 0;
     this.rows = 0;
     this.plan = {};
+    this.tiles = [];
 
     for (const item of this._items) {
       this.cols = Math.max(this.cols, item.x + getItemWidth(item));
@@ -131,5 +142,29 @@ export class CrosswordBoardComponent implements OnInit {
 
     this.letters = Object.keys(this.plan).sort();
     this.layout = makeLayout(this.cols, this.rows, this.letters.length);
+
+    this._makeTiles();
+  }
+
+  private _makeTiles() {
+    const left = this.layout.bankLeft;
+    const top = this.layout.bankTop;
+    const width = this.layout.bankRight - this.layout.bankLeft;
+
+    const tiles = [];
+    for (let i = 0; i < this.letters.length; i++) {
+      for (const cell of this.plan[this.letters[i]]) {
+        const x = left + i % width;
+        const y = top + Math.floor(i / width);
+        tiles.push({
+          ...cell, x, y,
+          order: tiles.length + 1,
+          className: '',
+          transform: transform(x, y)
+        });
+      }
+    }
+
+    this.tiles = tiles;
   }
 }

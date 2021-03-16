@@ -5,5 +5,7 @@
       <line stroke-width="0.1" stroke="#f00" fill="none" [attr.x1]="layout.marginLeft" [attr.x2]="layout.marginRight"
         [attr.y1]="layout.marginTop" [attr.y2]="layout.marginBottom" />
     </svg>
+    <div class="crossword-tile" *ngFor="let tile of tiles; index as i" [ngClass]="tile.className"
+      [style.z-index]="tile.order" [style.transform]="tile.transform">{{tile.value}}</div>
   </app-squared-paper>
 </div>
