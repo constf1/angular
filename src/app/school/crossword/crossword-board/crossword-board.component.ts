@@ -73,6 +73,29 @@ function makeLayout(cols: number, rows: number, charCount = 26) {
 
 type StaticLayout = Readonly<ReturnType<typeof makeLayout>>;
 
+function joinLines(a: string[], b: string[]): string[] | undefined {
+  return a[a.length - 1] === b[0] ? a.concat(b.slice(1))
+    : b[b.length - 1] === a[0] ? b.concat(a.slice(1))
+    : undefined;
+}
+
+function mergeLines(lines: string[][]) {
+  for (let i = lines.length; i-- > 1;) {
+    const a = lines[i];
+    for (let j = i; j-- > 0;) {
+      const b = lines[j];
+      const c = joinLines(a, b);
+      if (c) {
+        lines[j] = c;
+        lines.splice(i, 1);
+        // Restart merging:
+        i = lines.length;
+        break;
+      }
+    }
+  }
+}
+
 @Component({
   selector: 'app-crossword-board',
   templateUrl: './crossword-board.component.html',
@@ -87,6 +110,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   letters: ReadonlyArray<string>;
   layout: StaticLayout;
   tiles: Tile[];
+  fillPath: string;
 
   @Input() set items(value: ReadonlyArray<CWItem>) {
     this._items = value;
@@ -113,6 +137,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     this.rows = 0;
     this.plan = {};
     this.tiles = [];
+    this.fillPath = '';
 
     for (const item of this._items) {
       this.cols = Math.max(this.cols, item.x + getItemWidth(item));
@@ -153,7 +178,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       () => {
         this._makeTiles();
         this._play.timeout = 2000;
-        this._play.play(() => this._setBase());
+        this._play.play(() => {
+          this._setBase();
+          this._setFillPath();
+        });
       }
     );
   }
@@ -202,5 +230,52 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
         }
       }
     }
+  }
+
+  private _setFillPath() {
+    const lines = this._getLines();
+    // console.log('Line count:', lines.length);
+    mergeLines(lines);
+    // console.log('Shape count:', lines.length);
+
+    const pad = this.layout.pad;
+    const left = this.layout.baseLeft - pad;
+    const top = this.layout.baseTop - pad;
+    const width = this.layout.baseRight + pad - left;
+    const height = this.layout.baseBottom + pad - top;
+
+    let path = `M${left} ${top}v${height}h${width}v${-height}z`;
+    for (const shape of lines) {
+      path += 'M' + shape.join(' ') + (shape[0] === shape[shape.length - 1] ? 'z' : ' ');
+    }
+    // console.log(path);
+    this.fillPath = path;
+  }
+
+  private _getLines() {
+    const left = this.layout.baseLeft;
+    const top = this.layout.baseTop;
+
+    const buf = [] as string[][];
+    for (const key of this.letters) {
+      for (const cell of this.plan[key]) {
+        const x = cell.x + left;
+        const y = cell.y + top;
+
+        if (!cell.hasTop) {
+          buf.push([`${x},${y}`, `${x + 1},${y}`]);
+        }
+        if (!cell.hasRight) {
+          buf.push([`${x + 1},${y}`, `${x + 1},${y + 1}`]);
+        }
+        if (!cell.hasBottom) {
+          buf.push([`${x + 1},${y + 1}`, `${x},${y + 1}`]);
+        }
+        if (!cell.hasLeft) {
+          buf.push([`${x},${y + 1}`, `${x},${y}`]);
+        }
+      }
+    }
+    return buf;
   }
 }
