@@ -16,6 +16,7 @@ import { MathExpressionDialogComponent } from './math/math-expression-dialog/mat
 import { SimpleMultiplicationComponent } from './math/simple-multiplication/simple-multiplication.component';
 
 import { CrosswordComponent } from './crossword/crossword.component';
+import { CrosswordBoardComponent } from './crossword/crossword-board/crossword-board.component';
 import { LetterBoardComponent } from './english/letter-board/letter-board.component';
 import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
 import { MissingLettersComponent } from './missing-letters/missing-letters.component';
@@ -46,7 +47,8 @@ const routes: Routes = [
     WordSearchGameSvgComponent,
     MissingLettersComponent,
     SimpleDiffComponent,
-    CrosswordComponent
+    CrosswordComponent,
+    CrosswordBoardComponent
   ],
   imports: [
     RouterModule.forChild(routes),
