@@ -1,11 +1,13 @@
 // tslint:disable: variable-name
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Autoplay } from 'src/app/common/autoplay';
 import { Point } from 'src/app/common/math2d';
 import { transform } from '../../squared-paper/squared-paper.component';
 import { CWItem, getItemHeight, getItemWidth } from '../crossword-model';
 
 type Cell =  Point & {
   value: string;
+  isActive?: boolean;
   // neighbours, if any
   hasLeft?: boolean;
   hasRight?: boolean;
@@ -21,8 +23,6 @@ type Tile = Cell & {
   order: number;
   transform: string;
   className: string;
-
-  isActive?: boolean;
 };
 
 function makeLayout(cols: number, rows: number, charCount = 26) {
@@ -78,7 +78,8 @@ type StaticLayout = Readonly<ReturnType<typeof makeLayout>>;
   templateUrl: './crossword-board.component.html',
   styleUrls: ['./crossword-board.component.scss']
 })
-export class CrosswordBoardComponent implements OnInit {
+export class CrosswordBoardComponent implements OnInit, OnDestroy {
+  private _play = new Autoplay();
   private _items: ReadonlyArray<CWItem>;
   cols: number;
   rows: number;
@@ -101,6 +102,10 @@ export class CrosswordBoardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this._play.stop();
   }
 
   onNewPuzzle() {
@@ -143,7 +148,14 @@ export class CrosswordBoardComponent implements OnInit {
     this.letters = Object.keys(this.plan).sort();
     this.layout = makeLayout(this.cols, this.rows, this.letters.length);
 
-    this._makeTiles();
+    this._play.timeout = 2500;
+    this._play.play(
+      () => {
+        this._makeTiles();
+        this._play.timeout = 2000;
+        this._play.play(() => this._setBase());
+      }
+    );
   }
 
   private _makeTiles() {
@@ -166,5 +178,29 @@ export class CrosswordBoardComponent implements OnInit {
     }
 
     this.tiles = tiles;
+  }
+
+  private _setBase() {
+    // Activate all the tiles
+    for (const tile of this.tiles) {
+      tile.isActive = true;
+    }
+    // Move tiles to the base (except intersections).
+    const left = this.layout.baseLeft;
+    const top = this.layout.baseTop;
+    for (const key of this.letters) {
+      for (const cell of this.plan[key]) {
+        cell.isActive = (cell.hasBottom || cell.hasTop) && (cell.hasLeft || cell.hasRight);
+        if (!cell.isActive) {
+          const tile = this.tiles.find((it) => it.isActive && it.value === key);
+
+          tile.isActive = false;
+          tile.x = cell.x + left;
+          tile.y = cell.y + top;
+          tile.transform = transform(tile.x, tile.y);
+          tile.className = 'transition_deal';
+        }
+      }
+    }
   }
 }
