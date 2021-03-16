@@ -1,11 +1,11 @@
 export class Autoplay {
-  private timerID;
+  private timerID: ReturnType<typeof setTimeout>;
 
   get ended() {
     return this.timerID === undefined;
   }
 
-  constructor(public timeout?: number) {}
+  constructor(public timeout?: number) { }
 
   stop() {
     if (this.timerID) {
@@ -14,7 +14,7 @@ export class Autoplay {
     }
   }
 
-  play(callback: () => boolean) {
+  play(callback: () => (boolean | void)) {
     this.stop();
     this.timerID = setTimeout(() => {
       this.timerID = undefined;
