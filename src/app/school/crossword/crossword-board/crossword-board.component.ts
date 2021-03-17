@@ -3,12 +3,13 @@ import { Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 
 import { Autoplay } from 'src/app/common/autoplay';
 import { DragListener } from 'src/app/common/drag-listener';
+import { append, detach, Linkable } from 'src/app/common/linkable';
 import { Point } from 'src/app/common/math2d';
 
 import { SQUARE_SIDE, transform } from '../../squared-paper/squared-paper.component';
 import { CWItem, getItemHeight, getItemWidth } from '../crossword-model';
 
-type Cell = Point & {
+type Cell = Linkable<Cell> & Point & {
   value: string;
   isActive?: boolean;
   // neighbours, if any
@@ -115,9 +116,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   cols: number;
   rows: number;
   plan: CellMap;
+  cells: Cell[];
+  tiles: Tile[];
   letters: ReadonlyArray<string>;
   layout: StaticLayout;
-  tiles: Tile[];
   fillPath: string;
 
   @Input() set items(value: ReadonlyArray<CWItem>) {
@@ -158,6 +160,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     this.cols = 0;
     this.rows = 0;
     this.plan = {};
+    this.cells = [];
     this.tiles = [];
     this.fillPath = '';
 
@@ -193,6 +196,12 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
 
     this.letters = Object.keys(this.plan).sort();
+    for (const key of this.letters) {
+      for (const cell of this.plan[key]) {
+        this.cells.push(cell);
+      }
+    }
+
     this.layout = makeLayout(this.cols, this.rows, this.letters.length);
 
     this._play.timeout = 50;
@@ -233,6 +242,25 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     front.order = this.tiles.length;
   }
 
+  isAllPairs() {
+    for (const cell of this.cells) {
+      if (cell.list?.length !== 2) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  getPairedCount() {
+    let count = 0;
+    for (const cell of this.cells) {
+      if (cell.list?.length === 2) {
+        count++;
+      }
+    }
+    return count;
+  }
+
   private _makeTiles() {
     const left = this.layout.bankLeft;
     const top = this.layout.bankTop;
@@ -263,18 +291,19 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     // Move tiles to the base (except intersections).
     const left = this.layout.baseLeft;
     const top = this.layout.baseTop;
-    for (const key of this.letters) {
-      for (const cell of this.plan[key]) {
-        cell.isActive = (cell.hasBottom || cell.hasTop) && (cell.hasLeft || cell.hasRight);
-        if (!cell.isActive) {
-          const tile = this.tiles.find((it) => it.isActive && it.value === key);
 
-          tile.isActive = false;
-          tile.x = cell.x + left;
-          tile.y = cell.y + top;
-          tile.transform = transform(tile.x, tile.y);
-          tile.className = 'transition_deal';
-        }
+    for (const cell of this.cells) {
+      cell.isActive = (cell.hasBottom || cell.hasTop) && (cell.hasLeft || cell.hasRight);
+      if (!cell.isActive) {
+        const tile = this.tiles.find((it) => it.isActive && it.value === cell.value);
+
+        tile.isActive = false;
+        tile.x = cell.x + left;
+        tile.y = cell.y + top;
+        tile.transform = transform(tile.x, tile.y);
+        tile.className = 'transition_deal';
+
+        append(cell, tile);
       }
     }
   }
@@ -349,14 +378,36 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const data = this._dragListener.data;
     const tile = this.tiles[data.index];
     if (tile) {
-      const x = Math.round(tile.x + this._dragListener.deltaX / SQUARE_SIDE);
-      const y = Math.round(tile.y + this._dragListener.deltaY / SQUARE_SIDE);
+      let x = Math.round(tile.x + this._dragListener.deltaX / SQUARE_SIDE);
+      x = Math.max(0, Math.min(this.layout.width - 1, x));
+      let y = Math.round(tile.y + this._dragListener.deltaY / SQUARE_SIDE);
+      y = Math.max(0, Math.min(this.layout.height - 1, y));
 
-      tile.x = Math.max(0, Math.min(this.layout.width - 1, x));
-      tile.y = Math.max(0, Math.min(this.layout.height - 1, y));
+      tile.x = x;
+      tile.y = y;
+      tile.className = 'transition_fast';
+
+      // if (this.tiles.findIndex((it) => !it.isActive && it.x === x && it.y === y) < 0) {
+      //   tile.x = x;
+      //   tile.y = y;
+      //   tile.className = 'transition_fast';
+      // } else {
+      //   tile.className = 'transition_norm';
+      // }
       tile.transform = transform(tile.x, tile.y);
 
-      tile.className = 'transition_fast';
+      const left = this.layout.baseLeft;
+      const top = this.layout.baseTop;
+      const cell = this.cells.find((it) => it.x === x - left && it.y === y - top);
+      if (cell) {
+        append(cell, tile);
+      } else {
+        detach(tile);
+      }
+      if (this.isAllPairs()) {
+        console.log('Done!');
+      }
+      // console.log('Pairs:', this.getPairedCount());
     }
   }
 }

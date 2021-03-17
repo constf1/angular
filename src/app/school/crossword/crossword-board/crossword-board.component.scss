@@ -71,11 +71,26 @@ $X: $squared-paper-square-side;
   }
 }
 
+path {
+  fill: none;
+  stroke: none;
+}
+
 path.crossword-fill {
   stroke: rgb(250, 0, 0);
   stroke-width: 0.04px;
   // stroke-dasharray: 100;
   fill: rgba(0, 0, 0, 0.25);
 
-  animation: keyframes-fade-in 1s ease 1;
+  animation: keyframes-fade-in 2s ease 1;
+}
+
+button.crossword-check {
+  position: absolute;
+  right: 0;
+  top: 0;
+  // z-index: 1000;
+  margin-top: $X;
+  width: 4 * $X;
+  height: 2 * $X;
 }
