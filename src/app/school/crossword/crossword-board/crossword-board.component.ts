@@ -1,5 +1,5 @@
 // tslint:disable: variable-name
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, Renderer2, ViewChildren } from '@angular/core';
 
 import { Autoplay } from 'src/app/common/autoplay';
 import { DragListener } from 'src/app/common/drag-listener';
@@ -128,6 +128,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   layout: StaticLayout;
   fillPath: string;
 
+  @ViewChildren('tiles') tileList: QueryList<ElementRef<HTMLElement>>;
+
   @Input() set items(value: ReadonlyArray<CWItem>) {
     this._items = value;
     this.onNewPuzzle();
@@ -239,6 +241,50 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     if (tile?.isActive) {
       this._dragListener.mouseStart(event, this._renderer, { index });
     }
+  }
+
+  onTouchStart(event: TouchEvent) {
+    if (event.targetTouches.length > 0) {
+      const touch = event.targetTouches[0];
+      const index = this.getTileIndex(touch.clientX, touch.clientY);
+      if (index >= 0) {
+        this._dragListener.touchStart(event, { index });
+      }
+    }
+  }
+
+  onTouchStop(event: TouchEvent) {
+    if (this._dragListener.isTouchDragging) {
+      this._dragListener.stop();
+      // Try to prevent any further handling.
+      event.preventDefault();
+    }
+  }
+
+  onTouchMove(event: TouchEvent) {
+    if (this._dragListener.isTouchDragging) {
+      this._dragListener.touchMove(event);
+      // Try to prevent any further handling.
+      event.preventDefault();
+    }
+  }
+
+  getTileIndex(clientX: number, clientY: number): number {
+    let index = -1;
+    if (this.tileList) {
+      const tileRefs = this.tileList.toArray();
+      for (let i = tileRefs.length; i-- > 0;) {
+        if (this.tiles[i].isActive) {
+          const rc = tileRefs[i].nativeElement.getBoundingClientRect();
+          if (rc.left <= clientX && clientX <= rc.right && rc.top <= clientY && clientY <= rc.bottom) {
+            if (index < 0 || this.tiles[index].order < this.tiles[i].order) {
+              index = i;
+            }
+          }
+        }
+      }
+    }
+    return index;
   }
 
   onBoardChange() {
