@@ -1,5 +1,5 @@
 // tslint:disable: variable-name
-import { Component, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
 
 import { Autoplay } from 'src/app/common/autoplay';
 import { DragListener } from 'src/app/common/drag-listener';
@@ -27,6 +27,12 @@ type Tile = Cell & {
   order: number;
   transform: string;
   className: string;
+};
+
+export type CellState = Point & {
+  value: string;
+  answer?: string;
+  isActive?: boolean;
 };
 
 function makeLayout(cols: number, rows: number, charCount = 26) {
@@ -131,6 +137,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return this._items;
   }
 
+  @Output() boardChange = new EventEmitter<CellState[]>();
+
   constructor(private _renderer: Renderer2) {
     this.items = [];
   }
@@ -208,10 +216,13 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     this._play.play(
       () => {
         this._makeTiles();
+        this.onBoardChange();
+
         this._play.timeout = 1000;
         this._play.play(() => {
           this._setBase();
           this._setFillPath();
+          this.onBoardChange();
         });
       }
     );
@@ -228,6 +239,16 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     if (tile?.isActive) {
       this._dragListener.mouseStart(event, this._renderer, { index });
     }
+  }
+
+  onBoardChange() {
+    this.boardChange.emit(this.cells.map((c) => ({
+      x: c.x,
+      y: c.y,
+      value: c.value,
+      isActive: c.isActive,
+      answer: c.next?.value
+    })));
   }
 
   moveTileToFront(index: number) {
@@ -404,10 +425,12 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       } else {
         detach(tile);
       }
-      if (this.isAllPairs()) {
-        console.log('Done!');
-      }
+      // if (this.isAllPairs()) {
+      //   console.log('Done!');
+      // }
       // console.log('Pairs:', this.getPairedCount());
+
+      this.onBoardChange();
     }
   }
 }
