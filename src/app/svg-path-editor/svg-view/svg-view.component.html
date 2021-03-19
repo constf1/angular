@@ -1,4 +1,6 @@
-<svg [attr.viewBox]="viewBox" [class.dragging]="isDragging" [ngStyle]="styles">
+<svg #svgRef [attr.viewBox]="viewBox" [class.dragging]="isDragging" [ngStyle]="styles"
+  (touchstart)="onTouchStart($event, svgRef)" (touchend)="onTouchStop($event)" (touchcancel)="onTouchStop($event)"
+  (touchmove)="onTouchMove($event)">
   <filter id="filterBackgroundImage">
     <feColorMatrix in="SourceGraphic" type="matrix" [attr.values]="settings.imageColorMatrix" />
   </filter>

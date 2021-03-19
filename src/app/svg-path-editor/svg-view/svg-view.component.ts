@@ -241,8 +241,8 @@ export class SvgViewComponent implements OnInit, OnDestroy {
       const data = this._dragListener.data;
       const zoom = this.settingsState.zoom;
 
-      const deltaX = data.startX + Math.round(this._dragListener.deltaX * 100 / zoom) - data.point.x;
-      const deltaY = data.startY + Math.round(this._dragListener.deltaY * 100 / zoom) - data.point.y;
+      const deltaX = data.startX + Math.round(this._dragListener.pageDeltaX * 100 / zoom) - data.point.x;
+      const deltaY = data.startY + Math.round(this._dragListener.pageDeltaY * 100 / zoom) - data.point.y;
       this.controlDrag.emit({ ...data, name: event, deltaX, deltaY });
     }));
   }
@@ -260,10 +260,51 @@ export class SvgViewComponent implements OnInit, OnDestroy {
     if (event.button !== 0) {
       return;
     }
-    event.preventDefault();
 
     const point = this.controls[index];
     this._dragListener.mouseStart(event, this._renderer2, { point, startX: point.x, startY: point.y });
+  }
+
+  onTouchStart(event: TouchEvent, frame: SVGElement) {
+    if (frame && event.targetTouches.length > 0) {
+      const touch = event.targetTouches[0];
+      const rc = frame.getBoundingClientRect();
+      const index = this.getControlPointIndex(touch.clientX - rc.left, touch.clientY - rc.top);
+      if (index >= 0) {
+        const point = this.controls[index];
+        this._dragListener.touchStart(event, { point, startX: point.x, startY: point.y });
+      }
+    }
+  }
+
+  onTouchStop(event: TouchEvent) {
+    if (this._dragListener.isTouchDragging) {
+      this._dragListener.stop(event);
+    }
+  }
+
+  onTouchMove(event: TouchEvent) {
+    if (this._dragListener.isTouchDragging) {
+      this._dragListener.touchMove(event);
+    }
+  }
+
+  getControlPointIndex(clientX: number, clientY: number): number {
+    const R = 5;
+    const { xOffset, yOffset, zoom } = this.settingsState;
+    const x = clientX * 100 / zoom + xOffset;
+    const y = clientY * 100 / zoom + yOffset;
+
+    let index = this.controls.length;
+    while (index-- > 0) {
+      const control = this.controls[index];
+      const dx = control.x - x;
+      const dy = control.y - y;
+      if (dx * dx + dy * dy <= R * R) {
+        break;
+      }
+    }
+    return index;
   }
 
   trackByIndex(index: number): number {
