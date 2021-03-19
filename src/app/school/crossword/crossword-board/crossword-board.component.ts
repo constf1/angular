@@ -255,17 +255,13 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   onTouchStop(event: TouchEvent) {
     if (this._dragListener.isTouchDragging) {
-      this._dragListener.stop();
-      // Try to prevent any further handling.
-      event.preventDefault();
+      this._dragListener.stop(event);
     }
   }
 
   onTouchMove(event: TouchEvent) {
     if (this._dragListener.isTouchDragging) {
       this._dragListener.touchMove(event);
-      // Try to prevent any further handling.
-      event.preventDefault();
     }
   }
 
@@ -432,8 +428,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const data = this._dragListener.data;
     const tile = this.tiles[data.index];
     if (tile) {
-      const x = tile.x + this._dragListener.deltaX / SQUARE_SIDE;
-      const y = tile.y + this._dragListener.deltaY / SQUARE_SIDE;
+      const x = tile.x + this._dragListener.pageDeltaX / SQUARE_SIDE;
+      const y = tile.y + this._dragListener.pageDeltaY / SQUARE_SIDE;
       tile.transform = transform(
         Math.max(0, Math.min(this.layout.width - 1, x)),
         Math.max(0, Math.min(this.layout.height - 1, y)));
@@ -445,9 +441,9 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const data = this._dragListener.data;
     const tile = this.tiles[data.index];
     if (tile) {
-      let x = Math.round(tile.x + this._dragListener.deltaX / SQUARE_SIDE);
+      let x = Math.round(tile.x + this._dragListener.pageDeltaX / SQUARE_SIDE);
       x = Math.max(0, Math.min(this.layout.width - 1, x));
-      let y = Math.round(tile.y + this._dragListener.deltaY / SQUARE_SIDE);
+      let y = Math.round(tile.y + this._dragListener.pageDeltaY / SQUARE_SIDE);
       y = Math.max(0, Math.min(this.layout.height - 1, y));
 
       tile.x = x;
