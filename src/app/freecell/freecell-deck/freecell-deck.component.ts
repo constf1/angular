@@ -126,7 +126,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
       }
     }));
 
-    this._addSubscription(this._dragListener.dragChange.subscribe(event => {
+    this._addSubscription(this._dragListener.dragChange.subscribe((event) => {
       switch (event) {
         case 'DragStart':
           this._onDragStart();
@@ -166,22 +166,35 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     return transforms;
   }
 
-  onTouch(emitValue: { type: DragEvent, event: TouchEvent }) {
+  onTouch({ type, event }: { type: DragEvent, event: TouchEvent }) {
     if (this.isTouchDisabled) {
       return;
     }
 
-    const { type, event } = emitValue;
-    if (this._onTouch(type, event)) {
-      // Try to prevent any further handling.
-      event.preventDefault();
+    switch (type) {
+      case 'DragStart':
+        if (event.targetTouches.length > 0) {
+          const touch = event.targetTouches[0];
+          const index = this.getCardIndex(touch.clientX, touch.clientY);
+          if (index >= 0) {
+            const game = this._gameService.game;
+            const tableau = game.asTablaeu(index);
+            const transforms = this.getTransforms(tableau);
 
-      // stopPropagation prevents gesture detection. Don't use it.
-      // preventDefault should be enough.
-      // event.stopPropagation();
-
-      // Prevents other listeners of the same event from being called.
-      // event.stopImmediatePropagation();
+            this._dragListener.touchStart(event, { game, tableau, transforms });
+          }
+        }
+        break;
+      case 'DragMove':
+        if (this._dragListener.isTouchDragging) {
+          this._dragListener.touchMove(event);
+        }
+        break;
+      case 'DragStop':
+        if (this._dragListener.isTouchDragging) {
+          this._dragListener.stop(event);
+        }
+        break;
     }
   }
 
@@ -195,45 +208,12 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     if (event.button !== 0) {
       return;
     }
-    event.preventDefault();
 
     const game = this._gameService.game;
     const tableau = game.asTablaeu(index);
     const transforms = this.getTransforms(tableau);
 
     this._dragListener.mouseStart(event, this._renderer, { game, tableau, transforms });
-  }
-
-  private _onTouch(type: DragEvent, event: TouchEvent): boolean {
-    switch (type) {
-      case 'DragStart':
-        if (event.targetTouches.length > 0) {
-          const touch = event.targetTouches[0];
-          const index = this.getCardIndex(touch.clientX, touch.clientY);
-          if (index >= 0) {
-            const game = this._gameService.game;
-            const tableau = game.asTablaeu(index);
-            const transforms = this.getTransforms(tableau);
-
-            this._dragListener.touchStart(event, { game, tableau, transforms });
-            return true;
-          }
-        }
-        break;
-      case 'DragMove':
-        if (this._dragListener.isTouchDragging) {
-          this._dragListener.touchMove(event);
-          return true;
-        }
-        break;
-      case 'DragStop':
-        if (this._dragListener.isTouchDragging) {
-          this._dragListener.stop();
-          return true;
-        }
-        break;
-    }
-    return false;
   }
 
   private _onDragStart() {
@@ -252,8 +232,8 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
 
   private _onDragMove() {
     const { tableau, transforms } = this._dragListener.data;
-    const dx = this._dragListener.deltaX;
-    const dy = this._dragListener.deltaY;
+    const dx = this._dragListener.pageDeltaX;
+    const dy = this._dragListener.pageDeltaY;
 
     for (let i = tableau.length; i-- > 0;) {
       const card = this.cards[tableau[i]];
