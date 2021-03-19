@@ -10,67 +10,94 @@ export type DragEvent = typeof DragEvents[number];
 export class DragListener<T> {
   private readonly _listeners: Listener[] = [];
   private readonly _events = new Subject<DragEvent>();
-  private _screenX = 0;
-  private _screenY = 0;
   private _clientX = 0;
   private _clientY = 0;
-  private _deltaX = 0;
-  private _deltaY = 0;
+  private _pageX = 0;
+  private _pageY = 0;
+  private _screenX = 0;
+  private _screenY = 0;
+
+  private _clientDeltaX = 0;
+  private _clientDeltaY = 0;
+  private _pageDeltaX = 0;
+  private _pageDeltaY = 0;
+  private _screenDeltaX = 0;
+  private _screenDeltaY = 0;
+
   private _touchId = NaN;
 
-  public data?: T;
+  data?: T;
+  respectDefault?: boolean;
 
-  public get dragChange() {
+  get dragChange() {
     return this._events.asObservable();
   }
 
-  public get screenX() {
-    return this._screenX;
-  }
-  public get screenY() {
-    return this._screenY;
-  }
-  public get clientX() {
+  get clientX() {
     return this._clientX;
   }
-  public get clientY() {
+  get clientY() {
     return this._clientY;
   }
-  public get deltaX() {
-    return this._deltaX;
+  get pageX() {
+    return this._pageX;
   }
-  public get deltaY() {
-    return this._deltaY;
+  get pageY() {
+    return this._pageY;
+  }
+  get screenX() {
+    return this._screenX;
+  }
+  get screenY() {
+    return this._screenY;
   }
 
-  public get isTouchDragging() {
+  get clientDeltaX() {
+    return this._clientDeltaX;
+  }
+  get clientDeltaY() {
+    return this._clientDeltaY;
+  }
+  get pageDeltaX() {
+    return this._pageDeltaX;
+  }
+  get pageDeltaY() {
+    return this._pageDeltaY;
+  }
+  get screenDeltaX() {
+    return this._screenDeltaX;
+  }
+  get screenDeltaY() {
+    return this._screenDeltaY;
+  }
+
+  get isTouchDragging() {
     return !isNaN(this._touchId);
   }
 
-  public get isMouseDragging() {
+  get isMouseDragging() {
     return this._listeners.length > 0;
   }
 
-  public get isDragging() {
+  get isDragging() {
     return this.isTouchDragging || this.isMouseDragging;
   }
 
   touchStart(event: TouchEvent, data?: T) {
     this.stop();
-    this._deltaX = this._deltaY = 0;
+    this._clientDeltaX = this._clientDeltaY =
+      this._pageDeltaX = this._pageDeltaY =
+      this._screenDeltaX = this._screenDeltaY = 0;
+
+    this.data = data;
 
     const touches = event.targetTouches;
     if (touches.length > 0) {
       const touch = touches[0];
 
       this._touchId = touch.identifier;
-
-      this._clientX = touch.clientX;
-      this._clientY = touch.clientY;
-      this._screenX = touch.screenX;
-      this._screenY = touch.screenY;
-      this.data = data;
-      this._events.next('DragStart');
+      this._beDoneWith(event);
+      this._dragStart(touch);
     }
   }
 
@@ -79,9 +106,8 @@ export class DragListener<T> {
     for (let i = touches.length; i-- > 0;) {
       const touch = touches[i];
       if (touch.identifier === this._touchId) {
-        this._deltaX = touch.screenX - this._screenX;
-        this._deltaY = touch.screenY - this._screenY;
-        this._events.next('DragMove');
+        this._beDoneWith(event);
+        this._dragMove(touch);
         break;
       }
     }
@@ -90,36 +116,30 @@ export class DragListener<T> {
   mouseStart(event: MouseEvent, renderer: Renderer2, data?: T) {
     this.stop();
 
-    this._deltaX = this._deltaY = 0;
-    this._clientX = event.clientX;
-    this._clientY = event.clientY;
-    this._screenX = event.screenX;
-    this._screenY = event.screenY;
+    this._clientDeltaX = this._clientDeltaY =
+      this._pageDeltaX = this._pageDeltaY =
+      this._screenDeltaX = this._screenDeltaY = 0;
+
     this.data = data;
 
     this._listeners.push(renderer.listen('document', 'mousemove', (ev) => {
-      ev.preventDefault();
-
-      // Calculate the new cursor position:
-      this._deltaX = ev.screenX - this._screenX;
-      this._deltaY = ev.screenY - this._screenY;
-      const devicePixelRatio = window.devicePixelRatio;
-      if (devicePixelRatio && devicePixelRatio !== 1) {
-        this._deltaX /= devicePixelRatio;
-        this._deltaY /= devicePixelRatio;
-      }
-      this._events.next('DragMove');
+      this._beDoneWith(ev);
+      this._dragMove(ev);
     }));
 
     // Stop moving when mouse button is released:
     this._listeners.push(renderer.listen('document', 'mouseup', (ev) => {
-      this.stop();
+      this.stop(ev);
     }));
 
-    this._events.next('DragStart');
+    this._beDoneWith(event);
+    this._dragStart(event);
   }
 
-  stop() {
+  stop(event?: MouseEvent | TouchEvent) {
+    if (event) {
+      this._beDoneWith(event);
+    }
     // clean up
     if (this.isDragging) {
       for (const listener of this._listeners) {
@@ -128,6 +148,35 @@ export class DragListener<T> {
       this._listeners.length = 0;
       this._touchId = NaN;
       this._events.next('DragStop');
+    }
+  }
+
+  private _dragMove(event: MouseEvent | Touch) {
+    this._clientDeltaX = event.clientX - this._clientX;
+    this._clientDeltaY = event.clientY - this._clientY;
+    this._pageDeltaX = event.pageX - this._pageX;
+    this._pageDeltaY = event.pageY - this._pageY;
+    this._screenDeltaX = event.screenX - this._screenX;
+    this._screenDeltaY = event.screenY - this._screenY;
+
+    this._events.next('DragMove');
+  }
+
+  private _dragStart(event: MouseEvent | Touch) {
+    this._clientX = event.clientX;
+    this._clientY = event.clientY;
+    this._pageX = event.pageX;
+    this._pageY = event.pageY;
+    this._screenX = event.screenX;
+    this._screenY = event.screenY;
+
+    this._events.next('DragStart');
+  }
+
+  private _beDoneWith(event: MouseEvent | TouchEvent) {
+    if (!this.respectDefault) {
+      // Try to prevent any further handling.
+      event.preventDefault();
     }
   }
 }
