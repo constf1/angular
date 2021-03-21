@@ -214,20 +214,22 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
     this.layout = makeLayout(this.cols, this.rows, this.letters.length);
 
+    const tiles = this._makeTiles();
+    let count = 0;
     this._play.timeout = 50;
-    this._play.play(
-      () => {
-        this._makeTiles();
+    this._play.play(() => {
+      if (count < this.letters.length) {
+        const value = this.letters[count];
+        this.tiles = this.tiles.concat(tiles.filter((tile) => tile.value === value));
+        count++;
+        return true;
+      } else {
+        this._setBase();
+        this._setFillPath();
         this.onBoardChange();
-
-        this._play.timeout = 1000;
-        this._play.play(() => {
-          this._setBase();
-          this._setFillPath();
-          this.onBoardChange();
-        });
+        return false;
       }
-    );
+    });
   }
 
   onMouseDown(event: MouseEvent, index: number) {
@@ -329,7 +331,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const top = this.layout.bankTop;
     const width = this.layout.bankRight - this.layout.bankLeft;
 
-    const tiles = [];
+    const tiles: Tile[] = [];
     for (let i = 0; i < this.letters.length; i++) {
       for (const cell of this.plan[this.letters[i]]) {
         const x = left + i % width;
@@ -343,7 +345,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.tiles = tiles;
+    return tiles;
   }
 
   private _setBase() {
