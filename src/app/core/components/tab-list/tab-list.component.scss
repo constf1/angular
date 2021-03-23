@@ -1,0 +1,22 @@
+@import '../tab-colors';
+
+.tab-list-base {
+  padding: 1px;
+
+  .tab-list-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    color: $item-color;
+
+    &:hover:not(.active) {
+      color: $item-hover-color;
+      background-color: $background-hover-color;
+    }
+
+    &.active {
+      color: $item-select-color;
+      background-color: $background-hover-color;
+      outline: 1px solid $border-select-color;
+    }
+  }
+}

@@ -1,0 +1,6 @@
+<app-tab-group [items]="labels" [selection]="selection.groupIndex" (selectionChange)="onGroupChange($event)">
+  <div class="tab-list-base" *ngIf="groups[selection.groupIndex] as group">
+    <div class="tab-list-item" *ngFor="let item of group.items; index as i" [class.active]="i === selection.itemIndex"
+      (click)="onItemChange(i)">{{item}}</div>
+  </div>
+</app-tab-group>
