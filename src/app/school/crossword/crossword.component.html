@@ -1,4 +1,8 @@
-<app-crossword-board [items]="data" (boardChange)="onBoardChange($event)"></app-crossword-board>
-<pre style="margin-top: 1em;">
-  {{ boardState | json }}
-</pre>
+<button style="float: left;" (click)="onReset()">reset</button>
+<h3>{{title}}</h3>
+<div style="display: flex; flex-direction: row; flex-wrap: wrap;">
+  <app-crossword-board [items]="data" [selection]="selectedWordIndex" (selectionChange)="onWordSelectionChange($event)"
+    (boardChange)="onBoardChange($event)"></app-crossword-board>
+  <app-tab-list [groups]="clues" [selection]="selection" (selectionChange)="onClueSelectionChange($event)">
+  </app-tab-list>
+</div>
