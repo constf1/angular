@@ -1,3 +1,4 @@
+import { Grader, pickSome } from 'src/app/common/array-utils';
 import { Point } from 'src/app/common/math2d';
 
 export type CWPoint = Point & {
@@ -250,9 +251,9 @@ export function getNext(last: Readonly<CWNode>, letters: string[], accum: CWNode
   } while (node = node.prev);
 }
 
-export function makePuzzles(
-  words: string[],
-  iterator: (words: string[], index: number, output: CWNode[]) => CWNode[]): CWNode[] {
+export type PuzzleIterator = (words: string[], index: number, output: CWNode[]) => CWNode[];
+
+export function makePuzzles(words: string[], iterator: PuzzleIterator): CWNode[] {
   let input: CWNode[] = [{ x: 0, y: 0, letters: words[0].split('') }];
 
   for (let i = 1; i < words.length; i++) {
@@ -263,4 +264,77 @@ export function makePuzzles(
     input = output;
   }
   return iterator(words, words.length, input);
+}
+
+function sortAsNumbers(keys: string[]): number[] {
+  return keys.map(value => +value).sort((a, b) => a - b);
+}
+
+function descendingSortAsNumbers(keys: string[]): number[] {
+  return keys.map(value => +value).sort((a, b) => b - a);
+}
+
+export function createIterator(minSize: number, maxSize: number): PuzzleIterator {
+  // Min Area.
+  const aGrader: Grader<CWNode> = {
+    mapper: getArea,
+    picker: sortAsNumbers
+  };
+  // Close to Square (Min width-height difference).
+  const bGrader: Grader<CWNode> = {
+    mapper: (item) => Math.abs(getSizeDiff(item)),
+    picker: sortAsNumbers
+  };
+  // Max intersection count.
+  const cGrader: Grader<CWNode> = {
+    mapper: getIntersectionCount,
+    picker: descendingSortAsNumbers
+  };
+  // Min horizontal-vertical difference.
+  const dGrader: Grader<CWNode> = {
+    mapper: (item) => Math.abs(getWordDiff(item)),
+    picker: sortAsNumbers
+  };
+
+  let limit = 2 * maxSize;
+
+  return (words: string[], index: number, output: CWNode[]): CWNode[] => {
+    if (index >= words.length) {
+      // console.log(`Done! Will pick from: ${output.length}`);
+      // Area -> Count -> Difference -> Balance
+      (((aGrader.fallback = cGrader
+        ).fallback = dGrader
+        ).fallback = bGrader
+        ).fallback = undefined;
+      return pickSome(output, 1, aGrader);
+    }
+
+    // let log = `#${index}\tGrids: ${output.length}`;
+    if (index > 4) {
+      if (output.length > limit) {
+        limit = maxSize;
+        if (index > 0.85 * words.length) {
+          // Area -> Count -> Balance -> Difference
+          (((aGrader.fallback = cGrader
+            ).fallback = bGrader
+            ).fallback = dGrader
+            ).fallback = undefined;
+          output = pickSome(output, minSize, aGrader);
+        } else {
+          // Count -> Area -> Difference -> Balance
+          (((cGrader.fallback = aGrader
+            ).fallback = dGrader
+            ).fallback = bGrader
+            ).fallback = undefined;
+          output = pickSome(output, minSize, cGrader);
+        }
+        if (output.length > limit) {
+          output.length = limit;
+        }
+        // log += ` -> ${output.length}`;
+      }
+    }
+    // console.log(`${log}\tNext: ${words[index]}`);
+    return output;
+  };
 }
