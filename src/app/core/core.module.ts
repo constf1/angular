@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { XrangePipe } from './pipes/xrange.pipe';
+import { TabGroupComponent } from './components/tab-group/tab-group.component';
+import { TabListComponent } from './components/tab-list/tab-list.component';
 
+import { CanvasAnimationDirective } from './directives/canvas-animation.directive';
 import { FocusDirective } from './directives/focus.directive';
 import { GestureDirective } from './directives/gesture.directive';
 
-import { TabGroupComponent } from './components/tab-group/tab-group.component';
-import { CanvasAnimationDirective } from './directives/canvas-animation.directive';
+import { XrangePipe } from './pipes/xrange.pipe';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { CanvasAnimationDirective } from './directives/canvas-animation.directiv
     FocusDirective,
     GestureDirective,
     TabGroupComponent,
+    TabListComponent,
     XrangePipe,
   ],
   exports: [
@@ -22,6 +24,7 @@ import { CanvasAnimationDirective } from './directives/canvas-animation.directiv
     FocusDirective,
     GestureDirective,
     TabGroupComponent,
+    TabListComponent,
     XrangePipe,
   ],
   imports: [
