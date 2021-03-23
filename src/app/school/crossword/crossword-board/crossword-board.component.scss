@@ -71,18 +71,25 @@ $X: $squared-paper-square-side;
   }
 }
 
-path {
-  fill: none;
-  stroke: none;
-}
+// path {
+//   fill: none;
+//   stroke: none;
+// }
 
 path.crossword-fill {
   stroke: rgb(250, 0, 0);
   stroke-width: 0.04px;
   // stroke-dasharray: 100;
-  fill: rgba(0, 0, 0, 0.25);
+  fill: rgba(0, 0, 0, 0.15);
 
   animation: keyframes-fade-in 2s ease 1;
+}
+
+path.crossword-word {
+  fill: none;
+  stroke: yellow;
+  stroke-width: 0.2px;
+  opacity: 0.7;
 }
 
 // button.crossword-check {

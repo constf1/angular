@@ -119,6 +119,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   private _dragListener = new DragListener<DragData>();
   private _play = new Autoplay();
   private _items: ReadonlyArray<CWItem>;
+  private _selection = -1;
   cols: number;
   rows: number;
   plan: CellMap;
@@ -127,8 +128,18 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   letters: ReadonlyArray<string>;
   layout: StaticLayout;
   fillPath: string;
+  wordPath: string;
 
   @ViewChildren('tiles') tileList: QueryList<ElementRef<HTMLElement>>;
+
+  @Input() set selection(value: number) {
+    this._selection = value;
+    this._setSelection(value);
+  }
+
+  get selection() {
+    return this._selection;
+  }
 
   @Input() set items(value: ReadonlyArray<CWItem>) {
     this._items = value;
@@ -139,6 +150,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return this._items;
   }
 
+  @Output() selectionChange = new EventEmitter<number>();
   @Output() boardChange = new EventEmitter<CellState[]>();
 
   constructor(private _renderer: Renderer2) {
@@ -237,7 +249,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     if (event.button !== 0) {
       return;
     }
-    event.preventDefault();
+    // event.preventDefault();
 
     const tile = this.tiles[index];
     if (tile?.isActive) {
@@ -283,6 +295,42 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       }
     }
     return index;
+  }
+
+  getItemIndex(x: number, y: number) {
+    const offset = this._selection < 0 ? 0 : this._selection + 1;
+    for (let i = 0; i < this._items.length; i++) {
+      const index = (i + offset) % this._items.length;
+      const item = this._items[index];
+      if (item.vertical) {
+        if (x === item.x && y >= item.y && y < item.y + item.letters.length) {
+          return index;
+        }
+      } else {
+        if (y === item.y && x >= item.x && x < item.x + item.letters.length) {
+          return index;
+        }
+      }
+    }
+    return -1;
+  }
+
+  onDblClick(event: MouseEvent, board: HTMLElement) {
+    if (event.button !== 0) {
+      return;
+    }
+    const rc = board.getBoundingClientRect();
+
+    const left = this.layout.baseLeft;
+    const top = this.layout.baseTop;
+    const x = Math.floor((event.clientX - rc.left) / SQUARE_SIDE) - left;
+    const y = Math.floor((event.clientY - rc.top) / SQUARE_SIDE) - top;
+
+    const index = this.getItemIndex(x, y);
+    if (index >= 0) {
+      // event.preventDefault();
+      this.selectionChange.emit(index);
+    }
   }
 
   onBoardChange() {
@@ -475,6 +523,19 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       // console.log('Pairs:', this.getPairedCount());
 
       this.onBoardChange();
+    }
+  }
+
+  private _setSelection(value: number) {
+    const active = this._items[value];
+    if (active) {
+      const left = this.layout.baseLeft;
+      const top = this.layout.baseTop;
+      const width = getItemWidth(active);
+      const height = getItemHeight(active);
+      this.wordPath = `M${left + active.x} ${top + active.y}h${width}v${height}h${-width}z`;
+    } else {
+      this.wordPath = '';
     }
   }
 }
