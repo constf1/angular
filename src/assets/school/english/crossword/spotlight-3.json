@@ -1,0 +1,33 @@
+{
+  "Starter Unit": {
+    "again": "снова",
+    "begin": "начинать",
+    "day": "день",
+    "duck": "утка",
+    "everyone": "все, каждый",
+    "little": "маленький",
+    "love": "любовь",
+    "nice to see you": "рад тебя видеть",
+    "pencil case": "пенал",
+    "phone": "телефон",
+    "number": "номер, число",
+    "rainbow": "радуга",
+    "think": "думать",
+    "today": "сегодня",
+    "welcome back!": "с возвращением!"
+  },
+  "Module 1. Unit 1: School again!": {
+    "be late": "опаздывать",
+    "come": "приходить",
+    "get": "получать",
+    "once more": "ещё раз",
+    "pen": "ручка",
+    "pencil": "карандаш",
+    "plus": "плюс",
+    "rubber": "ластик",
+    "ruler": "линейка",
+    "school": "школа",
+    "school bag": "школьный портфель, рюкзак",
+    "time": "время"
+  }
+}
