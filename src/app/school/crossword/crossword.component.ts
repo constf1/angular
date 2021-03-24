@@ -1,22 +1,23 @@
 // tslint:disable: variable-name
 import { Component, OnInit } from '@angular/core';
 
-import { createIterator, makePuzzles, toCWArray } from './crossword-model';
+import { createSifter, makePuzzles, toCWArray } from './crossword-model';
 import { CellState } from './crossword-board/crossword-board.component';
 
 import * as DATA from 'src/assets/school/english/crossword/spotlight-3.json';
 import { randomItem, shuffle } from 'src/app/common/array-utils';
 import { TabListGroup, TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
+import { CrosswordMakerService } from './services/crossword-maker.service';
 
 // const DICT = DATA['Starter Unit'];
 // const KEYS = Object.keys(DICT);
 
 function makeGrid(words: string[]) {
-  const iter = createIterator(500, 2500);
+  const sifter = createSifter(500, 2500);
   for (let i = 0; i < 100; i++) {
     shuffle(words);
     // console.log(`Seed: ${words[0]}`);
-    const puzzles = makePuzzles(words, iter);
+    const puzzles = makePuzzles(words, sifter);
     // console.log(puzzles.length);
     if (puzzles.length > 0) {
       return toCWArray(randomItem(puzzles));
@@ -70,9 +71,39 @@ export class CrosswordComponent implements OnInit {
   selection: TabListSelection = { groupIndex: 0, itemIndex: -1 };
   selectedWordIndex = -1;
 
-  constructor() { }
+  constructor(private _puzzle: CrosswordMakerService) { }
 
   ngOnInit(): void {
+    const u0 = DATA['Starter Unit'];
+    const u1 = DATA['Module 1. Unit 1: School again!'];
+
+    const toClue = (letters: string[]) => {
+      const key = letters.join('');
+      return u0[key] || u1[key];
+    };
+
+    this._puzzle.subscribe((state) => {
+      if (state.isWorking) {
+        this.data = [];
+        this.clues = [];
+        this.selection = { groupIndex: 0, itemIndex: -1 };
+        this.selectedWordIndex = -1;
+      } else {
+        const data = state.items.slice();
+        data.sort((a, b) => a.y !== b.y ? a.y - b.y : a.x - b.x);
+
+        const across = data.filter((it) => !it.vertical);
+        const down = data.filter((it) => it.vertical);
+
+        this.data = across.concat(down);
+        this.clues = [
+          { label: 'Across', items: across.map((it) => toClue(it.letters)) },
+          { label: 'Down', items: down.map((it) => toClue(it.letters)) }
+        ];
+        this.selection = { groupIndex: 0, itemIndex: -1 };
+        this.selectedWordIndex = -1;
+      }
+    });
   }
 
   onBoardChange(state: CellState[]) {
@@ -83,24 +114,26 @@ export class CrosswordComponent implements OnInit {
     const u0 = DATA['Starter Unit'];
     const u1 = DATA['Module 1. Unit 1: School again!'];
 
-    const toClue = (letters: string[]) => {
-      const key = letters.join('');
-      return u0[key] || u1[key];
-    };
+    // const toClue = (letters: string[]) => {
+    //   const key = letters.join('');
+    //   return u0[key] || u1[key];
+    // };
 
-    const data = makeGrid(Object.keys(u0).concat(Object.keys(u1)));
-    data.sort((a, b) => a.y !== b.y ? a.y - b.y : a.x - b.x);
+    this._puzzle.makePuzzle(Object.keys(u0).concat(Object.keys(u1)));
 
-    const across = data.filter((it) => !it.vertical);
-    const down = data.filter((it) => it.vertical);
+    // const data = makeGrid(Object.keys(u0).concat(Object.keys(u1)));
+    // data.sort((a, b) => a.y !== b.y ? a.y - b.y : a.x - b.x);
 
-    this.data = across.concat(down);
-    this.clues = [
-      { label: 'Across', items: across.map((it) => toClue(it.letters)) },
-      { label: 'Down', items: down.map((it) => toClue(it.letters)) }
-    ];
-    this.selection = { groupIndex: 0, itemIndex: -1 };
-    this.selectedWordIndex = -1;
+    // const across = data.filter((it) => !it.vertical);
+    // const down = data.filter((it) => it.vertical);
+
+    // this.data = across.concat(down);
+    // this.clues = [
+    //   { label: 'Across', items: across.map((it) => toClue(it.letters)) },
+    //   { label: 'Down', items: down.map((it) => toClue(it.letters)) }
+    // ];
+    // this.selection = { groupIndex: 0, itemIndex: -1 };
+    // this.selectedWordIndex = -1;
   }
 
   onClueSelectionChange(selection: TabListSelection) {
