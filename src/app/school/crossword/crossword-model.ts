@@ -251,19 +251,19 @@ export function getNext(last: Readonly<CWNode>, letters: string[], accum: CWNode
   } while (node = node.prev);
 }
 
-export type PuzzleIterator = (words: string[], index: number, output: CWNode[]) => CWNode[];
+export type PuzzleSifter = (words: string[], index: number, output: CWNode[]) => CWNode[];
 
-export function makePuzzles(words: string[], iterator: PuzzleIterator): CWNode[] {
+export function makePuzzles(words: string[], sift: PuzzleSifter): CWNode[] {
   let input: CWNode[] = [{ x: 0, y: 0, letters: words[0].split('') }];
 
   for (let i = 1; i < words.length; i++) {
     const output: CWNode[] = [];
-    for (const node of iterator(words, i, input)) {
+    for (const node of sift(words, i, input)) {
       getNext(node, words[i].split(''), output);
     }
     input = output;
   }
-  return iterator(words, words.length, input);
+  return sift(words, words.length, input);
 }
 
 function sortAsNumbers(keys: string[]): number[] {
@@ -274,7 +274,7 @@ function descendingSortAsNumbers(keys: string[]): number[] {
   return keys.map(value => +value).sort((a, b) => b - a);
 }
 
-export function createIterator(minSize: number, maxSize: number): PuzzleIterator {
+export function createSifter(minSize: number, maxSize: number): PuzzleSifter {
   // Min Area.
   const aGrader: Grader<CWNode> = {
     mapper: getArea,

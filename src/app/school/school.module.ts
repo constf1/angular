@@ -21,6 +21,7 @@ import { LetterBoardComponent } from './english/letter-board/letter-board.compon
 import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
 import { MissingLettersComponent } from './missing-letters/missing-letters.component';
 import { SimpleDiffComponent } from './simple-diff/simple-diff.component';
+import { CrosswordMakerService } from './crossword/services/crossword-maker.service';
 
 /**
  * Routes:
@@ -61,5 +62,8 @@ const routes: Routes = [
   exports: [
     RouterModule,
   ],
+  providers: [
+    CrosswordMakerService,
+  ]
 })
 export class SchoolModule { }
