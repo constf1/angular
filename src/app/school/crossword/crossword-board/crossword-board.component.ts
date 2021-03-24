@@ -236,7 +236,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
         count++;
         return true;
       } else {
-        this._setBase();
+        this._setBase(0.55);
         this._setFillPath();
         this.onBoardChange();
         return false;
@@ -396,7 +396,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return tiles;
   }
 
-  private _setBase() {
+  private _setBase(difficulty: number) {
     // Activate all the tiles
     for (const tile of this.tiles) {
       tile.isActive = true;
@@ -406,7 +406,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const top = this.layout.baseTop;
 
     for (const cell of this.cells) {
-      cell.isActive = (cell.hasBottom || cell.hasTop) && (cell.hasLeft || cell.hasRight);
+      cell.isActive = (Math.random() < difficulty) ||
+        ((cell.hasBottom || cell.hasTop) && (cell.hasLeft || cell.hasRight));
       if (!cell.isActive) {
         const tile = this.tiles.find((it) => it.isActive && it.value === cell.value);
 
