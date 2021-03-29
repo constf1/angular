@@ -1,5 +1,6 @@
 import { Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { RANGE_MEDIATOR, RANGE_SEPARATOR, sieveArray } from 'src/app/common/sieve-array';
 
 type PathDataItem = {
   value: string;
@@ -9,9 +10,6 @@ type PathDataItem = {
 const FILE_LOAD_MESSAGE = 'Loading...';
 const FILE_LOAD_ERROR_MESSAGE = 'Error reading from file. Verify that the file exists and that you can access it.';
 const FILE_EMPTY_MESSAGE = 'Could not find any SVG path data.';
-
-const RANGE_SEPARATOR = ',';
-const RANGE_MEDIATOR = '-';
 
 @Component({
   selector: 'app-svg-open-dialog',
@@ -181,29 +179,12 @@ export class SvgOpenDialogComponent implements OnInit {
   }
 
   onInputChange() {
-    for (const item of this.items) {
-      item.selected = false;
+    const size = this.items.length;
+    const sift = sieveArray(size, this.selectionInput);
+    for (let i = 0; i < size; i++) {
+      this.items[i].selected = sift[i];
     }
 
-    const reNumber = /^\d+$/;
-    // Parse input into selection ranges.
-    for (const str of this.selectionInput.split(RANGE_SEPARATOR)) {
-      if (reNumber.test(str)) {
-        const item = this.items[+str - 1];
-        if (item) {
-          item.selected = true;
-        }
-      } else {
-        const range = str.split(RANGE_MEDIATOR);
-        const start = +range[0] - 1;
-        const end = +range[1] - 1;
-        if (start >= 0 && end >= start) {
-          for (let i = start; i < this.items.length && i <= end; i++) {
-            this.items[i].selected = true;
-          }
-        }
-      }
-    }
     this.onSelectionChange();
   }
 }
