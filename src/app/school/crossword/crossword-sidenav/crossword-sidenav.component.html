@@ -1,0 +1,65 @@
+<mat-sidenav-container>
+  <mat-sidenav [mode]="mode" [opened]="opened" (openedChange)="settings.set({ sidenavClosed: !$event })">
+    <mat-toolbar color="primary">
+      <button mat-icon-button (click)="settings.set({ sidenavClosed: true })">
+        <mat-icon>close</mat-icon>
+      </button>
+      <span class="flex-space-filler-1"></span>
+      <span>Crossword</span>
+      <span class="flex-space-filler-1"></span>
+      <mat-slide-toggle color="primary" [checked]="settings.state.sidenavModeSide"
+        (change)="settings.set({ sidenavModeSide: $event.checked })"></mat-slide-toggle>
+    </mat-toolbar>
+
+    <mat-action-list>
+      <button mat-list-item>
+        <mat-icon>developer_board</mat-icon>Create...
+      </button>
+      <!-- <button mat-list-item > Undo </button> -->
+    </mat-action-list>
+
+    <!-- <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-icon>import_export</mat-icon>File
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-icon>design_services</mat-icon>Edit
+        </mat-expansion-panel-header>
+
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon>transform</mat-icon>
+            </mat-panel-title>
+            <mat-panel-description>Transform</mat-panel-description>
+          </mat-expansion-panel-header>
+        </mat-expansion-panel>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-icon>visibility</mat-icon>View
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+        </ng-template>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-icon>design_services</mat-icon>Path
+        </mat-expansion-panel-header>
+      </mat-expansion-panel>
+    </mat-accordion> -->
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })" mat-icon-button
+      color="primary">
+      <mat-icon>double_arrow</mat-icon>
+    </button>
+  </mat-sidenav-content>
+</mat-sidenav-container>

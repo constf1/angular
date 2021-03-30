@@ -15,13 +15,17 @@ import { SimpleAdditionComponent } from './math/simple-addition/simple-addition.
 import { MathExpressionDialogComponent } from './math/math-expression-dialog/math-expression-dialog.component';
 import { SimpleMultiplicationComponent } from './math/simple-multiplication/simple-multiplication.component';
 
-import { CrosswordComponent } from './crossword/crossword.component';
 import { CrosswordBoardComponent } from './crossword/crossword-board/crossword-board.component';
+import { CrosswordComponent } from './crossword/crossword.component';
+import { CrosswordGameComponent } from './crossword/crossword-game/crossword-game.component';
+import { CrosswordMakerService } from './crossword/services/crossword-maker.service';
+import { CrosswordSettingsService } from './crossword/services/crossword-settings.service';
+
 import { LetterBoardComponent } from './english/letter-board/letter-board.component';
-import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
 import { MissingLettersComponent } from './missing-letters/missing-letters.component';
 import { SimpleDiffComponent } from './simple-diff/simple-diff.component';
-import { CrosswordMakerService } from './crossword/services/crossword-maker.service';
+import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
+import { CrosswordSidenavComponent } from './crossword/crossword-sidenav/crossword-sidenav.component';
 
 /**
  * Routes:
@@ -30,7 +34,7 @@ const routes: Routes = [
   { path: 'mental-math', component: MentalMathComponent },
   { path: 'word-puzzle', component: WordSearchGameComponent },
   { path: 'missing-letters', component: MissingLettersComponent },
-  { path: 'crossword', component: CrosswordComponent },
+  { path: 'crossword', component: CrosswordSidenavComponent },
   { path: '', component: MentalMathComponent },
 ];
 
@@ -49,7 +53,9 @@ const routes: Routes = [
     MissingLettersComponent,
     SimpleDiffComponent,
     CrosswordComponent,
-    CrosswordBoardComponent
+    CrosswordBoardComponent,
+    CrosswordGameComponent,
+    CrosswordSidenavComponent
   ],
   imports: [
     RouterModule.forChild(routes),
@@ -64,6 +70,7 @@ const routes: Routes = [
   ],
   providers: [
     CrosswordMakerService,
+    CrosswordSettingsService,
   ]
 })
 export class SchoolModule { }
