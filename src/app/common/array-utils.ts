@@ -116,3 +116,15 @@ export function pickSome<T>(items: T[], limit: number, grader: Grader<T>): T[] {
 
   return items;
 }
+
+export function pickSelected<T>(items: ReadonlyArray<T>, includes?: ReadonlyArray<any>, excludes?: ReadonlyArray<any>): T[] {
+  const skipIncludes = !includes;
+  const skipExcludes = !excludes;
+  const picks: T[] = [];
+  for (let i = 0; i < items.length; i++) {
+    if ((skipIncludes || includes[i]) && (skipExcludes || !excludes[i])) {
+      picks.push(items[i]);
+    }
+  }
+  return picks;
+}
