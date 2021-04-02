@@ -26,6 +26,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTreeModule } from '@angular/material/tree';
 
 import { IndexSelectorComponent } from './index-selector/index-selector.component';
 import { PageSelectorComponent } from './page-selector/page-selector.component';
@@ -64,7 +65,8 @@ import { SandwichComponent } from './sandwich/sandwich.component';
     MatSlideToggleModule,
     MatSnackBarModule,
     MatTabsModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MatTreeModule,
   ],
   exports: [
     LayoutModule,
@@ -92,6 +94,7 @@ import { SandwichComponent } from './sandwich/sandwich.component';
     MatSnackBarModule,
     MatTabsModule,
     MatToolbarModule,
+    MatTreeModule,
 
     IndexSelectorComponent,
     PageSelectorComponent,
