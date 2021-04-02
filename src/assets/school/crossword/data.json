@@ -1,0 +1,151 @@
+{
+  "En-Ru": {
+    "Spotlight 3. Английский в фокусе 3 класс": {
+      "Starter Unit": {
+        "again": "снова",
+        "begin": "начинать",
+        "day": "день",
+        "duck": "утка",
+        "everyone": "все, каждый",
+        "little": "маленький",
+        "love": "любовь",
+        "nice to see you": "рад тебя видеть",
+        "pencil case": "пенал",
+        "phone": "телефон",
+        "number": "номер, число",
+        "rainbow": "радуга",
+        "think": "думать",
+        "today": "сегодня",
+        "welcome back!": "с возвращением!"
+      },
+      "Module 1": {
+        "Unit 1: School again!": {
+          "be late": "опаздывать",
+          "come": "приходить",
+          "get": "получать",
+          "once more": "ещё раз",
+          "pen": "ручка",
+          "pencil": "карандаш",
+          "plus": "плюс",
+          "rubber": "ластик",
+          "ruler": "линейка",
+          "school": "школа",
+          "school bag": "школьный портфель, рюкзак",
+          "time": "время"
+        },
+        "Unit 2: School subjects": {
+          "art": "изобразительное искусство",
+          "come on": "смелее",
+          "geography": "география",
+          "history": "история",
+          "maths": "математика",
+          "music": "музыка",
+          "object": "предмет",
+          "science": "наука",
+          "subject": "школьный предмет",
+          "year": "год"
+        }
+      },
+      "Module 2": {
+        "Unit 3: A New member!": {
+          "big brother": "старший брат",
+          "family tree": "семейное дерево",
+          "little sister": "младшая сестра",
+          "of course": "конечно"
+        },
+        "Unit 4: A Happy family!": {
+          "baby": "младенец",
+          "big": "большой",
+          "father": "папа",
+          "grandfather": "дедушка",
+          "grandmother": "бабушка",
+          "great": "замечательный, великолепный",
+          "mother": "мама",
+          "small": "маленький",
+          "tall": "высокий"
+        }
+      },
+      "Module 3": {
+        "Unit 5: He loves jelly!": {
+          "cheese": "сыр",
+          "chicken": "курица, цыплёнок",
+          "egg": "яйцо",
+          "jelly": "желе",
+          "lemonade": "лимонад"
+        },
+        "Unit 6: In my lunch box!": {
+          "cake": "торт",
+          "carrot": "морковь",
+          "crunch": "грызть с хрустом, хрустеть",
+          "drink": "пить",
+          "dry": "сухой",
+          "find out": "выяснять",
+          "here you are": "вот, пожалуйста!",
+          "lunch box": "коробка с завтраком",
+          "munch": "жевать",
+          "need": "нуждаться",
+          "pasta": "макароны",
+          "potato": "картофель",
+          "rice": "рис",
+          "sausage": "сосиска",
+          "shopping list": "список покупок"
+        }
+      },
+      "Module 4": {
+        "Unit 7: Toys for little Betsy!": {
+          "aeroplane": "самолёт",
+          "elephant": "слон",
+          "let me see": "дай мне подумать",
+          "musical box": "музыкальная шкатулка",
+          "rocking horse": "лошадка-качалка",
+          "tea set": "чайный сервиз",
+          "train": "поезд",
+          "whose": "чей"
+        },
+        "Unit 8: In my room!": {
+          "armchair": "кресло",
+          "computer": "компьютер",
+          "desk": "парта, письменный стол",
+          "playroom": "игровая комната"
+        }
+      },
+      "Module 5": {
+        "Unit 9: Cows are funny!": {
+          "body": "туловище, тело",
+          "cow": "корова",
+          "fat": "толстый",
+          "feet": "ступни",
+          "foot": "ступня",
+          "get on the train": "сесть в поезд",
+          "head": "голова",
+          "leg": "нога",
+          "long": "длинный",
+          "man": "мужчина",
+          "men": "мужчины",
+          "mice": "мыши",
+          "mouse": "мышь",
+          "mouth": "рот",
+          "sheep": "овца",
+          "short": "короткий",
+          "tail": "хвост",
+          "teeth": "зубы",
+          "thin": "худой",
+          "tooth": "зуб",
+          "track": "путь (железнодорожный)",
+          "woman": "женщина",
+          "women": "женщины"
+        },
+        "Unit 10: Clever animals!": {
+          "crawl": "ползать",
+          "parrot": "попугай",
+          "rabbit": "кролик",
+          "seahorse": "морской конёк",
+          "spider": "паук",
+          "talk": "говорить, разговаривать",
+          "tortoise": "черепаха",
+          "walk": "ходить"
+        }
+      }
+    }
+  }
+}
