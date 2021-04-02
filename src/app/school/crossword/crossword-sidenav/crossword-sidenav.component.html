@@ -57,9 +57,12 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
+    <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game>
+
     <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })" mat-icon-button
       color="primary">
       <mat-icon>double_arrow</mat-icon>
     </button>
+
   </mat-sidenav-content>
 </mat-sidenav-container>
