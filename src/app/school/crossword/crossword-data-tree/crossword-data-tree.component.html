@@ -1,0 +1,26 @@
+<ng-template #templateError>
+  <div>
+    <mat-icon>sentiment_very_dissatisfied</mat-icon>
+    {{errorMessage}}
+  </div>
+</ng-template>
+
+<ng-template #templateLoading>
+  <div *ngIf="!errorMessage; else templateError">Loading...</div>
+</ng-template>
+
+<mat-tree *ngIf="root; else templateLoading" [dataSource]="dataSource" [treeControl]="treeControl">
+  <mat-nested-tree-node class="tree-node" *matTreeNodeDef="let node">
+    <button mat-icon-button [style.visibility]="getNodeVisibility(node)" [disabled]="!isNodeParent(node)"
+      matTreeNodeToggle>
+      <mat-icon>{{getNodeIcon(node)}}</mat-icon>
+    </button>
+    <mat-checkbox [checked]="node.selected" [indeterminate]="node.indeterminate"
+      (change)="setNodeChecked(node, $event.checked)">{{node.name}}</mat-checkbox>
+    <span style="font-size: x-small; padding-left: 1em"
+      [style.color]="(node.selected || node.indeterminate) ? 'blue' : 'grey'">{{getNodeInfo(node)}}</span>
+    <div *ngIf="isNodeParent(node)" [class.tree-invisible]="!isNodeExpanded(node)">
+      <ng-container matTreeNodeOutlet></ng-container>
+    </div>
+  </mat-nested-tree-node>
+</mat-tree>
