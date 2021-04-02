@@ -1,6 +1,7 @@
 // tslint:disable: variable-name
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { Data } from '../crossword-data-tree/crossword-data-tree.component';
 import { CrosswordMakerService } from '../services/crossword-maker.service';
 
@@ -12,6 +13,8 @@ import { CrosswordMakerService } from '../services/crossword-maker.service';
 export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
   data: Data = {};
   words: string[] = [];
+  closeOnSuccess = false;
+  subscription: Subscription;
 
   get progress() {
     const { items, words, isWorking } = this.maker.state;
@@ -25,14 +28,25 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
   constructor(public dialogRef: MatDialogRef<CrosswordCreateDialogComponent>, public maker: CrosswordMakerService) { }
 
   ngOnInit(): void {
+    this.subscription = this.maker.subscribe((state) => {
+      if (this.closeOnSuccess && !state.isWorking && state.items.length > 0) {
+        const game = state.items.map((item) => ({ ...item, clue: this.data[item.letters.join('')]}));
+        this.dialogRef.close(game);
+      }
+    });
   }
 
   ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = undefined;
+    }
     this.maker.stop();
   }
 
   onCreate() {
     if (this.words.length > 0) {
+      this.closeOnSuccess = true;
       this.maker.makePuzzle(this.words);
     }
   }
@@ -40,17 +54,13 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
   onStop() {
     if (this.maker.state.isWorking) {
       this.maker.stop();
-      this.closeDialog();
     }
   }
 
   onDataChange(data: Data) {
+    this.closeOnSuccess = false;
     this.maker.stop();
     this.data = data;
     this.words = Object.keys(data);
-  }
-
-  closeDialog() {
-    this.dialogRef.close('DATA!');
   }
 }
