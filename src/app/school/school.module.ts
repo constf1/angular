@@ -26,6 +26,8 @@ import { MissingLettersComponent } from './missing-letters/missing-letters.compo
 import { SimpleDiffComponent } from './simple-diff/simple-diff.component';
 import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/word-search-game/word-search-game.component';
 import { CrosswordSidenavComponent } from './crossword/crossword-sidenav/crossword-sidenav.component';
+import { CrosswordCreateDialogComponent } from './crossword/crossword-create-dialog/crossword-create-dialog.component';
+import { CrosswordDataTreeComponent } from './crossword/crossword-data-tree/crossword-data-tree.component';
 
 /**
  * Routes:
@@ -55,7 +57,9 @@ const routes: Routes = [
     CrosswordComponent,
     CrosswordBoardComponent,
     CrosswordGameComponent,
-    CrosswordSidenavComponent
+    CrosswordSidenavComponent,
+    CrosswordCreateDialogComponent,
+    CrosswordDataTreeComponent
   ],
   imports: [
     RouterModule.forChild(routes),
