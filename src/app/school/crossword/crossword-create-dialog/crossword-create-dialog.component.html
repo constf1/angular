@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Crossword Puzzle Maker</h1>
+<div mat-dialog-content>
+  <div class="crossword-data-tree">
+    <app-crossword-data-tree (dataChange)="onDataChange($event)"></app-crossword-data-tree>
+  </div>
+  <mat-progress-bar [style.visibility]="progressVisibility" mode="determinate" [value]="progress"></mat-progress-bar>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [disabled]="maker.state.isWorking || 1 > words?.length" (click)="onCreate()">Create</button>
+  <button mat-button [disabled]="!maker.state.isWorking || 1 > maker.state.items.length"
+    [style.visibility]="progressVisibility" (click)="onStop()">Stop at
+    {{maker.state.items.length}}</button>
+  <span class="flex-space-filler-1"></span>
+  <button mat-button mat-dialog-close>Close</button>
+</div>
