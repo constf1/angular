@@ -1,149 +1,361 @@
 {
   "En-Ru": {
     "Spotlight 3. Английский в фокусе 3 класс": {
+      "begin": "начинать",
+      "day": "день",
+      "everyone": "все, каждый",
+      "nice to see you": "рад тебя видеть",
+      "number": "номер, число",
+      "object": "предмет",
+      "phone": "телефон",
+      "plus": "плюс",
+      "subject": "школьный предмет",
+      "welcome back!": "с возвращением!",
+      "year": "год",
+      "head": "голова",
+      "long": "длинный",
+      "short": "короткий",
+      "tail": "хвост",
       "Starter Unit": {
-        "again": "снова",
-        "begin": "начинать",
-        "day": "день",
-        "duck": "утка",
-        "everyone": "все, каждый",
-        "little": "маленький",
-        "love": "любовь",
-        "nice to see you": "рад тебя видеть",
-        "pencil case": "пенал",
-        "phone": "телефон",
-        "number": "номер, число",
-        "rainbow": "радуга",
-        "think": "думать",
-        "today": "сегодня",
-        "welcome back!": "с возвращением!"
-      },
-      "Module 1": {
-        "Unit 1: School again!": {
-          "be late": "опаздывать",
-          "come": "приходить",
-          "get": "получать",
-          "once more": "ещё раз",
-          "pen": "ручка",
-          "pencil": "карандаш",
-          "plus": "плюс",
-          "rubber": "ластик",
-          "ruler": "линейка",
-          "school": "школа",
-          "school bag": "школьный портфель, рюкзак",
-          "time": "время"
-        },
-        "Unit 2: School subjects": {
-          "art": "изобразительное искусство",
-          "come on": "смелее",
-          "geography": "география",
-          "history": "история",
-          "maths": "математика",
-          "music": "музыка",
-          "object": "предмет",
-          "science": "наука",
-          "subject": "школьный предмет",
-          "year": "год"
+        "Page 5 Ex. 3. Sing along!": {
+          "colour me": "раскрась меня",
+          "red": "красный",
+          "blue": "синий, голубой",
+          "rainbow": "радуга",
+          "duck": "утка",
+          "brown": "коричневый",
+          "green": "зелёный",
+          "pink": "розовый",
+          "sun": "солнце",
+          "today": "сегодня",
+          "yellow": "жёлтый",
+          "think": "думать"
         }
       },
-      "Module 2": {
-        "Unit 3: A New member!": {
-          "big brother": "старший брат",
-          "family tree": "семейное дерево",
-          "little sister": "младшая сестра",
-          "of course": "конечно"
+      "Module 1. School days!": {
+        "Unit 1. School again!": {
+          "Page 10 Ex. 1. Vocabulary": {
+            "school": "школа",
+            "school bag": "школьный портфель, рюкзак",
+            "pen": "ручка",
+            "pencil": "карандаш",
+            "rubber": "ластик",
+            "ruler": "линейка",
+            "book": "книга",
+            "pencil case": "пенал"
+          },
+          "Page 11 Ex. 4. Listen and read": {
+            "bye": "до свидания",
+            "hello": "привет",
+            "this is": "это",
+            "pet": "домашнее животное",
+            "let's go": "пошли",
+            "what's this": "что это?"
+          },
+          "Page 12 Ex. 1. Sing along!": {
+            "time": "время",
+            "once more": "ещё раз",
+            "get": "получать",
+            "be late": "опаздывать",
+            "come": "приходить",
+            "with me": "со мной",
+            "again": "снова"
+          },
+          "Page 12 Ex. 2. Numbers 11-20": {
+            "eleven": "одиннадцать",
+            "twelve": "двенадцать",
+            "thirteen": "тринадцать",
+            "fourteen": "четырнадцать",
+            "fifteen": "пятнадцать",
+            "sixteen": "шестнадцать",
+            "seventeen": "семнадцать",
+            "eighteen": "восемнадцать",
+            "nineteen": "девятнадцать",
+            "twenty": "двадцать"
+          }
         },
-        "Unit 4: A Happy family!": {
-          "baby": "младенец",
-          "big": "большой",
-          "father": "папа",
-          "grandfather": "дедушка",
-          "grandmother": "бабушка",
-          "great": "замечательный, великолепный",
-          "mother": "мама",
-          "small": "маленький",
-          "tall": "высокий"
+        "Unit 2. School subjects": {
+          "Page 14 Ex. 1. Vocabulary": {
+            "english": "английский",
+            "maths": "математика",
+            "geography": "география",
+            "pe": "физкультура",
+            "history": "история",
+            "science": "наука",
+            "art": "изобразительное искусство",
+            "music": "музыка"
+          },
+          "Page 16 Ex. 2. Sing along!": {
+            "come on": "смелее",
+            "everybody": "все, каждый",
+            "stand up": "встаньте",
+            "sit down": "сядьте",
+            "stamp": "топать, плясать с притопами",
+            "clap": "хлопать",
+            "feet": "ноги, стопы",
+            "hands": "руки"
+          }
         }
       },
-      "Module 3": {
-        "Unit 5: He loves jelly!": {
-          "cheese": "сыр",
-          "chicken": "курица, цыплёнок",
-          "egg": "яйцо",
-          "jelly": "желе",
-          "lemonade": "лимонад"
+      "Module 2. Family moments!": {
+        "Unit 3. A new member!": {
+          "Page 26 Ex. 1. Sing along!": {
+            "family tree": "семейное дерево",
+            "grandma": "бабушка",
+            "grandpa": "дедушка",
+            "mum": "мама",
+            "dad": "папа",
+            "big brother": "старший брат",
+            "little sister": "младшая сестра"
+          },
+          "Page 27 Ex. 3. Listen and read": {
+            "good": "хорошо",
+            "little": "маленький",
+            "of course": "конечно",
+            "lovely": "милая, прекрасная"
+          }
         },
-        "Unit 6: In my lunch box!": {
-          "cake": "торт",
-          "carrot": "морковь",
-          "crunch": "грызть с хрустом, хрустеть",
+        "Unit 4. A Happy family!": {
+          "Page 30 Ex. 1. Vocabulary": {
+            "grandmother": "бабушка",
+            "grandfather": "дедушка",
+            "father": "папа",
+            "mother": "мама"
+          },
+          "Page 32 Ex. 3. Sing along!": {
+            "happy": "счастливый",
+            "family": "семья",
+            "very": "очень",
+            "pretty": "прелестная, очаровательная",
+            "big": "большой",
+            "tall": "высокий",
+            "baby": "младенец",
+            "small": "маленький",
+            "great": "замечательный, великолепный"
+          }
+        }
+      },
+      "Module 3. All the things I like!": {
+        "Unit 5. He loves jelly!": {
+          "Page 42 Ex. 1. Vocabulary": {
+            "chicken": "курица, цыплёнок",
+            "vegetables": "овощи",
+            "ice cream": "мороженое",
+            "chocolate": "шоколад",
+            "water": "вода",
+            "lemonade": "лимонад",
+            "pizza": "пицца",
+            "cheese": "сыр",
+            "egg": "яйцо",
+            "sandwich": "бутерброд",
+            "burger": "бургер"
+          },
+          "Page 43 Ex. 3. Listen and read": {
+            "favourite": "любимый, излюбленный",
+            "food": "еда",
+            "chips": "чипсы, ломтики",
+            "some": "немного, некоторое количество",
+            "jelly": "желе",
+            "here you are": "вот, пожалуйста!"
+          }
+        },
+        "Unit 6. In my lunch box!": {
+          "Page 46 Ex. 1. Vocabulary": {
+            "meat": "мясо",
+            "potatoes": "картошка",
+            "biscuits": "печенье",
+            "milk": "молоко",
+            "cake": "торт",
+            "orange juice": "апельсиновый сок",
+            "pasta": "макароны",
+            "carrots": "морковь",
+            "sausages": "сосиски, колбаски",
+            "rice": "рис",
+            "popcorn": "попкорн",
+            "coke": "кола"
+          },
+          "Page 48 Ex. 2. Sing along!": {
+            "crunch": "грызть с хрустом, хрустеть",
+            "munch": "жевать",
+            "love": "любовь, любить",
+            "eat": "есть, кушать",
+            "every": "каждый, всякий, любой",
+            "dry": "сухой",
+            "any way": "в любом случае"
+          },
           "drink": "пить",
-          "dry": "сухой",
           "find out": "выяснять",
-          "here you are": "вот, пожалуйста!",
           "lunch box": "коробка с завтраком",
-          "munch": "жевать",
           "need": "нуждаться",
-          "pasta": "макароны",
-          "potato": "картофель",
-          "rice": "рис",
-          "sausage": "сосиска",
           "shopping list": "список покупок"
         }
       },
-      "Module 4": {
-        "Unit 7: Toys for little Betsy!": {
-          "aeroplane": "самолёт",
-          "elephant": "слон",
-          "let me see": "дай мне подумать",
-          "musical box": "музыкальная шкатулка",
-          "rocking horse": "лошадка-качалка",
-          "tea set": "чайный сервиз",
-          "train": "поезд",
-          "whose": "чей"
+      "Module 4. Come in and play!": {
+        "Unit 7. Toys for little Betsy!": {
+          "Page 58 Ex. 1. Vocabulary": {
+            "musical box": "музыкальная шкатулка",
+            "tea set": "чайный сервиз",
+            "doll": "кукла",
+            "elephant": "слон",
+            "rocking horse": "лошадка-качалка",
+            "aeroplane": "самолёт",
+            "train": "поезд",
+            "ball": "мяч"
+          },
+          "Page 59 Ex. 3. Listen and read": {
+            "look at": "посмотри на",
+            "what's this": "что это?",
+            "whose": "чей?",
+            "what's wrong": "что не так?",
+            "let me see": "дай мне подумать",
+            "try again": "попробуй снова"
+          }
         },
-        "Unit 8: In my room!": {
-          "armchair": "кресло",
-          "computer": "компьютер",
-          "desk": "парта, письменный стол",
-          "playroom": "игровая комната"
+        "Unit 8. In my room!": {
+          "Page 62 Ex. 1. Vocabulary": {
+            "computer": "компьютер",
+            "tv": "телевизор",
+            "radio": "радио",
+            "armchair": "кресло",
+            "lamp": "лампа",
+            "bed": "кровать",
+            "desk": "парта, письменный стол",
+            "chair": "стул"
+          },
+          "Page 64 Ex. 2. Sing along!": {
+            "playroom": "игровая комната",
+            "come in": "заходи",
+            "ready": "готовый, приготовленный",
+            "tea": "чай"
+          }
         }
       },
-      "Module 5": {
-        "Unit 9: Cows are funny!": {
-          "body": "туловище, тело",
-          "cow": "корова",
-          "fat": "толстый",
-          "feet": "ступни",
-          "foot": "ступня",
-          "get on the train": "сесть в поезд",
-          "head": "голова",
-          "leg": "нога",
-          "long": "длинный",
-          "man": "мужчина",
-          "men": "мужчины",
-          "mice": "мыши",
-          "mouse": "мышь",
-          "mouth": "рот",
-          "sheep": "овца",
-          "short": "короткий",
-          "tail": "хвост",
-          "teeth": "зубы",
-          "thin": "худой",
-          "tooth": "зуб",
-          "track": "путь (железнодорожный)",
-          "woman": "женщина",
-          "women": "женщины"
+      "Module 5. Furry friends!": {
+        "Unit 9. Cows are funny!": {
+          "Page 74 Ex. 1. Vocabulary": {
+            "small nose": "маленький нос",
+            "big ears": "большие уши",
+            "small head": "маленькая голова",
+            "big eyes": "большие глаза",
+            "thin legs": "тонкие ножки",
+            "fat body": "толстое тело",
+            "short tail": "короткий хвост",
+            "long tail": "длинный хвост"
+          },
+          "Page 75 Ex. 5. Listen and read": {
+            "get on the train": "сесть в поезд",
+            "cow": "корова",
+            "sheep": "овца",
+            "fat": "толстый",
+            "body": "туловище, тело",
+            "thin": "худой",
+            "legs": "ноги",
+            "what's the matter": "в чем дело?",
+            "track": "путь (железнодорожный)",
+            "mouth": "рот",
+            "funny": "смешной, забавный"
+          },
+          "Page 76 Ex. 2. Listen and repeat": {
+            "man": "мужчина",
+            "men": "мужчины",
+            "woman": "женщина",
+            "women": "женщины",
+            "child": "ребенок, дитя",
+            "children": "дети",
+            "tooth": "зуб",
+            "teeth": "зубы",
+            "foot": "ступня",
+            "feet": "ступни",
+            "mouse": "мышь",
+            "mice": "мыши",
+            "sheep": "овца, овцы",
+            "fish": "рыба"
+          }
         },
-        "Unit 10: Clever animals!": {
-          "crawl": "ползать",
-          "parrot": "попугай",
-          "rabbit": "кролик",
-          "seahorse": "морской конёк",
-          "spider": "паук",
-          "talk": "говорить, разговаривать",
-          "tortoise": "черепаха",
-          "walk": "ходить"
+        "Unit 10. Clever animals!": {
+          "Page 79 Ex. 1. Vocabulary": {
+            "crawl": "ползать",
+            "spider": "паук",
+            "fly": "летать",
+            "bird": "птица",
+            "jump": "прыгать",
+            "rabbit": "кролик",
+            "swim": "плавать",
+            "seahorse": "морской конёк",
+            "walk": "ходить",
+            "tortoise": "черепаха",
+            "talk": "говорить, разговаривать",
+            "parrot": "попугай"
+          },
+          "Page 80 Ex. 1. Vocabulary": {
+            "twenty": "двадцать",
+            "twenty-one": "двадцать один",
+            "twenty-eight": "двадцать восемь",
+            "thirty": "тридцать",
+            "thirty-two": "тридцать два",
+            "forty": "сорок",
+            "forty-three": "сорок три",
+            "fifty": "пятьдесят"
+          },
+          "Page 80 Ex. 3. Sing and do": {
+            "dance": "танцевать",
+            "sing": "петь",
+            "run": "бегать",
+            "jump": "прыгать",
+            "like me": "как я",
+            "walk": "ходить",
+            "talk": "говорить, разговаривать",
+            "swim": "плавать",
+            "climb": "залезать, карабкаться"
+          }
+        }
+      },
+      "Module 6. Home, sweet home!": {
+        "Unit 11: Grandma! Grandma!": {
+          "behind": "позади, сзади",
+          "bloom": "цвести",
+          "car": "автомобиль",
+          "in front of": "перед",
+          "next to": "рядом, близко",
+          "present": "подарок",
+          "room": "комната"
+        },
+        "Unit 12: My House!": {
+          "cooker": "кухонная плита",
+          "cupboard": "шкаф с полками",
+          "everywhere": "везде",
+          "fridge": "холодильник",
+          "how many": "сколько?",
+          "mirror": "зеркало",
+          "sofa": "диван"
+        }
+      },
+      "Module 7": {
+        "Unit 13: We're having a great time!": {
+          "day off": "выходной день",
+          "drive": "водить машину",
+          "face": "лицо",
+          "make a sandcastle": "строить замок из песка",
+          "over there": "там",
+          "paint a picture": "рисовать картину",
+          "piano": "пианино",
+          "upside down": "вверх ногами",
+          "watch tv": "смотреть телевизор"
+        },
+        "Unit 14: In the park!": {
+          "basketball": "баскетбол",
+          "bell": "колокольчик",
+          "fabulous": "потрясающий, изумительный",
+          "fly a kite": "запускать воздушного змея",
+          "hot dog": "сосиска в булочке",
+          "laugh": "смеяться",
+          "mac": "резиновый плащ, макинтош",
+          "park": "парк",
+          "race": "гонка",
+          "ride a bike": "кататься на велосипеде",
+          "ring": "звенеть",
+          "sleep": "спать",
+          "soccer": "футбол"
         }
       }
     }
