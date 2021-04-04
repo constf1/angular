@@ -1,21 +1,6 @@
 {
   "En-Ru": {
     "Spotlight 3. Английский в фокусе 3 класс": {
-      "begin": "начинать",
-      "day": "день",
-      "everyone": "все, каждый",
-      "nice to see you": "рад тебя видеть",
-      "number": "номер, число",
-      "object": "предмет",
-      "phone": "телефон",
-      "plus": "плюс",
-      "subject": "школьный предмет",
-      "welcome back!": "с возвращением!",
-      "year": "год",
-      "head": "голова",
-      "long": "длинный",
-      "short": "короткий",
-      "tail": "хвост",
       "Starter Unit": {
         "Page 5 Ex. 3. Sing along!": {
           "colour me": "раскрась меня",
@@ -182,12 +167,7 @@
             "every": "каждый, всякий, любой",
             "dry": "сухой",
             "any way": "в любом случае"
-          },
-          "drink": "пить",
-          "find out": "выяснять",
-          "lunch box": "коробка с завтраком",
-          "need": "нуждаться",
-          "shopping list": "список покупок"
+          }
         }
       },
       "Module 4. Come in and play!": {
@@ -311,53 +291,123 @@
         }
       },
       "Module 6. Home, sweet home!": {
-        "Unit 11: Grandma! Grandma!": {
-          "behind": "позади, сзади",
-          "bloom": "цвести",
-          "car": "автомобиль",
-          "in front of": "перед",
-          "next to": "рядом, близко",
-          "present": "подарок",
-          "room": "комната"
+        "Unit 11. Grandma! Grandma!": {
+          "Page 90 Ex.1 Sing along!": {
+            "house": "дом, жилище",
+            "number": "номер, число",
+            "bedroom": "спальня",
+            "bathroom": "ванная комната",
+            "kitchen": "кухня",
+            "living room": "гостиная",
+            "garden": "сад",
+            "bloom": "цвести"
+          },
+          "Page 91 Ex.3 Listen and read": {
+            "where": "где",
+            "room": "комната",
+            "present": "подарок",
+            "kangaroo": "кенгуру",
+            "koala": "коала",
+            "under": "под, внизу"
+          }
         },
-        "Unit 12: My House!": {
-          "cooker": "кухонная плита",
-          "cupboard": "шкаф с полками",
-          "everywhere": "везде",
-          "fridge": "холодильник",
-          "how many": "сколько?",
-          "mirror": "зеркало",
-          "sofa": "диван"
+        "Unit 12. My House!": {
+          "Page 94 Ex. 1. Vocabulary": {
+            "cupboard": "шкаф с полками",
+            "mirror": "зеркало",
+            "fridge": "холодильник",
+            "sofa": "диван",
+            "cooker": "кухонная плита",
+            "glass": "стакан"
+          },
+          "Page 96 Ex.3 Sing along!": {
+            "boxes": "коробки",
+            "everywhere": "везде",
+            "some": "немного, некоторое количество",
+            "head": "голова"
+          }
         }
       },
-      "Module 7": {
+      "Module 7. A day off!": {
         "Unit 13: We're having a great time!": {
-          "day off": "выходной день",
-          "drive": "водить машину",
-          "face": "лицо",
-          "make a sandcastle": "строить замок из песка",
-          "over there": "там",
-          "paint a picture": "рисовать картину",
-          "piano": "пианино",
-          "upside down": "вверх ногами",
-          "watch tv": "смотреть телевизор"
+          "Page 106 Ex.1 Sing along!": {
+            "playing a game": "играю в игру",
+            "driving a car": "вожу машину",
+            "making a sandcastle": "строю замок из песка",
+            "watching tv": "смотрю телевизор",
+            "painting a picture": "рисую картину",
+            "upside down": "вверх ногами",
+            "face": "лицо",
+            "clown": "клоун"
+          },
+          "Page 107 Ex.4 Listen and read": {
+            "having a good time": "хорошо проводить время, веселиться",
+            "what are you doing": "что ты делаешь?",
+            "sandcastle": "замок из песка",
+            "paint": "красить, раскрашивать",
+            "over there": "там"
+          }
         },
         "Unit 14: In the park!": {
-          "basketball": "баскетбол",
-          "bell": "колокольчик",
-          "fabulous": "потрясающий, изумительный",
-          "fly a kite": "запускать воздушного змея",
-          "hot dog": "сосиска в булочке",
-          "laugh": "смеяться",
-          "mac": "резиновый плащ, макинтош",
-          "park": "парк",
-          "race": "гонка",
-          "ride a bike": "кататься на велосипеде",
-          "ring": "звенеть",
-          "sleep": "спать",
-          "soccer": "футбол"
+          "Page 110 Ex. 1. Vocabulary": {
+            "playing soccer": "играют в футбол",
+            "eating a hot dog": "ест хот-дог",
+            "playing basketball": "играют в баскетбол",
+            "flying a kite": "запускает воздушного змея",
+            "riding a bike": "катается на велосипеде",
+            "wearing a mac": "носит резиновый плащ, макинтош",
+            "drinking coke": "пьёт колу",
+            "sleeping": "спит"
+          },
+          "Page 112 Ex.2 Sing along!": {
+            "having a good time": "хорошо проводить время, веселиться",
+            "fabulous": "потрясающий, изумительный",
+            "running": "бегаем",
+            "race": "гонка",
+            "park": "парк",
+            "bell": "колокольчик",
+            "ringing": "звенят",
+            "laughing": "смеёмся",
+            "singing": "поём"
+          }
         }
-      }
+      },
+      "basketball": "баскетбол",
+      "begin": "начинать",
+      "behind": "позади, сзади",
+      "car": "автомобиль",
+      "day off": "выходной день",
+      "day": "день",
+      "drink": "пить",
+      "drive": "водить машину",
+      "everyone": "все, каждый",
+      "find out": "выяснять",
+      "fly a kite": "запускать воздушного змея",
+      "hot dog": "сосиска в булочке",
+      "how many": "сколько?",
+      "in front of": "перед",
+      "laugh": "смеяться",
+      "long": "длинный",
+      "lunch box": "коробка с завтраком",
+      "mac": "резиновый плащ, макинтош",
+      "need": "нуждаться",
+      "next to": "рядом, близко",
+      "nice to see you": "рад тебя видеть",
+      "object": "предмет",
+      "paint a picture": "рисовать картину",
+      "phone": "телефон",
+      "piano": "пианино",
+      "plus": "плюс",
+      "ride a bike": "кататься на велосипеде",
+      "shopping list": "список покупок",
+      "short": "короткий",
+      "sleep": "спать",
+      "soccer": "футбол",
+      "subject": "школьный предмет",
+      "tail": "хвост",
+      "watch tv": "смотреть телевизор",
+      "welcome back!": "с возвращением!",
+      "year": "год"
     }
   }
 }
