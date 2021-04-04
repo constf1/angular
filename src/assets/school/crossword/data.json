@@ -329,7 +329,7 @@
         }
       },
       "Module 7. A day off!": {
-        "Unit 13: We're having a great time!": {
+        "Unit 13. We're having a great time!": {
           "Page 106 Ex.1 Sing along!": {
             "playing a game": "играю в игру",
             "driving a car": "вожу машину",
@@ -348,7 +348,7 @@
             "over there": "там"
           }
         },
-        "Unit 14: In the park!": {
+        "Unit 14. In the park!": {
           "Page 110 Ex. 1. Vocabulary": {
             "playing soccer": "играют в футбол",
             "eating a hot dog": "ест хот-дог",
@@ -372,12 +372,66 @@
           }
         }
       },
+      "Module 8. Day by day!": {
+        "Unit 15. A fun day!": {
+          "Page 122 Ex.1 Sing along!": {
+            "monday": "понедельник",
+            "tuesday": "вторник",
+            "wednesday": "среда ",
+            "thursday": "четверг",
+            "friday": "пятница",
+            "saturday": "суббота",
+            "sunday": "воскресенье"
+          },
+          "Page 123 Ex. 4. Listen and read": {
+            "day": "день",
+            "today": "сегодня",
+            "what do we do": "что мы делаем?",
+            "want": "хотеть, желать",
+            "pick": "выбирать",
+            "card": "карта",
+            "that one": "вон тот, вон та",
+            "face": "лицо",
+            "numbers": "числа",
+            "clock": "часы",
+            "well done": "отличная работа"
+          }
+        },
+        "Unit 16. On Sundays": {
+          "Page 126 Ex. 1. Vocabulary": {
+            "have a shower": "принять душ",
+            "have breakfast": "завтракать",
+            "have lunch": "обедать",
+            "listen to music": "слушать музыку",
+            "visit my friend": "навестить моего друга",
+            "have supper": "ужинать",
+            "watch a video": "смотреть видео",
+            "go to bed": "идти в кровать, ложиться спать"
+          },
+          "Page 126 Ex. 3. Listen and match": {
+            "get up": "вставать",
+            "go to school": "идти в школу",
+            "come home": "идти домойz",
+            "watch tv": "смотреть телевизор",
+            "go to bed": "идти в кровать, ложиться спать"
+          },
+          "Page 128 Ex.2 Sing along!": {
+            "fine": "отлично, прекрасно",
+            "any time": "в любое время",
+            "holiday": "праздник",
+            "morning": "утро",
+            "evening": "вечер",
+            "noon": "полдень",
+            "night": "ночь",
+            "the time is right": "подходящее время"
+          }
+        }
+      },
       "basketball": "баскетбол",
       "begin": "начинать",
       "behind": "позади, сзади",
       "car": "автомобиль",
       "day off": "выходной день",
-      "day": "день",
       "drink": "пить",
       "drive": "водить машину",
       "everyone": "все, каждый",
@@ -405,7 +459,6 @@
       "soccer": "футбол",
       "subject": "школьный предмет",
       "tail": "хвост",
-      "watch tv": "смотреть телевизор",
       "welcome back!": "с возвращением!",
       "year": "год"
     }
