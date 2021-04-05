@@ -16,7 +16,6 @@ import { MathExpressionDialogComponent } from './math/math-expression-dialog/mat
 import { SimpleMultiplicationComponent } from './math/simple-multiplication/simple-multiplication.component';
 
 import { CrosswordBoardComponent } from './crossword/crossword-board/crossword-board.component';
-import { CrosswordComponent } from './crossword/crossword.component';
 import { CrosswordGameComponent } from './crossword/crossword-game/crossword-game.component';
 import { CrosswordMakerService } from './crossword/services/crossword-maker.service';
 import { CrosswordSettingsService } from './crossword/services/crossword-settings.service';
@@ -54,7 +53,6 @@ const routes: Routes = [
     WordSearchGameSvgComponent,
     MissingLettersComponent,
     SimpleDiffComponent,
-    CrosswordComponent,
     CrosswordBoardComponent,
     CrosswordGameComponent,
     CrosswordSidenavComponent,
