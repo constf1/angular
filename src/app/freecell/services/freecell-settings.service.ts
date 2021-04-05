@@ -77,20 +77,7 @@ const KEY = '[FreecellSettingsState]';
 export class FreecellSettingsService extends StateSubject<FreecellSettingsState> {
   constructor() {
     super(initialState);
-
-    const text = localStorage.getItem(KEY);
-    if (text) {
-      const data = JSON.parse(text);
-      if (data) {
-        const state = { ...initialState };
-        for (const key of this.keys) {
-          if (typeof state[key] === typeof data[key]) {
-            state[key] = data[key];
-          }
-        }
-        this._set(state);
-      }
-    }
+    this.loadLocal(KEY, initialState);
   }
 
   restoreDefaults() {
@@ -111,11 +98,7 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
   set(params: Partial<Readonly<FreecellSettingsState>>): boolean {
     const ok = this._set(params);
     if (ok) {
-      try {
-        localStorage.setItem(KEY, JSON.stringify(this.state));
-      } catch (error) {
-        console.warn('localStorage error:', error);
-      }
+      this.saveLocal(KEY);
     }
     return ok;
   }

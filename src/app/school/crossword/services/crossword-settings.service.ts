@@ -1,13 +1,25 @@
 // tslint:disable: variable-name
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
+import { SubType } from 'src/app/common/types';
 
 export interface CrosswordSettingsState {
+  crosswordDifficulty: number;
   sidenavModeSide: boolean;
   sidenavClosed: boolean;
 }
 
+export const minState: Readonly<SubType<CrosswordSettingsState, number>> = {
+  crosswordDifficulty: 0,
+};
+
+export const maxState: Readonly<SubType<CrosswordSettingsState, number>> = {
+  crosswordDifficulty: 100,
+};
+
+
 export const initialState: Readonly<CrosswordSettingsState> = {
+  crosswordDifficulty: Math.round((minState.crosswordDifficulty + maxState.crosswordDifficulty) / 2),
   sidenavModeSide: true,
   sidenavClosed: false,
 };
@@ -18,23 +30,7 @@ const KEY = '[crossword.settings]';
 export class CrosswordSettingsService extends StateSubject<CrosswordSettingsState> {
   constructor() {
     super(initialState);
-    try {
-      const text = localStorage?.getItem(KEY);
-      if (text) {
-        const data = JSON.parse(text);
-        if (data) {
-          const state = { ...initialState };
-          for (const key of this.keys) {
-            if (typeof state[key] === typeof data[key]) {
-              state[key] = data[key];
-            }
-          }
-          this._set(state);
-        }
-      }
-    } catch (e) {
-      console.warn('localStorage error:', e);
-    }
+    this.loadLocal(KEY, initialState);
   }
 
   restoreDefaults() {
@@ -44,12 +40,15 @@ export class CrosswordSettingsService extends StateSubject<CrosswordSettingsStat
   set(params: Partial<Readonly<CrosswordSettingsState>>): boolean {
     const ok = this._set(params);
     if (ok) {
-      try {
-        localStorage.setItem(KEY, JSON.stringify(this.state));
-      } catch (e) {
-        console.warn('localStorage error:', e);
-      }
+      this.saveLocal(KEY);
     }
     return ok;
+  }
+
+  protected _validate(state: CrosswordSettingsState) {
+    for (const key of Object.keys(minState)) {
+      state[key] = Math.max(minState[key], Math.min(maxState[key], state[key]));
+    }
+    return super._validate(state);
   }
 }

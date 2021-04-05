@@ -131,24 +131,7 @@ export class EditorSettingsService extends StateSubject<EditorSettingsState> {
 
   constructor() {
     super(initialState);
-
-    try {
-      const text = localStorage?.getItem(KEY);
-      if (text) {
-        const data = JSON.parse(text);
-        if (data) {
-          const state = { ...initialState };
-          for (const key of this.keys) {
-            if (typeof state[key] === typeof data[key]) {
-              state[key] = data[key];
-            }
-          }
-          this._set(state);
-        }
-      }
-    } catch (e) {
-      console.warn('localStorage error:', e);
-    }
+    this.loadLocal(KEY, initialState);
   }
 
   restoreDefaults() {
@@ -179,11 +162,7 @@ export class EditorSettingsService extends StateSubject<EditorSettingsState> {
       }
       this._timerId = setTimeout(() => {
         this._timerId = null;
-        try {
-          localStorage.setItem(KEY, JSON.stringify(this.state));
-        } catch (e) {
-          console.warn('localStorage error:', e);
-        }
+        this.saveLocal(KEY);
       }, SAVE_DELAY_MS);
     }
     return ok;

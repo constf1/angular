@@ -68,4 +68,46 @@ export class StateSubject<T> {
     }
     return true;
   }
+
+  /**
+   * Saves the state locally.
+   * Saving could fail if the user has disabled storage for the site, or if the quota has been exceeded.
+   * @param keyName the name of the key
+   */
+  saveLocal(keyName: string): boolean {
+    try {
+      localStorage.setItem(keyName, JSON.stringify(this.state));
+      return true;
+    } catch (e) {
+      console.warn('localStorage error:', e);
+      return false;
+    }
+  }
+
+  /**
+   * Load the state from the local storage.
+   * @param keyName the name of the key
+   * @param defaultState fallback state
+   * @returns `true` if state has been changed, `false` otherwise
+   */
+  loadLocal(keyName: string, defaultState: Readonly<T>): boolean {
+    try {
+      const text = localStorage?.getItem(keyName);
+      if (text) {
+        const data = JSON.parse(text);
+        if (data) {
+          const state = { ...defaultState };
+          for (const key of this.keys) {
+            if (typeof state[key] === typeof data[key]) {
+              state[key] = data[key];
+            }
+          }
+          return this._set(state);
+        }
+      }
+    } catch (e) {
+      console.warn('localStorage error:', e);
+    }
+    return false;
+  }
 }
