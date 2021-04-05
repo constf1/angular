@@ -1,4 +1,5 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { NgStyle } from '@angular/common';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChildren, QueryList, ElementRef } from '@angular/core';
 
 export type TabListGroup = {
   label: string;
@@ -16,10 +17,14 @@ export type TabListSelection = {
   templateUrl: './tab-list.component.html',
   styleUrls: ['./tab-list.component.scss']
 })
-export class TabListComponent implements OnInit {
+export class TabListComponent implements OnInit, OnChanges {
   @Input() groups: TabListGroup[] = [];
   @Input() selection: TabListSelection = { groupIndex: 0, itemIndex: -1 };
   @Output() selectionChange = new EventEmitter<TabListSelection>();
+
+  @Input() panelStyle: NgStyle;
+
+  @ViewChildren('item') itemList: QueryList<ElementRef<HTMLElement>>;
 
   get labels() {
     return this.groups.map((it) => it.label);
@@ -28,6 +33,17 @@ export class TabListComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    const selection = changes.selection;
+    if (selection?.currentValue && selection.currentValue !== selection.previousValue) {
+      const index = this.selection.itemIndex;
+      if (index >= 0) {
+        // Give Angular a chance to rebuild the panel and scroll selected item into the view.
+        setTimeout(() => this.scrollItemIntoView(index), 100);
+      }
+    }
   }
 
   onGroupChange(groupIndex: number) {
@@ -46,5 +62,12 @@ export class TabListComponent implements OnInit {
   onItemChange(itemIndex: number) {
     const sel: TabListSelection = { groupIndex: this.selection.groupIndex, itemIndex };
     this.selectionChange.emit(sel);
+  }
+
+  scrollItemIntoView(index: number) {
+    const elem = this.itemList?.toArray()[index]?.nativeElement;
+    if (elem && typeof elem.scrollIntoView === 'function') {
+      elem.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+    }
   }
 }
