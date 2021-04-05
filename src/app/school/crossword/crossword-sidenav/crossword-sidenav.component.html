@@ -17,6 +17,11 @@
       </button>
       <!-- <button mat-list-item > Undo </button> -->
     </mat-action-list>
+    <div *ngIf="clues" style="margin: 1em;">
+      <h3>Clues</h3>
+      <app-tab-list [groups]="clues" [selection]="selection" (selectionChange)="onClueSelectionChange($event)">
+      </app-tab-list>
+    </div>
 
     <!-- <mat-accordion>
       <mat-expansion-panel>
@@ -57,7 +62,9 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game>
+    <!-- <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game> -->
+    <app-crossword-board *ngIf="items" [items]="items" [selection]="selectedWordIndex"
+      (selectionChange)="onWordSelectionChange($event)"></app-crossword-board>
 
     <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })" mat-icon-button
       color="primary">
