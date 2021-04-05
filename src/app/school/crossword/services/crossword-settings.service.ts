@@ -10,11 +10,11 @@ export interface CrosswordSettingsState {
 }
 
 export const minState: Readonly<SubType<CrosswordSettingsState, number>> = {
-  crosswordDifficulty: 0,
+  crosswordDifficulty: 1,
 };
 
 export const maxState: Readonly<SubType<CrosswordSettingsState, number>> = {
-  crosswordDifficulty: 100,
+  crosswordDifficulty: 5,
 };
 
 

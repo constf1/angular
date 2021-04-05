@@ -1,6 +1,11 @@
 <h1 mat-dialog-title>Crossword Puzzle Maker</h1>
 <div mat-dialog-content>
   <div class="crossword-data-tree">
+    <div style="padding: 1em;">
+      <app-index-selector label="Difficulty" [count]="difficultyMax - difficultyMin + 1"
+        [selection]="difficultyMax - settings.state.crosswordDifficulty"
+        (selectionChange)="settings.set({ crosswordDifficulty: difficultyMax - $event })"></app-index-selector>
+    </div>
     <app-crossword-data-tree (dataChange)="onDataChange($event)"></app-crossword-data-tree>
   </div>
   <mat-progress-bar [style.visibility]="progressVisibility" mode="determinate" [value]="progress"></mat-progress-bar>

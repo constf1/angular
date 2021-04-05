@@ -63,7 +63,7 @@
 
   <mat-sidenav-content>
     <!-- <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game> -->
-    <app-crossword-board *ngIf="items" [items]="items" [selection]="selectedWordIndex"
+    <app-crossword-board *ngIf="items" [difficulty]="difficulty" [items]="items" [selection]="selectedWordIndex"
       (selectionChange)="onWordSelectionChange($event)"></app-crossword-board>
 
     <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })" mat-icon-button

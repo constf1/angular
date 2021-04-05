@@ -4,6 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Data } from '../crossword-data-tree/crossword-data-tree.component';
 import { CrosswordMakerService } from '../services/crossword-maker.service';
+import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
 
 @Component({
   selector: 'app-crossword-create-dialog',
@@ -16,6 +17,9 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
   closeOnSuccess = false;
   subscription: Subscription;
 
+  readonly difficultyMin = minState.crosswordDifficulty;
+  readonly difficultyMax = maxState.crosswordDifficulty;
+
   get progress() {
     const { items, words, isWorking } = this.maker.state;
     return (isWorking && words.length > 0) ? Math.floor(100 * items.length / words.length) : 0;
@@ -25,7 +29,10 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
     return this.maker.state.isWorking ? 'visible' : 'hidden';
   }
 
-  constructor(public dialogRef: MatDialogRef<CrosswordCreateDialogComponent>, public maker: CrosswordMakerService) { }
+  constructor(
+    public dialogRef: MatDialogRef<CrosswordCreateDialogComponent>,
+    public maker: CrosswordMakerService,
+    public settings: CrosswordSettingsService) { }
 
   ngOnInit(): void {
     this.subscription = this.maker.subscribe((state) => {

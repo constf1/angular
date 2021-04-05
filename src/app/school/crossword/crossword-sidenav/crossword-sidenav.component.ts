@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TabListGroup, TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
 import { CrosswordCreateDialogComponent } from '../crossword-create-dialog/crossword-create-dialog.component';
 import { CWTerm } from '../crossword-game/crossword-game.component';
-import { CrosswordSettingsService } from '../services/crossword-settings.service';
+import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
 
 @Component({
   selector: 'app-crossword-sidenav',
@@ -27,6 +27,13 @@ export class CrosswordSidenavComponent implements OnInit {
 
   get opened() {
     return !this.settings.state.sidenavClosed;
+  }
+
+  get difficulty() {
+    const lo = minState.crosswordDifficulty;
+    const hi = maxState.crosswordDifficulty;
+    const di = this.settings.state.crosswordDifficulty;
+    return (hi - di) / (hi - lo);
   }
 
   constructor(public settings: CrosswordSettingsService, public dialog: MatDialog) { }
