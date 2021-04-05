@@ -141,6 +141,9 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return this._selection;
   }
 
+  /* Crossword difficulty: number in the range [0, 1] */
+  @Input() difficulty = 0;
+
   @Input() set items(value: ReadonlyArray<CWItem>) {
     this._items = value;
     this.onNewPuzzle();
@@ -236,7 +239,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
         count++;
         return true;
       } else {
-        this._setBase(0.55);
+        this._setBase(this.difficulty);
         this._setFillPath();
         this.onBoardChange();
         return false;
