@@ -3,6 +3,7 @@ import { ArrayDataSource } from '@angular/cdk/collections';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { CrosswordSettingsService } from '../services/crossword-settings.service';
 
 const ASSETS_URL = 'assets/school/crossword/data.json';
 
@@ -76,6 +77,49 @@ function onTreeNodeSelectionChange(node: TreeNode): void {
   }
 }
 
+type TreeNodeCallback = (node: TreeNode, stack: number[]) => boolean;
+
+function forEachTreeNode(node: TreeNode, callback: TreeNodeCallback, stack: number[]) {
+  if (callback(node, stack)) {
+    const children = node.children;
+    if (children) {
+      const index = stack.length;
+      for (let i = 0; i < children.length; i++) {
+        stack[index] = i;
+        forEachTreeNode(children[i], callback, stack);
+      }
+      stack.length = index;
+    }
+  }
+}
+
+const WORD_SEPARATOR = ',';
+const NODE_SEPARATOR = '/';
+
+function getTreeSelectionState(root: TreeNode): string {
+  const buf: string[] = [];
+  forEachTreeNode(root, (node, stack) => {
+    if (node.selected) {
+      buf.push(stack.join(NODE_SEPARATOR));
+    }
+    return !node.selected;
+  }, [0]);
+  return buf.join(WORD_SEPARATOR);
+}
+
+function setTreeSelectionState(root: TreeNode, state?: string): void {
+  if (state) {
+    const selected = new Set<string>(state.split(WORD_SEPARATOR));
+    forEachTreeNode(root, (node, stack) => {
+      const key = stack.join(NODE_SEPARATOR);
+      setTreeNodeSelected(node, selected.has(key));
+      return !node.selected;
+    }, [0]);
+  } else {
+    setTreeNodeSelected(root, false);
+  }
+}
+
 export type Data = { [key: string]: string };
 
 @Component({
@@ -92,7 +136,7 @@ export class CrosswordDataTreeComponent implements OnInit {
 
   @Output() dataChange = new EventEmitter<Data>();
 
-  constructor(private _http: HttpClient) { }
+  constructor(public settings: CrosswordSettingsService, private _http: HttpClient) { }
 
   isNodeExpanded(node: TreeNode) {
     return this.treeControl.isExpanded(node);
@@ -117,6 +161,10 @@ export class CrosswordDataTreeComponent implements OnInit {
   setNodeChecked(node: TreeNode, value: boolean) {
     setTreeNodeSelected(node, value);
     onTreeNodeSelectionChange(this.root);
+    // Save tree selection state
+    this.settings.set({
+      crosswordDataTreeState: getTreeSelectionState(this.root)
+    });
     this.onDataChange();
   }
 
@@ -127,8 +175,8 @@ export class CrosswordDataTreeComponent implements OnInit {
         // Update capacity info.
         setTreeNodeSelected(root, true);
         onTreeNodeSelectionChange(root);
-        // TODO: Load and set previously saved tree selection state.
-        setTreeNodeSelected(root, false);
+        // Load and set previously saved tree selection state.
+        setTreeSelectionState(root, this.settings.state.crosswordDataTreeState);
         onTreeNodeSelectionChange(root);
 
         this.root = root;

@@ -4,6 +4,7 @@ import { StateSubject } from 'src/app/common/state-subject';
 import { SubType } from 'src/app/common/types';
 
 export interface CrosswordSettingsState {
+  crosswordDataTreeState: string;
   crosswordDifficulty: number;
   sidenavModeSide: boolean;
   sidenavClosed: boolean;
@@ -19,6 +20,7 @@ export const maxState: Readonly<SubType<CrosswordSettingsState, number>> = {
 
 
 export const initialState: Readonly<CrosswordSettingsState> = {
+  crosswordDataTreeState: '',
   crosswordDifficulty: Math.round((minState.crosswordDifficulty + maxState.crosswordDifficulty) / 2),
   sidenavModeSide: true,
   sidenavClosed: false,
