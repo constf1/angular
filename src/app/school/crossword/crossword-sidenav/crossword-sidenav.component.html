@@ -15,6 +15,9 @@
       <button mat-list-item (click)="openCreateDialog()">
         <mat-icon>developer_board</mat-icon>Create...
       </button>
+      <button mat-list-item [disabled]="!canCheckCrossword" (click)="checkCrossword()">
+        <mat-icon [ngClass]="canCheckCrossword ? 'mat-accent' : 'disabled-color'">mode</mat-icon>Check
+      </button>
       <!-- <button mat-list-item > Undo </button> -->
     </mat-action-list>
     <div *ngIf="clues" style="margin: 1em;">
@@ -62,14 +65,17 @@
   </mat-sidenav>
 
   <mat-sidenav-content>
-    <!-- <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game> -->
-    <app-crossword-board *ngIf="items" [difficulty]="difficulty" [items]="items" [selection]="selectedWordIndex"
-      (selectionChange)="onWordSelectionChange($event)"></app-crossword-board>
+    <div style="padding: 1px;">
+      <app-crossword-board *ngIf="items" [difficulty]="difficulty" [items]="items" [showMistakes]="showMistakes"
+        [selection]="selectedWordIndex" (selectionChange)="onWordSelectionChange($event)"
+        (boardChange)="onBoardChange($event)"></app-crossword-board>
 
-    <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })" mat-icon-button
-      color="primary">
-      <mat-icon>double_arrow</mat-icon>
-    </button>
+      <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })"
+        mat-icon-button color="primary">
+        <mat-icon>double_arrow</mat-icon>
+      </button>
+    </div>
+    <!-- <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game> -->
 
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TabListGroup, TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
+import { CellState } from '../crossword-board/crossword-board.component';
 import { CrosswordCreateDialogComponent } from '../crossword-create-dialog/crossword-create-dialog.component';
 import { CWTerm } from '../crossword-game/crossword-game.component';
 import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
@@ -16,6 +17,9 @@ export class CrosswordSidenavComponent implements OnInit {
   clues: TabListGroup[];
   selection: TabListSelection;
   selectedWordIndex: number;
+
+  canCheckCrossword = false;
+  showMistakes = false;
 
   get mode() {
     return this.settings.state.sidenavModeSide ? 'side' : 'over';
@@ -39,6 +43,17 @@ export class CrosswordSidenavComponent implements OnInit {
   constructor(public settings: CrosswordSettingsService, public dialog: MatDialog) { }
 
   ngOnInit(): void {
+  }
+
+  onBoardChange(cells: CellState[]) {
+    this.canCheckCrossword = !this.showMistakes && cells.findIndex((cell) => !cell.answer) < 0;
+  }
+
+  checkCrossword() {
+    if (this.canCheckCrossword) {
+      this.showMistakes = true;
+      this.canCheckCrossword = false;
+    }
   }
 
   openCreateDialog() {
@@ -81,6 +96,8 @@ export class CrosswordSidenavComponent implements OnInit {
     ];
     this.items = across.concat(down);
     this._resetSelection();
+    this.showMistakes = false;
+    this.canCheckCrossword = false;
   }
 
   private _resetSelection() {
