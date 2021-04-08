@@ -1,10 +1,12 @@
-<div #board class="crossword-board" (touchstart)="onTouchStart($event)" (touchend)="onTouchStop($event)"
-  (touchcancel)="onTouchStop($event)" (touchmove)="onTouchMove($event)" (dblclick)="onDblClick($event, board)">
+<div #board class="crossword-board" [class.solved]="!isActive" (mousedown)="onBoardMouse($event, board, true)"
+  (mouseup)="onBoardMouse($event, board, false)" (touchstart)="onTouchStart($event)" (touchend)="onTouchStop($event)"
+  (touchcancel)="onTouchStop($event)" (touchmove)="onTouchMove($event)">
   <app-squared-paper [colNum]="layout.width" [rowNum]="layout.height">
     <svg appContentSvg>
       <!-- margin -->
       <path class="crossword-fill" *ngIf="fillPath" [attr.d]="fillPath" pathLength="100" />
       <path class="crossword-word" *ngIf="wordPath" [attr.d]="wordPath" />
+      <path class="crossword-fail" *ngIf="failPath" [attr.d]="failPath" pathLength="100" />
       <line stroke-width="0.1" stroke="#f00" fill="none" [attr.x1]="layout.marginLeft" [attr.x2]="layout.marginRight"
         [attr.y1]="layout.marginTop" [attr.y2]="layout.marginBottom" />
     </svg>

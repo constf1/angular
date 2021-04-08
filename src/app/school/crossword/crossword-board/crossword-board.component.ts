@@ -35,6 +35,13 @@ export type CellState = Point & {
   isActive?: boolean;
 };
 
+type MouseState = {
+  x: number;
+  y: number;
+  time: number;
+  index: number;
+};
+
 function makeLayout(cols: number, rows: number, charCount = 26) {
   const pad = 1; // 1 square padding
   const margin = 4; // 4 squares margin
@@ -116,10 +123,12 @@ function mergeLines(lines: string[][]) {
   styleUrls: ['./crossword-board.component.scss']
 })
 export class CrosswordBoardComponent implements OnInit, OnDestroy {
+  private _mouse?: MouseState; // Word on click selection workaround.
   private _dragListener = new DragListener<DragData>();
   private _play = new Autoplay();
   private _items: ReadonlyArray<CWItem>;
   private _selection = -1;
+  private _showMistakes = false;
   cols: number;
   rows: number;
   plan: CellMap;
@@ -129,6 +138,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   layout: StaticLayout;
   fillPath: string;
   wordPath: string;
+  failPath: string;
 
   @ViewChildren('tiles') tileList: QueryList<ElementRef<HTMLElement>>;
 
@@ -139,6 +149,17 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   get selection() {
     return this._selection;
+  }
+
+  @Input() set showMistakes(value: boolean) {
+    if (this._showMistakes === !value) {
+      this._showMistakes = value;
+      this._setMistakes();
+    }
+  }
+
+  get showMistakes() {
+    return this._showMistakes;
   }
 
   /* Crossword difficulty: number in the range [0, 1] */
@@ -156,6 +177,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   @Output() selectionChange = new EventEmitter<number>();
   @Output() boardChange = new EventEmitter<CellState[]>();
 
+  get isActive(): boolean {
+    return this.cells?.length > 0 && this.cells.findIndex((it) => it.isActive) >= 0;
+  }
+
   constructor(private _renderer: Renderer2) {
     this.items = [];
   }
@@ -163,6 +188,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // tslint:disable-next-line: deprecation
     this._dragListener.dragChange.subscribe(event => {
+      this._mouse = undefined;
       switch (event) {
         case 'DragStart':
           this._onDragStart();
@@ -228,23 +254,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
 
     this.layout = makeLayout(this.cols, this.rows, this.letters.length);
-
-    const tiles = this._makeTiles();
-    let count = 0;
-    this._play.timeout = 50;
-    this._play.play(() => {
-      if (count < this.letters.length) {
-        const value = this.letters[count];
-        this.tiles = this.tiles.concat(tiles.filter((tile) => tile.value === value));
-        count++;
-        return true;
-      } else {
-        this._setBase(this.difficulty);
-        this._setFillPath();
-        this.onBoardChange();
-        return false;
-      }
-    });
+    this._playIntro();
   }
 
   onMouseDown(event: MouseEvent, index: number) {
@@ -318,7 +328,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return -1;
   }
 
-  onDblClick(event: MouseEvent, board: HTMLElement) {
+  onBoardMouse(event: MouseEvent, board: HTMLElement, down: boolean) {
     if (event.button !== 0) {
       return;
     }
@@ -331,12 +341,28 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
     const index = this.getItemIndex(x, y);
     if (index >= 0) {
-      // event.preventDefault();
-      this.selectionChange.emit(index);
+      if (down) {
+        this._mouse = { x, y, index, time: Date.now() };
+      } else {
+        if (this._mouse) {
+          const mouse = this._mouse;
+          this._mouse = undefined;
+
+          if (index === mouse.index && x === mouse.x && y === mouse.y && Date.now() - mouse.time < 5000) {
+            this.selectionChange.emit(index);
+          }
+        }
+      }
+    } else {
+      this._mouse = undefined;
     }
   }
 
   onBoardChange() {
+    if (this._showMistakes) {
+      this._setMistakes();
+    }
+
     this.boardChange.emit(this.cells.map((c) => ({
       x: c.x,
       y: c.y,
@@ -375,6 +401,25 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       }
     }
     return count;
+  }
+
+  private _playIntro() {
+    const tiles = this._makeTiles();
+    let count = 0;
+    this._play.timeout = 50;
+    this._play.play(() => {
+      if (count < this.letters.length) {
+        const value = this.letters[count];
+        this.tiles = this.tiles.concat(tiles.filter((tile) => tile.value === value));
+        count++;
+        return true;
+      } else {
+        this._setBase(this.difficulty);
+        this._setFillPath();
+        this.onBoardChange();
+        return false;
+      }
+    });
   }
 
   private _makeTiles() {
@@ -440,6 +485,18 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       path += 'M' + shape.join(' ') + (shape[0] === shape[shape.length - 1] ? 'z' : ' ');
     }
     this.fillPath = path;
+  }
+
+  private _setFailPath() {
+    this.failPath = '';
+    if (this.showMistakes) {
+      const { baseLeft, baseTop } = this.layout;
+      for (const cell of this.cells) {
+        if (cell.isActive && cell.next && cell.next.value !== cell.value) {
+          this.failPath += `M${cell.x + baseLeft} ${cell.y + baseTop}h1v1h-1z`;
+        }
+      }
+    }
   }
 
   private _getLines() {
@@ -531,15 +588,52 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _setSelection(value: number) {
-    const active = this._items[value];
-    if (active) {
+    const item = this._items[value];
+    if (item) {
       const left = this.layout.baseLeft;
       const top = this.layout.baseTop;
-      const width = getItemWidth(active);
-      const height = getItemHeight(active);
-      this.wordPath = `M${left + active.x} ${top + active.y}h${width}v${height}h${-width}z`;
+      if (item.vertical) {
+        const x = left + item.x;
+        const y = top + item.y;
+        this.wordPath = `M${x} ${y}h1v${item.letters.length}h-1z`;
+      } else {
+        const x = left + item.x;
+        const y = top + item.y + 1;
+        this.wordPath = `M${x} ${y}v-1h${item.letters.length}v1z`;
+      }
     } else {
       this.wordPath = '';
     }
+  }
+
+  private _setMistakes() {
+    if (this._showMistakes) {
+      const { baseLeft, baseTop, bankLeft, bankTop, bankRight } = this.layout;
+      const bankWidth = bankRight - bankLeft;
+
+      for (const cell of this.cells) {
+        if (cell.isActive && cell.next?.value === cell.value) {
+          const tile = cell.next as Tile;
+          cell.isActive = tile.isActive = false;
+          tile.x = cell.x + baseLeft;
+          tile.y = cell.y + baseTop;
+          tile.transform = transform(tile.x, tile.y);
+          tile.className = 'transition_deal';
+
+          // Move any extra tiles to the bank.
+          while (cell.list?.length > 2) {
+            const extra = cell.list.tail as Tile;
+            detach(extra);
+
+            const i = this.letters.findIndex((it) => it === extra.value);
+            extra.x = bankLeft + i % bankWidth;
+            extra.y = bankTop + Math.floor(i / bankWidth);
+            extra.transform = transform(extra.x, extra.y);
+            extra.className = 'transition_norm';
+          }
+        }
+      }
+    }
+    this._setFailPath();
   }
 }
