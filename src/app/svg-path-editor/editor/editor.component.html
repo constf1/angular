@@ -1,4 +1,4 @@
-<mat-sidenav-container>
+<mat-sidenav-container [class.app-dark-theme]="settings.state.darkMode">
   <mat-sidenav [mode]="settings.state.sidenavModeSide ? 'side' : 'over'" [opened]="!settings.state.sidenavClosed"
     (openedChange)="settings.set({ sidenavClosed: !$event })">
     <mat-toolbar color="primary">
@@ -150,6 +150,10 @@
         </mat-expansion-panel-header>
         <ng-template matExpansionPanelContent>
           <app-menu-view (requestSmallestViewBox)="svgView.adjustViewBox($event)"></app-menu-view>
+          <button mat-stroked-button style="margin-top: 1em;" (click)="settings.set({ darkMode: !settings.state.darkMode })">
+            <mat-icon>{{settings.state.darkMode ? 'brightness_3' : 'brightness_7'}}</mat-icon>
+            <span>MODE</span>
+          </button>
         </ng-template>
       </mat-expansion-panel>
 

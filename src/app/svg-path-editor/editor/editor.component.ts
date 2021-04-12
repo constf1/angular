@@ -1,5 +1,6 @@
 // tslint:disable: variable-name
 import { Component, OnInit } from '@angular/core';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
 
 // app/common
@@ -46,6 +47,8 @@ const SAMPLE_PATH_ITEMS: { [key in Path.DrawCommand] : number[] } = {
 };
 
 const enum EditMode { All, Group, Single }
+
+const DARK_THEME = 'app-dark-theme';
 
 function compact(pathData: string): string {
   // remove spaces:
@@ -125,7 +128,8 @@ export class EditorComponent implements OnInit {
     public settings: EditorSettingsService,
     public history: PathDataService,
     public background: BackgroundImageService,
-    private _dialog: MatDialog) { }
+    private _dialog: MatDialog,
+    private _overlayContainer: OverlayContainer) { }
 
   onDrag(event: ControlDragEvent) {
     if (event.name === 'DragMove') {
@@ -223,6 +227,18 @@ export class EditorComponent implements OnInit {
   ngOnInit(): void {
     this.path = Path.createFromString(this.history.pathData || SAMPLE_PATH_DATA);
     this.onPathModelChange();
+
+    this.settings.subscribe(state => {
+      const src = this.settings.previousState?.darkMode;
+      const dst = state.darkMode;
+      if (src !== dst) {
+        if (dst) {
+          this._overlayContainer.getContainerElement().classList.add(DARK_THEME);
+        } else {
+          this._overlayContainer.getContainerElement().classList.remove(DARK_THEME);
+        }
+      }
+    });
   }
 
   convertInput(relative: boolean) {

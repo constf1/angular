@@ -62,6 +62,7 @@ export interface EditorSettingsState {
 
   sidenavModeSide: boolean;
   sidenavClosed: boolean;
+  darkMode: boolean;
 
   backgroundColor: string;
 
@@ -91,6 +92,7 @@ export const initialState: Readonly<EditorSettingsState> = {
 
   sidenavModeSide: false,
   sidenavClosed: true,
+  darkMode: false,
 
   backgroundColor: '#282828',
 
