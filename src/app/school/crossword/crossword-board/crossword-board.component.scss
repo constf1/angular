@@ -91,13 +91,13 @@ path.crossword-fill {
   // stroke-dasharray: 100;
   fill: rgba(0, 0, 0, 0.15);
   animation: keyframes-fade-in 2s ease 1;
-  transition: fill 1s ease-in;
+  transition: fill 1.5s ease-in;
 }
 
 .solved path.crossword-fill {
   stroke: green;
   stroke-width: 0.04px;
-  fill: rgba(40, 240, 40, 0.15);
+  fill: rgba(40, 240, 40, 0.3);
 }
 
 path.crossword-fail {
