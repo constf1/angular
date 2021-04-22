@@ -168,10 +168,46 @@ export function getWordDiff(node: Readonly<CWNode>): number {
 export function getIntersectionCount(node: Readonly<CWNode>): number {
   let count = 0;
 
+  // v1
+  // for (; node; node = node.prev) {
+  //   for (let prev = node.prev; prev; prev = prev.prev) {
+  //     if (isValidIntersection(node, prev)) {
+  //       count += 1;
+  //     }
+  //   }
+  // }
+
+  // v2
+  // for (; node; node = node.prev) {
+  //   if (node.vertical) {
+  //     for (let prev = node.prev; prev; prev = prev.prev) {
+  //       if (!prev.vertical && isValidHVIntersection(prev, node)) {
+  //         count += 1;
+  //       }
+  //     }
+  //   } else {
+  //     for (let prev = node.prev; prev; prev = prev.prev) {
+  //       if (prev.vertical && isValidHVIntersection(node, prev)) {
+  //         count += 1;
+  //       }
+  //     }
+  //   }
+  // }
+
+  // v3
+  const hs: Readonly<CWItem>[] = [];
+  const vs: Readonly<CWItem>[] = [];
   for (; node; node = node.prev) {
-    for (let prev = node.prev; prev; prev = prev.prev) {
-      if (isValidIntersection(node, prev)) {
-        count += 1;
+    if (node.vertical) {
+      vs.push(node);
+    } else {
+      hs.push(node);
+    }
+  }
+  for (const h of hs) {
+    for (const v of vs) {
+      if (isValidHVIntersection(h, v)) {
+        count++;
       }
     }
   }
@@ -226,29 +262,63 @@ export function canAdd(node: Readonly<CWNode>, entry: Readonly<CWItem>) {
   return true;
 }
 
+function canAddV(node: Readonly<CWNode>, entry: Readonly<CWItem>) {
+  do {
+    const ok = node.vertical ? canPairV(node, entry) : canPairHV(node, entry);
+    if (!ok) {
+      return false;
+    }
+    // tslint:disable-next-line: no-conditional-assignment
+  } while (node = node.prev);
+  return true;
+}
+
+function canAddH(node: Readonly<CWNode>, entry: Readonly<CWItem>) {
+  do {
+    const ok = node.vertical ? canPairHV(entry, node) : canPairH(node, entry);
+    if (!ok) {
+      return false;
+    }
+    // tslint:disable-next-line: no-conditional-assignment
+  } while (node = node.prev);
+  return true;
+}
+
 export function getNext(last: Readonly<CWNode>, letters: string[], accum: CWNode[]) {
   const done: { [key: string]: boolean } = {};
-  let node = last;
-  do {
+
+  for (let node = last; node; node = node.prev) {
     for (let i = node.letters.length; i-- > 0;) {
       const a = node.letters[i];
       for (let j = letters.length; j-- > 0;) {
         if (a === letters[j]) {
-          const next: CWNode = node.vertical
-            ? { x: node.x - j, y: node.y + i, letters, prev: last }
-            : { x: node.x + i, y: node.y - j, letters, prev: last, vertical: true };
-          const key = `${next.x}:${next.y}`;
-          if (!done[key]) {
-            done[key] = true;
-            if (canAdd(last, next)) {
-              accum.push(next);
+          if (node.vertical) {
+            const x = node.x - j;
+            const y = node.y + i;
+            const key = `${x}H${y}`;
+            if (!done[key]) {
+              done[key] = true;
+              const next: CWNode = { letters, x, y, prev: last };
+              if (canAddH(last, next)) {
+                accum.push(next);
+              }
+            }
+          } else {
+            const x = node.x + i;
+            const y = node.y - j;
+            const key = `${x}V${y}`;
+            if (!done[key]) {
+              done[key] = true;
+              const next: CWNode = { letters, x, y, prev: last, vertical: true };
+              if (canAddV(last, next)) {
+                accum.push(next);
+              }
             }
           }
         }
       }
     }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
+  }
 }
 
 export type PuzzleSifter = (words: string[], index: number, output: CWNode[]) => CWNode[];
@@ -303,9 +373,9 @@ export function createSifter(minSize: number, maxSize: number): PuzzleSifter {
       // console.log(`Done! Will pick from: ${output.length}`);
       // Area -> Count -> Difference -> Balance
       (((aGrader.fallback = cGrader
-        ).fallback = dGrader
-        ).fallback = bGrader
-        ).fallback = undefined;
+      ).fallback = dGrader
+      ).fallback = bGrader
+      ).fallback = undefined;
       return pickSome(output, 1, aGrader);
     }
 
@@ -316,16 +386,16 @@ export function createSifter(minSize: number, maxSize: number): PuzzleSifter {
         if (index > 0.85 * words.length) {
           // Area -> Count -> Balance -> Difference
           (((aGrader.fallback = cGrader
-            ).fallback = bGrader
-            ).fallback = dGrader
-            ).fallback = undefined;
+          ).fallback = bGrader
+          ).fallback = dGrader
+          ).fallback = undefined;
           output = pickSome(output, minSize, aGrader);
         } else {
           // Count -> Area -> Difference -> Balance
           (((cGrader.fallback = aGrader
-            ).fallback = dGrader
-            ).fallback = bGrader
-            ).fallback = undefined;
+          ).fallback = dGrader
+          ).fallback = bGrader
+          ).fallback = undefined;
           output = pickSome(output, minSize, cGrader);
         }
         if (output.length > limit) {
