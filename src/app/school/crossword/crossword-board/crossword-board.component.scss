@@ -12,6 +12,7 @@ $active-tile-bg-color: #fadc9a;
 }
 
 .crossword-tile {
+  user-select: none;
   position: absolute;
   width: $X - 2px;
   height: $X - 2px;
