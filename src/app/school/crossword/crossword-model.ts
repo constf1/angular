@@ -1,318 +1,117 @@
 import { Grader, pickSome } from 'src/app/common/array-utils';
 import { Point } from 'src/app/common/math2d';
 
-export type CWPoint = Point & {
-  vertical?: boolean;
-};
-
-export type CWItem = CWPoint & {
+export type Word = Point & {
   letters: string[];
 };
 
-export type CWNode = CWItem & {
-  prev?: CWNode;
+export type Grid = {
+  xWords: Word[];
+  yWords: Word[];
+
+  xMin: number;
+  xMax: number;
+  yMin: number;
+  yMax: number;
 };
 
 const GRID_PAD = 1; // 1: British/Australian-style grid; 0: American-style grid;
 const GRID_ROW_END = '\n';
 const GRID_SPACE = ' ';
 
-// Item Info:
-function isValidHVIntersection(a: Readonly<CWItem>, b: Readonly<CWItem>) {
-  const dx = b.x - a.x;
-  const dy = a.y - b.y;
-  return dx >= 0 && dx < a.letters.length && dy >= 0 && dy < b.letters.length && a.letters[dx] === b.letters[dy];
+export function normalize(words: ReadonlyArray<Readonly<Word>>, dx: number, dy: number): Word[] {
+  return words
+    .map((wx) => ({ x: wx.x + dx, y: wx.y + dy, letters: wx.letters }))
+    .sort((a, b) => a.y !== b.y ? a.y - b.y : a.x - b.x);
 }
 
-export function isValidIntersection(a: Readonly<CWItem>, b: Readonly<CWItem>) {
-  return (!a.vertical && b.vertical)
-    ? isValidHVIntersection(a, b)
-    : (a.vertical && !b.vertical)
-      ? isValidHVIntersection(b, a)
-      : false;
+function isIntersectionXY(wx: Readonly<Word>, wy: Readonly<Word>): boolean {
+  const dx = wy.x - wx.x;
+  const dy = wx.y - wy.y;
+  return dx >= 0 && dx < wx.letters.length && dy >= 0 && dy < wy.letters.length;
 }
 
-function canPairHV(a: Readonly<CWItem>, b: Readonly<CWItem>) {
-  const dx = b.x - a.x;
-  if (dx >= -GRID_PAD && dx < a.letters.length + GRID_PAD) {
-    const dy = a.y - b.y;
-    if (dy >= -GRID_PAD && dy < b.letters.length + GRID_PAD) {
+function canPairXY(wx: Readonly<Word>, wy: Readonly<Word>) {
+  const dx = wy.x - wx.x;
+  if (dx >= -GRID_PAD && dx < wx.letters.length + GRID_PAD) {
+    const dy = wx.y - wy.y;
+    if (dy >= -GRID_PAD && dy < wy.letters.length + GRID_PAD) {
       // We are in the zone. It should be a valid intersection.
-      return dx >= 0 && dx < a.letters.length && dy >= 0 && dy < b.letters.length
-        && a.letters[dx] === b.letters[dy];
+      return dx >= 0 && dx < wx.letters.length && dy >= 0 && dy < wy.letters.length
+        && wx.letters[dx] === wy.letters[dy];
     }
   }
-
   return true;
 }
 
-function canPairH(a: Readonly<CWItem>, b: Readonly<CWItem>): boolean {
-  const dx = b.x - a.x;
-  if (dx >= -b.letters.length - GRID_PAD && dx <= a.letters.length + GRID_PAD) {
-    const dy = a.y - b.y;
+function canPairX(wx1: Readonly<Word>, wx2: Readonly<Word>): boolean {
+  const dx = wx2.x - wx1.x;
+  if (dx >= -wx2.letters.length - GRID_PAD && dx <= wx1.letters.length + GRID_PAD) {
+    const dy = wx1.y - wx2.y;
     return dy < -GRID_PAD || dy > GRID_PAD;
   }
-
   return true;
 }
 
-function canPairV(a: Readonly<CWItem>, b: Readonly<CWItem>): boolean {
-  const dy = a.y - b.y;
-  if (dy >= -a.letters.length - GRID_PAD && dy <= b.letters.length + GRID_PAD) {
-    const dx = b.x - a.x;
+function canPairY(wy1: Readonly<Word>, wy2: Readonly<Word>): boolean {
+  const dy = wy1.y - wy2.y;
+  if (dy >= -wy1.letters.length - GRID_PAD && dy <= wy2.letters.length + GRID_PAD) {
+    const dx = wy2.x - wy1.x;
     return dx < -GRID_PAD || dx > GRID_PAD;
   }
-
   return true;
 }
 
-export function canPair(a: Readonly<CWItem>, b: Readonly<CWItem>): boolean {
-  return a.vertical ? (b.vertical ? canPairV(a, b) : canPairHV(b, a))
-    : (b.vertical ? canPairHV(a, b) : canPairH(a, b));
-}
-
-export function getItemWidth(a: Readonly<CWItem>) {
-  return a.vertical ? 1 : a.letters.length;
-}
-
-export function getItemHeight(a: Readonly<CWItem>) {
-  return a.vertical ? a.letters.length : 1;
-}
-
-// Node Info:
-export function getMinLeft(node: Readonly<CWNode>): number {
-  let x = node.x;
-  // I'm not hugely fond of conditional assignments, but the alternative is much uglier.
-  // tslint:disable-next-line: no-conditional-assignment
-  while (node = node.prev) {
-    x = Math.min(x, node.x);
-  }
-  return x;
-}
-
-export function getMinTop(node: Readonly<CWNode>): number {
-  let y = node.y;
-  // tslint:disable-next-line: no-conditional-assignment
-  while (node = node.prev) {
-    y = Math.min(y, node.y);
-  }
-  return y;
-}
-
-export function getMaxRight(node: Readonly<CWNode>): number {
-  let x = node.x + getItemWidth(node);
-  // tslint:disable-next-line: no-conditional-assignment
-  while (node = node.prev) {
-    x = Math.max(x, node.x + getItemWidth(node));
-  }
-  return x;
-}
-
-export function getMaxBottom(node: Readonly<CWNode>): number {
-  let y = node.y + getItemHeight(node);
-  // tslint:disable-next-line: no-conditional-assignment
-  while (node = node.prev) {
-    y = Math.max(y, node.y + getItemHeight(node));
-  }
-  return y;
-}
-
-export function getArea(node: Readonly<CWNode>): number {
-  return (getMaxRight(node) - getMinLeft(node)) * (getMaxBottom(node) - getMinTop(node));
-}
-
-export function getSizeDiff(node: Readonly<CWNode>): number {
-  return getMaxRight(node) + getMinTop(node) - getMinLeft(node) - getMaxBottom(node);
-}
-
-export function getWordCount(node: Readonly<CWNode>): number {
-  let count = 1;
-  // tslint:disable-next-line: no-conditional-assignment
-  while (node = node.prev) {
-    count++;
-  }
-  return count;
-}
-
-export function getHWordCount(node: Readonly<CWNode>): number {
-  let count = 0;
-  do {
-    if (!node.vertical) {
-      count += 1;
-    }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
-  return count;
-}
-
-export function getVWordCount(node: Readonly<CWNode>): number {
-  let count = 0;
-  do {
-    if (node.vertical) {
-      count += 1;
-    }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
-  return count;
-}
-
-export function getWordDiff(node: Readonly<CWNode>): number {
-  let diff = 0;
-  do {
-    diff += node.vertical ? -1 : 1;
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
-  return diff;
-}
-
-export function getIntersectionCount(node: Readonly<CWNode>): number {
-  let count = 0;
-
-  // v1
-  // for (; node; node = node.prev) {
-  //   for (let prev = node.prev; prev; prev = prev.prev) {
-  //     if (isValidIntersection(node, prev)) {
-  //       count += 1;
-  //     }
-  //   }
-  // }
-
-  // v2
-  // for (; node; node = node.prev) {
-  //   if (node.vertical) {
-  //     for (let prev = node.prev; prev; prev = prev.prev) {
-  //       if (!prev.vertical && isValidHVIntersection(prev, node)) {
-  //         count += 1;
-  //       }
-  //     }
-  //   } else {
-  //     for (let prev = node.prev; prev; prev = prev.prev) {
-  //       if (prev.vertical && isValidHVIntersection(node, prev)) {
-  //         count += 1;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // v3
-  const hs: Readonly<CWItem>[] = [];
-  const vs: Readonly<CWItem>[] = [];
-  for (; node; node = node.prev) {
-    if (node.vertical) {
-      vs.push(node);
-    } else {
-      hs.push(node);
-    }
-  }
-  for (const h of hs) {
-    for (const v of vs) {
-      if (isValidHVIntersection(h, v)) {
-        count++;
-      }
-    }
-  }
-
-  return count;
-}
-
-export function toCWString(node: Readonly<CWNode>): string {
-  const x0 = getMinLeft(node);
-  const x1 = getMaxRight(node);
-
-  const y0 = getMinTop(node);
-  const y1 = getMaxBottom(node);
-
-  const rows = x1 - x0 + 1;
-  const grid: string[] = new Array(rows * (y1 - y0));
-  for (let i = grid.length; i-- > 0;) {
-    grid[i] = (i + 1) % rows ? GRID_SPACE : GRID_ROW_END;
-  }
-
-  // Fill-up the grid.
-  do {
-    const k = (node.y - y0) * rows + node.x - x0;
-    for (let i = node.letters.length; i-- > 0;) {
-      grid[k + (node.vertical ? i * rows : i)] = node.letters[i];
-    }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
-
-  return grid.join('');
-}
-
-export function toCWArray(node: Readonly<CWNode>): CWItem[] {
-  const items: CWItem[] = [];
-
-  const left = getMinLeft(node);
-  const top = getMinTop(node);
-  do {
-    items.push({ x: node.x - left, y: node.y - top, letters: node.letters, vertical: node.vertical });
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
-  return items;
-}
-
-export function canAdd(node: Readonly<CWNode>, entry: Readonly<CWItem>) {
-  do {
-    if (!canPair(node, entry)) {
+function canAddY(grid: Readonly<Grid>, yWord: Readonly<Word>) {
+  for (const wy of grid.yWords) {
+    if (!canPairY(wy, yWord)) {
       return false;
     }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
-  return true;
-}
-
-function canAddV(node: Readonly<CWNode>, entry: Readonly<CWItem>) {
-  do {
-    const ok = node.vertical ? canPairV(node, entry) : canPairHV(node, entry);
-    if (!ok) {
+  }
+  for (const wx of grid.xWords) {
+    if (!canPairXY(wx, yWord)) {
       return false;
     }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
+  }
   return true;
 }
 
-function canAddH(node: Readonly<CWNode>, entry: Readonly<CWItem>) {
-  do {
-    const ok = node.vertical ? canPairHV(entry, node) : canPairH(node, entry);
-    if (!ok) {
+function canAddX(grid: Readonly<Grid>, xWord: Readonly<Word>) {
+  for (const wx of grid.xWords) {
+    if (!canPairX(wx, xWord)) {
       return false;
     }
-    // tslint:disable-next-line: no-conditional-assignment
-  } while (node = node.prev);
+  }
+  for (const wy of grid.yWords) {
+    if (!canPairXY(xWord, wy)) {
+      return false;
+    }
+  }
   return true;
 }
 
-export function getNext(last: Readonly<CWNode>, letters: string[], accum: CWNode[]) {
+function getNextY(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
   const done: { [key: string]: boolean } = {};
 
-  for (let node = last; node; node = node.prev) {
-    for (let i = node.letters.length; i-- > 0;) {
-      const a = node.letters[i];
-      for (let j = letters.length; j-- > 0;) {
-        if (a === letters[j]) {
-          if (node.vertical) {
-            const x = node.x - j;
-            const y = node.y + i;
-            const key = `${x}H${y}`;
-            if (!done[key]) {
-              done[key] = true;
-              const next: CWNode = { letters, x, y, prev: last };
-              if (canAddH(last, next)) {
-                accum.push(next);
-              }
-            }
-          } else {
-            const x = node.x + i;
-            const y = node.y - j;
-            const key = `${x}V${y}`;
-            if (!done[key]) {
-              done[key] = true;
-              const next: CWNode = { letters, x, y, prev: last, vertical: true };
-              if (canAddV(last, next)) {
-                accum.push(next);
-              }
+  for (const wx of grid.xWords) {
+    for (let dx = wx.letters.length; dx-- > 0;) {
+      for (let dy = letters.length; dy-- > 0;) {
+        if (wx.letters[dx] === letters[dy]) {
+          const x = wx.x + dx;
+          const y = wx.y - dy;
+          const key = `${x}Y${y}`;
+          if (!done[key]) {
+            done[key] = true;
+            const yWord: Word = { letters, x, y };
+            if (canAddY(grid, yWord)) {
+              accum.push({
+                xWords: grid.xWords,
+                yWords: [...grid.yWords, yWord],
+                xMin: grid.xMin,
+                xMax: grid.xMax,
+                yMin: Math.min(grid.yMin, yWord.y),
+                yMax: Math.max(grid.yMax, yWord.y + yWord.letters.length)
+              });
             }
           }
         }
@@ -321,13 +120,76 @@ export function getNext(last: Readonly<CWNode>, letters: string[], accum: CWNode
   }
 }
 
-export type PuzzleSifter = (words: string[], index: number, output: CWNode[]) => CWNode[];
+function getNextX(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
+  const done: { [key: string]: boolean } = {};
 
-export function makePuzzles(words: string[], sift: PuzzleSifter): CWNode[] {
-  let input: CWNode[] = [{ x: 0, y: 0, letters: words[0].split('') }];
+  for (const wy of grid.yWords) {
+    for (let dy = wy.letters.length; dy-- > 0;) {
+      for (let dx = letters.length; dx-- > 0;) {
+        if (wy.letters[dy] === letters[dx]) {
+          const x = wy.x - dx;
+          const y = wy.y + dy;
+          const key = `${x}X${y}`;
+          if (!done[key]) {
+            done[key] = true;
+            const xWord: Word = { letters, x, y };
+            if (canAddX(grid, xWord)) {
+              accum.push({
+                xWords: [...grid.xWords, xWord],
+                yWords: grid.yWords,
+                xMin: Math.min(grid.xMin, xWord.x),
+                xMax: Math.max(grid.xMax, xWord.x + xWord.letters.length),
+                yMin: grid.yMin,
+                yMax: grid.yMax
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+export function getNext(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
+  getNextY(grid, letters, accum);
+  getNextX(grid, letters, accum);
+}
+function getArea(grid: Readonly<Grid>): number {
+  return (grid.xMax - grid.xMin) * (grid.yMax - grid.yMin);
+}
+
+function getSizeDiff(grid: Readonly<Grid>): number {
+  return grid.xMax - grid.xMin - grid.yMax + grid.yMin;
+}
+
+function getIntersectionCount(grid: Readonly<Grid>): number {
+  let count = 0;
+
+  for (const wx of grid.xWords) {
+    for (const wy of grid.yWords) {
+      if (isIntersectionXY(wx, wy)) {
+        count += 1;
+      }
+    }
+  }
+  return count;
+}
+
+type PuzzleSifter = (words: string[], index: number, output: Grid[]) => Grid[];
+
+function makePuzzles(words: string[], sift: PuzzleSifter): Grid[] {
+  const letters = words[0].split('');
+  let input: Grid[] = [{
+    xWords: [{ letters, x: 0, y: 0 }],
+    yWords: [],
+    xMin: 0,
+    xMax: letters.length,
+    yMin: 0,
+    yMax: 1
+  }];
 
   for (let i = 1; i < words.length; i++) {
-    const output: CWNode[] = [];
+    const output: Grid[] = [];
     for (const node of sift(words, i, input)) {
       getNext(node, words[i].split(''), output);
     }
@@ -344,31 +206,31 @@ function descendingSortAsNumbers(keys: string[]): number[] {
   return keys.map(value => +value).sort((a, b) => b - a);
 }
 
-export function createSifter(minSize: number, maxSize: number): PuzzleSifter {
+export function createDefaultSifter(minSize: number, maxSize: number): PuzzleSifter {
   // Min Area.
-  const aGrader: Grader<CWNode> = {
+  const aGrader: Grader<Grid> = {
     mapper: getArea,
     picker: sortAsNumbers
   };
   // Close to Square (Min width-height difference).
-  const bGrader: Grader<CWNode> = {
-    mapper: (item) => Math.abs(getSizeDiff(item)),
+  const bGrader: Grader<Grid> = {
+    mapper: (grid) => Math.abs(getSizeDiff(grid)),
     picker: sortAsNumbers
   };
   // Max intersection count.
-  const cGrader: Grader<CWNode> = {
+  const cGrader: Grader<Grid> = {
     mapper: getIntersectionCount,
     picker: descendingSortAsNumbers
   };
   // Min horizontal-vertical difference.
-  const dGrader: Grader<CWNode> = {
-    mapper: (item) => Math.abs(getWordDiff(item)),
+  const dGrader: Grader<Grid> = {
+    mapper: (grid) => Math.abs(grid.xWords.length - grid.yWords.length),
     picker: sortAsNumbers
   };
 
   let limit = 2 * maxSize;
 
-  return (words: string[], index: number, output: CWNode[]): CWNode[] => {
+  return (words: string[], index: number, output: Grid[]): Grid[] => {
     if (index >= words.length) {
       // console.log(`Done! Will pick from: ${output.length}`);
       // Area -> Count -> Difference -> Balance
@@ -383,7 +245,7 @@ export function createSifter(minSize: number, maxSize: number): PuzzleSifter {
     if (index > 4) {
       if (output.length > limit) {
         limit = maxSize;
-        if (index > 0.85 * words.length) {
+        if (index > 0.9 * words.length) {
           // Area -> Count -> Balance -> Difference
           (((aGrader.fallback = cGrader
           ).fallback = bGrader
@@ -407,4 +269,33 @@ export function createSifter(minSize: number, maxSize: number): PuzzleSifter {
     // console.log(`${log}\tNext: ${words[index]}`);
     return output;
   };
+}
+
+function asString(grid: Readonly<Grid>): string {
+  const x0 = grid.xMin;
+  const x1 = grid.xMax;
+
+  const y0 = grid.yMin;
+  const y1 = grid.yMax;
+
+  const rows = x1 - x0 + 1;
+  const buf: string[] = new Array(rows * (y1 - y0));
+  for (let i = buf.length; i-- > 0;) {
+    buf[i] = (i + 1) % rows ? GRID_SPACE : GRID_ROW_END;
+  }
+
+  // Fill-up the grid.
+  for (const wx of grid.xWords) {
+    const k = (wx.y - y0) * rows + wx.x - x0;
+    for (let i = wx.letters.length; i-- > 0;) {
+      buf[k + i] = wx.letters[i];
+    }
+  }
+  for (const wy of grid.yWords) {
+    const k = (wy.y - y0) * rows + wy.x - x0;
+    for (let i = wy.letters.length; i-- > 0;) {
+      buf[k + i * rows] = wy.letters[i];
+    }
+  }
+  return buf.join('');
 }

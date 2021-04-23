@@ -1,4 +1,4 @@
-import { CWItem } from './crossword-model';
+import { Grid } from './crossword-model';
 
 export interface CrosswordWorkerMessage {
   requestId: string | null;
@@ -13,5 +13,5 @@ export interface CrosswordWorkerInput extends CrosswordWorkerMessage {
 export interface CrosswordWorkerOutput extends CrosswordWorkerMessage {
   requestId: string;
   isWorking: boolean;
-  items: CWItem[] | null;
+  grid: Grid | null;
 }

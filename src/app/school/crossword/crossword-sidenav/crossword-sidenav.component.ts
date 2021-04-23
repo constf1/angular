@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TabListGroup, TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
 import { CellState } from '../crossword-board/crossword-board.component';
-import { CrosswordCreateDialogComponent } from '../crossword-create-dialog/crossword-create-dialog.component';
-import { CWTerm } from '../crossword-game/crossword-game.component';
+import { CrosswordCreateDialogComponent, Game } from '../crossword-create-dialog/crossword-create-dialog.component';
 import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
 
 @Component({
@@ -12,11 +11,9 @@ import { CrosswordSettingsService, maxState, minState } from '../services/crossw
   styleUrls: ['./crossword-sidenav.component.scss']
 })
 export class CrosswordSidenavComponent implements OnInit {
-  items: ReadonlyArray<CWTerm>;
-
+  game: Readonly<Game>;
   clues: TabListGroup[];
   selection: TabListSelection;
-  selectedWordIndex: number;
 
   canCheckCrossword = false;
   showMistakes = false;
@@ -65,36 +62,22 @@ export class CrosswordSidenavComponent implements OnInit {
     });
   }
 
-  onClueSelectionChange(selection: TabListSelection) {
+  onSelectionChange(selection: TabListSelection) {
     if (this.selection.groupIndex === selection.groupIndex &&
       this.clues[selection.groupIndex].selection === selection.itemIndex) {
       // Unselect this item.
       selection.itemIndex = -1;
     }
-    this.clues[selection.groupIndex].selection = this.selectedWordIndex = selection.itemIndex;
-    if (selection.groupIndex === 1 && selection.itemIndex >= 0) {
-      this.selectedWordIndex += this.clues[0].items.length;
-    }
+    this.clues[selection.groupIndex].selection = selection.itemIndex;
     this.selection = selection;
   }
 
-  onWordSelectionChange(index: number) {
-    const offset = this.clues[0].items.length;
-    if (index < offset) {
-      this.onClueSelectionChange({ groupIndex: 0, itemIndex: index });
-    } else {
-      this.onClueSelectionChange({ groupIndex: 1, itemIndex: index - offset });
-    }
-  }
-
-  setItems(value: ReadonlyArray<CWTerm>) {
-    const across = value.filter((it) => !it.vertical).sort((a, b) => a.y !== b.y ? a.y - b.y : a.x - b.x);
-    const down = value.filter((it) => it.vertical).sort((a, b) => a.y !== b.y ? a.y - b.y : a.x - b.x);
+  setItems(value: Readonly<Game>) {
     this.clues = [
-      { label: 'Across', items: across.map((it) => it.clue) },
-      { label: 'Down', items: down.map((it) => it.clue) }
+      { label: 'Across', items: value.xClues },
+      { label: 'Down', items: value.yClues }
     ];
-    this.items = across.concat(down);
+    this.game = value;
     this._resetSelection();
     this.showMistakes = false;
     this.canCheckCrossword = false;
@@ -102,6 +85,5 @@ export class CrosswordSidenavComponent implements OnInit {
 
   private _resetSelection() {
     this.selection = { groupIndex: 0, itemIndex: -1 };
-    this.selectedWordIndex = -1;
   }
 }

@@ -12,9 +12,8 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button [disabled]="maker.state.isWorking || 1 > words?.length" (click)="onCreate()">Create</button>
-  <button mat-button [disabled]="!maker.state.isWorking || 1 > maker.state.items.length"
-    [style.visibility]="progressVisibility" (click)="onStop()">Stop at
-    {{maker.state.items.length}}</button>
+  <button mat-button [disabled]="!(maker.state.isWorking && maker.state.grid)"
+    [style.visibility]="progressVisibility" (click)="onStop()">Stop at {{gridSize}}</button>
   <span class="flex-space-filler-1"></span>
   <button mat-button mat-dialog-close>Close</button>
 </div>

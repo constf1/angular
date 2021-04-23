@@ -1,20 +1,32 @@
 // tslint:disable: variable-name
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
-import { CWItem } from '../crossword-model';
+import { Grid } from '../crossword-model';
 import { CrosswordWorkerInput, CrosswordWorkerMessage, CrosswordWorkerOutput } from '../crossword-worker-model';
+
+function getBestGrid(grid1: Grid | null, grid2: Grid | null): Grid | null {
+  if (grid1) {
+    if (grid2) {
+      if (grid2.xWords.length + grid2.yWords.length > grid1.xWords.length + grid1.yWords.length) {
+        return grid2;
+      }
+    }
+    return grid1;
+  }
+  return grid2;
+}
 
 export interface CrosswordMakerState {
   requestId: string;
   isWorking: boolean;
-  items: ReadonlyArray<CWItem>;
+  grid: Readonly<Grid> | null;
   words: ReadonlyArray<string>;
 }
 
 const initialValue: Readonly<CrosswordMakerState> = {
   requestId: '',
   isWorking: false,
-  items: [],
+  grid: null,
   words: [],
 };
 
@@ -54,7 +66,7 @@ export class CrosswordMakerService extends StateSubject<CrosswordMakerState> {
       words: words.slice()
     };
     this._worker.postMessage(message);
-    this._set({ requestId, words, isWorking: true, items: [] });
+    this._set({ requestId, words, isWorking: true, grid: null });
   }
 
   private _createWorker() {
@@ -67,7 +79,7 @@ export class CrosswordMakerService extends StateSubject<CrosswordMakerState> {
         // Take the worker's data.
         if (state.isWorking && state.requestId === data.requestId) {
           this._set({
-            items: data.items?.length > state.items.length ? data.items : state.items,
+            grid: getBestGrid(state.grid, data.grid),
             isWorking: data.isWorking
           });
         }

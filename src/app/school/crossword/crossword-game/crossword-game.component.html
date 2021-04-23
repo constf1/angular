@@ -1,7 +1,7 @@
 <div style="display: flex; flex-direction: row; flex-wrap: wrap;">
   <!-- (boardChange)="onBoardChange($event)" -->
-  <app-crossword-board [items]="items" [selection]="selectedWordIndex"
-    (selectionChange)="onWordSelectionChange($event)"></app-crossword-board>
+  <app-crossword-board [grid]="game" [selection]="selection"
+    (selectionChange)="onSelectionChange($event)"></app-crossword-board>
   <app-tab-list [groups]="clues" [selection]="selection" [panelStyle]="{ maxHeight: '44em', overflowY: 'auto' }"
-    (selectionChange)="onClueSelectionChange($event)"></app-tab-list>
+    (selectionChange)="onSelectionChange($event)"></app-tab-list>
 </div>

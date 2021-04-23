@@ -5,9 +5,12 @@ import { Autoplay } from 'src/app/common/autoplay';
 import { DragListener } from 'src/app/common/drag-listener';
 import { append, detach, Linkable } from 'src/app/common/linkable';
 import { Point } from 'src/app/common/math2d';
+import { TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
 
 import { SQUARE_SIDE, transform } from '../../squared-paper/squared-paper.component';
-import { CWItem, getItemHeight, getItemWidth } from '../crossword-model';
+import { Grid } from '../crossword-model';
+
+enum Axis { x = 0, y = 1 }
 
 type Cell = Linkable<Cell> & Point & {
   value: string;
@@ -35,11 +38,10 @@ export type CellState = Point & {
   isActive?: boolean;
 };
 
-type MouseState = {
+type MouseState = TabListSelection & {
   x: number;
   y: number;
   time: number;
-  index: number;
 };
 
 function makeLayout(cols: number, rows: number, charCount = 26) {
@@ -126,8 +128,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   private _mouse?: MouseState; // Word on click selection workaround.
   private _dragListener = new DragListener<DragData>();
   private _play = new Autoplay();
-  private _items: ReadonlyArray<CWItem>;
-  private _selection = -1;
+  private _grid: Readonly<Grid>;
+  private _selection: TabListSelection;
   private _showMistakes = false;
   cols: number;
   rows: number;
@@ -142,9 +144,9 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   @ViewChildren('tiles') tileList: QueryList<ElementRef<HTMLElement>>;
 
-  @Input() set selection(value: number) {
+  @Input() set selection(value: TabListSelection) {
     this._selection = value;
-    this._setSelection(value);
+    this.wordPath = this._getSelectionPath();
   }
 
   get selection() {
@@ -165,16 +167,16 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   /* Crossword difficulty: number in the range [0, 1] */
   @Input() difficulty = 0;
 
-  @Input() set items(value: ReadonlyArray<CWItem>) {
-    this._items = value;
+  @Input() set grid(value: Readonly<Grid>) {
+    this._grid = value;
     this.onNewPuzzle();
   }
 
-  get items() {
-    return this._items;
+  get grid() {
+    return this._grid;
   }
 
-  @Output() selectionChange = new EventEmitter<number>();
+  @Output() selectionChange = new EventEmitter<TabListSelection>();
   @Output() boardChange = new EventEmitter<CellState[]>();
 
   get isActive(): boolean {
@@ -182,7 +184,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   constructor(private _renderer: Renderer2) {
-    this.items = [];
+    this.grid = { xWords: [], yWords: [], xMin: 0, xMax: 0, yMin: 0, yMax: 0 };
   }
 
   ngOnInit(): void {
@@ -208,41 +210,42 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   onNewPuzzle() {
-    this.cols = 0;
-    this.rows = 0;
+    this.cols = this._grid.xMax - this._grid.xMin;
+    this.rows = this._grid.yMax - this._grid.yMin;
     this.plan = {};
     this.cells = [];
     this.tiles = [];
     this.fillPath = '';
 
-    for (const item of this._items) {
-      this.cols = Math.max(this.cols, item.x + getItemWidth(item));
-      this.rows = Math.max(this.rows, item.y + getItemHeight(item));
-
+    for (const item of this._grid.xWords) {
+      const y = this._grid.yMin + item.y;
       for (let i = item.letters.length; i-- > 0;) {
+        const x = this._grid.xMin + item.x + i;
         const value = item.letters[i];
         const row = this.plan[value] || (this.plan[value] = []);
-        let x: number;
-        let y: number;
-        if (item.vertical) {
-          x = item.x;
-          y = item.y + i;
-        } else {
-          x = item.x + i;
-          y = item.y;
-        }
         let index = row.findIndex((c) => c.x === x && c.y === y);
         if (index < 0) {
           index = row.length;
           row.push({ x, y, value });
         }
-        if (item.vertical) {
-          row[index].hasTop = i > 0;
-          row[index].hasBottom = i < item.letters.length - 1;
-        } else {
-          row[index].hasLeft = i > 0;
-          row[index].hasRight = i < item.letters.length - 1;
+        row[index].hasLeft = i > 0;
+        row[index].hasRight = i < item.letters.length - 1;
+      }
+    }
+
+    for (const item of this._grid.yWords) {
+      const x = this._grid.xMin + item.x;
+      for (let i = item.letters.length; i-- > 0;) {
+        const y = this._grid.yMin + item.y + i;
+        const value = item.letters[i];
+        const row = this.plan[value] || (this.plan[value] = []);
+        let index = row.findIndex((c) => c.x === x && c.y === y);
+        if (index < 0) {
+          index = row.length;
+          row.push({ x, y, value });
         }
+        row[index].hasTop = i > 0;
+        row[index].hasBottom = i < item.letters.length - 1;
       }
     }
 
@@ -310,22 +313,38 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return index;
   }
 
-  getItemIndex(x: number, y: number) {
-    const offset = this._selection < 0 ? 0 : this._selection + 1;
-    for (let i = 0; i < this._items.length; i++) {
-      const index = (i + offset) % this._items.length;
-      const item = this._items[index];
-      if (item.vertical) {
-        if (x === item.x && y >= item.y && y < item.y + item.letters.length) {
-          return index;
-        }
-      } else {
-        if (y === item.y && x >= item.x && x < item.x + item.letters.length) {
-          return index;
+  getXItemIndex(x: number, y: number): TabListSelection | null {
+    const grid = this._grid;
+    if (grid) {
+      for (let index = grid.xWords.length; index-- > 0;) {
+        const wx = grid.xWords[index];
+        if (y === wx.y && x >= wx.x && x < wx.x + wx.letters.length) {
+          return { groupIndex: Axis.x, itemIndex: index };
         }
       }
     }
-    return -1;
+    return null;
+  }
+
+  getYItemIndex(x: number, y: number): TabListSelection | null {
+    const grid = this._grid;
+    if (grid) {
+      for (let index = grid.yWords.length; index-- > 0;) {
+        const wy = grid.yWords[index];
+        if (x === wy.x && y >= wy.y && y < wy.y + wy.letters.length) {
+          return { groupIndex: Axis.y, itemIndex: index };
+        }
+      }
+    }
+    return null;
+  }
+
+  getItemIndex(x: number, y: number): TabListSelection | null {
+    // Toggle axis priority.
+    if (this._selection?.groupIndex === Axis.x) {
+      return this.getYItemIndex(x, y) || this.getXItemIndex(x, y);
+    }
+    return this.getXItemIndex(x, y) || this.getYItemIndex(x, y);
   }
 
   onBoardMouse(event: MouseEvent, board: HTMLElement, down: boolean) {
@@ -334,22 +353,21 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
     const rc = board.getBoundingClientRect();
 
-    const left = this.layout.baseLeft;
-    const top = this.layout.baseTop;
-    const x = Math.floor((event.clientX - rc.left) / SQUARE_SIDE) - left;
-    const y = Math.floor((event.clientY - rc.top) / SQUARE_SIDE) - top;
+    const x = Math.floor((event.clientX - rc.left) / SQUARE_SIDE) - this.layout.baseLeft - this._grid.xMin;
+    const y = Math.floor((event.clientY - rc.top) / SQUARE_SIDE) - this.layout.baseTop - this._grid.yMin;
 
-    const index = this.getItemIndex(x, y);
-    if (index >= 0) {
+    const sel = this.getItemIndex(x, y);
+    if (sel) {
       if (down) {
-        this._mouse = { x, y, index, time: Date.now() };
+        this._mouse = { ...sel, x, y, time: Date.now() };
       } else {
         if (this._mouse) {
           const mouse = this._mouse;
           this._mouse = undefined;
 
-          if (index === mouse.index && x === mouse.x && y === mouse.y && Date.now() - mouse.time < 5000) {
-            this.selectionChange.emit(index);
+          if (sel.groupIndex === mouse.groupIndex && sel.itemIndex === mouse.itemIndex
+            && x === mouse.x && y === mouse.y && Date.now() - mouse.time < 5000) {
+            this.selectionChange.emit(sel);
           }
         }
       }
@@ -587,23 +605,26 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private _setSelection(value: number) {
-    const item = this._items[value];
-    if (item) {
-      const left = this.layout.baseLeft;
-      const top = this.layout.baseTop;
-      if (item.vertical) {
-        const x = left + item.x;
-        const y = top + item.y;
-        this.wordPath = `M${x} ${y}h1v${item.letters.length}h-1z`;
-      } else {
-        const x = left + item.x;
-        const y = top + item.y + 1;
-        this.wordPath = `M${x} ${y}v-1h${item.letters.length}v1z`;
+  private _getSelectionPath() {
+    if (this._selection && this._grid) {
+      const { groupIndex, itemIndex } = this._selection;
+      if (groupIndex === Axis.x) {
+        const wx = this._grid.xWords[itemIndex];
+        if (wx) {
+          const x = this.layout.baseLeft + this._grid.xMin + wx.x;
+          const y = this.layout.baseTop + this._grid.yMin + wx.y + 1;
+          return `M${x} ${y}v-1h${wx.letters.length}v1z`;
+        }
+      } else if (groupIndex === Axis.y) {
+        const wy = this._grid.yWords[itemIndex];
+        if (wy) {
+          const x = this.layout.baseLeft + this._grid.xMin + wy.x;
+          const y = this.layout.baseTop + this._grid.yMin + wy.y;
+          return `M${x} ${y}h1v${wy.letters.length}h-1z`;
+        }
       }
-    } else {
-      this.wordPath = '';
     }
+    return '';
   }
 
   private _setMistakes() {

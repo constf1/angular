@@ -22,7 +22,7 @@
     </mat-action-list>
     <div *ngIf="clues" style="margin: 1em;">
       <h3>Clues</h3>
-      <app-tab-list [groups]="clues" [selection]="selection" (selectionChange)="onClueSelectionChange($event)">
+      <app-tab-list [groups]="clues" [selection]="selection" (selectionChange)="onSelectionChange($event)">
       </app-tab-list>
     </div>
 
@@ -66,8 +66,8 @@
 
   <mat-sidenav-content>
     <div style="padding: 1px;">
-      <app-crossword-board *ngIf="items" [difficulty]="difficulty" [items]="items" [showMistakes]="showMistakes"
-        [selection]="selectedWordIndex" (selectionChange)="onWordSelectionChange($event)"
+      <app-crossword-board *ngIf="game" [difficulty]="difficulty" [grid]="game" [showMistakes]="showMistakes"
+        [selection]="selection" (selectionChange)="onSelectionChange($event)"
         (boardChange)="onBoardChange($event)"></app-crossword-board>
 
       <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })"

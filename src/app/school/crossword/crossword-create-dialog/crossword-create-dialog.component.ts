@@ -3,8 +3,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Data } from '../crossword-data-tree/crossword-data-tree.component';
+import { Grid, normalize } from '../crossword-model';
 import { CrosswordMakerService } from '../services/crossword-maker.service';
 import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
+
+export type Game = Grid & {
+  xClues: string[];
+  yClues: string[];
+};
 
 @Component({
   selector: 'app-crossword-create-dialog',
@@ -20,9 +26,14 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
   readonly difficultyMin = minState.crosswordDifficulty;
   readonly difficultyMax = maxState.crosswordDifficulty;
 
+  get gridSize() {
+    const grid = this.maker.state.grid;
+    return grid ? grid.xWords.length + grid.yWords.length : 0;
+  }
+
   get progress() {
-    const { items, words, isWorking } = this.maker.state;
-    return (isWorking && words.length > 0) ? Math.floor(100 * items.length / words.length) : 0;
+    const { words, isWorking } = this.maker.state;
+    return (isWorking && words.length > 0) ? Math.floor(100 * this.gridSize / words.length) : 0;
   }
 
   get progressVisibility() {
@@ -36,8 +47,22 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription = this.maker.subscribe((state) => {
-      if (this.closeOnSuccess && !state.isWorking && state.items.length > 0) {
-        const game = state.items.map((item) => ({ ...item, clue: this.data[item.letters.join('')]}));
+      if (this.closeOnSuccess && !state.isWorking && state.grid) {
+        const grid = state.grid;
+        const xWords = normalize(grid.xWords, -grid.xMin, -grid.yMin);
+        const yWords = normalize(grid.yWords, -grid.xMin, -grid.yMin);
+
+        const game: Game = {
+          xWords,
+          yWords,
+          xMin: 0,
+          xMax: grid.xMax - grid.xMin,
+          yMin: 0,
+          yMax: grid.yMax - grid.yMin,
+          xClues: xWords.map((wx) => this.data[wx.letters.join('')]),
+          yClues: yWords.map((wy) => this.data[wy.letters.join('')]),
+        };
+
         this.dialogRef.close(game);
       }
     });
