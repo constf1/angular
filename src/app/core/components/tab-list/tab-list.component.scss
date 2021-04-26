@@ -15,8 +15,8 @@
 
     &.active {
       color: $item-select-color;
-      background-color: $background-hover-color;
-      outline: 1px solid $border-select-color;
+      background-color: $background-select-color;
+      // outline: 1px solid $border-select-color;
     }
   }
 }
