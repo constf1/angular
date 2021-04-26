@@ -34,7 +34,7 @@ export class CrosswordSidenavComponent implements OnInit {
     const lo = minState.crosswordDifficulty;
     const hi = maxState.crosswordDifficulty;
     const di = this.settings.state.crosswordDifficulty;
-    return (hi - di) / (hi - lo);
+    return (di - lo) / (hi - lo);
   }
 
   constructor(public settings: CrosswordSettingsService, public dialog: MatDialog) { }

@@ -3,9 +3,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Data } from '../crossword-data-tree/crossword-data-tree.component';
-import { Grid, normalize } from '../crossword-model';
+import { Grid, normalize, toWord } from '../crossword-model';
 import { CrosswordMakerService } from '../services/crossword-maker.service';
-import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
+import { CrosswordDifficultyNames, CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
 
 export type Game = Grid & {
   xClues: string[];
@@ -25,6 +25,13 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
 
   readonly difficultyMin = minState.crosswordDifficulty;
   readonly difficultyMax = maxState.crosswordDifficulty;
+  readonly difficultyNames = CrosswordDifficultyNames;
+
+  readonly heightMin = minState.crosswordMaxHeight;
+  readonly heightMax = maxState.crosswordMaxHeight;
+
+  readonly widthMin = minState.crosswordMaxWidth;
+  readonly widthMax = maxState.crosswordMaxWidth;
 
   get gridSize() {
     const grid = this.maker.state.grid;
@@ -59,8 +66,8 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
           xMax: grid.xMax - grid.xMin,
           yMin: 0,
           yMax: grid.yMax - grid.yMin,
-          xClues: xWords.map((wx) => this.data[wx.letters.join('')]),
-          yClues: yWords.map((wy) => this.data[wy.letters.join('')]),
+          xClues: xWords.map((wx) => this.data[toWord(wx.letters)]),
+          yClues: yWords.map((wy) => this.data[toWord(wy.letters)]),
         };
 
         this.dialogRef.close(game);
@@ -78,8 +85,9 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
 
   onCreate() {
     if (this.words.length > 0) {
+      const state = this.settings.state;
       this.closeOnSuccess = true;
-      this.maker.makePuzzle(this.words);
+      this.maker.makePuzzle(this.words, state.crosswordMaxWidth, state.crosswordMaxHeight);
     }
   }
 

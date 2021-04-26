@@ -6,6 +6,8 @@ export interface CrosswordWorkerMessage {
 
 export interface CrosswordWorkerInput extends CrosswordWorkerMessage {
   requestId: string;
+  maxHeight: number;
+  maxWidth: number;
   tryCount: number;
   words: string[];
 }

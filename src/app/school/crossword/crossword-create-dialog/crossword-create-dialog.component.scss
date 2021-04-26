@@ -3,3 +3,39 @@
   height: 60vmin;
   overflow: auto;
 }
+
+fieldset {
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.crossword-settings-difficulty {
+  display: inline-block;
+  padding-right: 1em;
+  padding-bottom: 1em;
+  vertical-align: top;
+
+  >label {
+    padding-right: 1em;
+  }
+}
+
+.crossword-settings-size {
+  display: inline-block;
+
+  .input-range {
+    >label {
+      display: inline-block;
+      min-width: 6em;
+      vertical-align: text-bottom;
+    }
+
+    >input[type=range] {
+      margin-right: 1em;
+
+      +span {
+        vertical-align: text-bottom;
+      }
+    }
+  }
+}

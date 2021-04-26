@@ -22,7 +22,8 @@
     </mat-action-list>
     <div *ngIf="clues" style="margin: 1em;">
       <h3>Clues</h3>
-      <app-tab-list [groups]="clues" [selection]="selection" (selectionChange)="onSelectionChange($event)">
+      <app-tab-list [groups]="clues" [selection]="selection" [panelStyle]="{ maxHeight: '30em', overflowY: 'auto' }"
+        (selectionChange)="onSelectionChange($event)">
       </app-tab-list>
     </div>
 

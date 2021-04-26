@@ -1,19 +1,43 @@
 <h1 mat-dialog-title>Crossword Puzzle Maker</h1>
 <div mat-dialog-content>
   <div class="crossword-data-tree">
-    <div style="padding: 1em;">
-      <app-index-selector label="Difficulty" [count]="difficultyMax - difficultyMin + 1"
-        [selection]="difficultyMax - settings.state.crosswordDifficulty"
-        (selectionChange)="settings.set({ crosswordDifficulty: difficultyMax - $event })"></app-index-selector>
-    </div>
+    <fieldset>
+      <legend>Settings:</legend>
+
+      <div class="crossword-settings-difficulty">
+        <label for="crosswordDifficultySelect">Difficulty:</label>
+        <select name="crosswordDifficulty" id="crosswordDifficultySelect" [ngModel]="settings.state.crosswordDifficulty"
+          (ngModelChange)="settings.set({ crosswordDifficulty: +$event })">
+          <option [value]="i" *ngFor="let name of difficultyNames; index as i">{{name}}</option>
+        </select>
+      </div>
+
+      <fieldset class="crossword-settings-size">
+        <legend>Maximum Size:</legend>
+        <div class="input-range">
+          <label for="crosswordMaxWidthInput">Width</label>
+          <input type="range" name="crosswordMaxWidth" id="crosswordMaxWidthInput" step="1" [min]="widthMin" [max]="widthMax"
+            [ngModel]="settings.state.crosswordMaxWidth" (ngModelChange)="settings.set({ crosswordMaxWidth: +$event })">
+          <span>{{settings.state.crosswordMaxWidth}}</span>
+        </div>
+
+        <div class="input-range">
+          <label for="crosswordMaxHeightInput">Height</label>
+          <input type="range" name="crosswordMaxHeight" id="crosswordMaxHeightInput" step="1" [min]="heightMin" [max]="heightMax"
+            [ngModel]="settings.state.crosswordMaxHeight"
+            (ngModelChange)="settings.set({ crosswordMaxHeight: +$event })">
+          <span>{{settings.state.crosswordMaxHeight}}</span>
+        </div>
+      </fieldset>
+    </fieldset>
     <app-crossword-data-tree (dataChange)="onDataChange($event)"></app-crossword-data-tree>
   </div>
   <mat-progress-bar [style.visibility]="progressVisibility" mode="determinate" [value]="progress"></mat-progress-bar>
 </div>
 <div mat-dialog-actions>
   <button mat-button [disabled]="maker.state.isWorking || 1 > words?.length" (click)="onCreate()">Create</button>
-  <button mat-button [disabled]="!(maker.state.isWorking && maker.state.grid)"
-    [style.visibility]="progressVisibility" (click)="onStop()">Stop at {{gridSize}}</button>
+  <button mat-button [disabled]="!(maker.state.isWorking && maker.state.grid)" [style.visibility]="progressVisibility"
+    (click)="onStop()">Stop at {{gridSize}}</button>
   <span class="flex-space-filler-1"></span>
   <button mat-button mat-dialog-close>Close</button>
 </div>

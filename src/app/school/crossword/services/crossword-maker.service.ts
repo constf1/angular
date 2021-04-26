@@ -53,7 +53,7 @@ export class CrosswordMakerService extends StateSubject<CrosswordMakerState> {
     }
   }
 
-  makePuzzle(words: ReadonlyArray<string>) {
+  makePuzzle(words: ReadonlyArray<string>, maxWidth: number, maxHeight: number) {
     if (!this._worker) {
       return;
     }
@@ -61,8 +61,8 @@ export class CrosswordMakerService extends StateSubject<CrosswordMakerState> {
 
     const requestId = JSON.stringify(words);
     const message: CrosswordWorkerInput = {
-      requestId,
-      tryCount: 100,
+      requestId, maxWidth, maxHeight,
+      tryCount: 2,
       words: words.slice()
     };
     this._worker.postMessage(message);

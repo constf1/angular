@@ -19,6 +19,14 @@ const GRID_PAD = 1; // 1: British/Australian-style grid; 0: American-style grid;
 const GRID_ROW_END = '\n';
 const GRID_SPACE = ' ';
 
+export function toLetters(word: string): string[] {
+  return word.split('');
+}
+
+export function toWord(letters: ReadonlyArray<string>): string {
+  return letters.join('');
+}
+
 export function normalize(words: ReadonlyArray<Readonly<Word>>, dx: number, dy: number): Word[] {
   return words
     .map((wx) => ({ x: wx.x + dx, y: wx.y + dy, letters: wx.letters }))
@@ -178,7 +186,7 @@ function getIntersectionCount(grid: Readonly<Grid>): number {
 type PuzzleSifter = (words: string[], index: number, output: Grid[]) => Grid[];
 
 function makePuzzles(words: string[], sift: PuzzleSifter): Grid[] {
-  const letters = words[0].split('');
+  const letters = toLetters(words[0]);
   let input: Grid[] = [{
     xWords: [{ letters, x: 0, y: 0 }],
     yWords: [],
@@ -191,7 +199,7 @@ function makePuzzles(words: string[], sift: PuzzleSifter): Grid[] {
   for (let i = 1; i < words.length; i++) {
     const output: Grid[] = [];
     for (const node of sift(words, i, input)) {
-      getNext(node, words[i].split(''), output);
+      getNext(node, toLetters(words[i]), output);
     }
     input = output;
   }
@@ -297,5 +305,5 @@ function asString(grid: Readonly<Grid>): string {
       buf[k + i * rows] = wy.letters[i];
     }
   }
-  return buf.join('');
+  return toWord(buf);
 }
