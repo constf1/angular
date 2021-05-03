@@ -300,7 +300,7 @@ export class SvgViewComponent implements OnInit, OnDestroy {
       const control = this.controls[index];
       const dx = control.x - x;
       const dy = control.y - y;
-      if (dx * dx + dy * dy <= R * R) {
+      if (dx * dx + dy * dy <= R * R && this.getVisibility(control.item) === 'visible') {
         break;
       }
     }
