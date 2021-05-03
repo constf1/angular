@@ -48,6 +48,7 @@ export class CrosswordSidenavComponent implements OnInit {
 
   checkCrossword() {
     if (this.canCheckCrossword) {
+      this._resetSelection();
       this.showMistakes = true;
       this.canCheckCrossword = false;
     }
