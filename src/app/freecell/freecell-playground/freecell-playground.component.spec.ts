@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { FreecellPlaygroundComponent } from './freecell-playground.component';
 
@@ -6,7 +6,7 @@ describe('FreecellPlaygroundComponent', () => {
   let component: FreecellPlaygroundComponent;
   let fixture: ComponentFixture<FreecellPlaygroundComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ FreecellPlaygroundComponent ]
     })
