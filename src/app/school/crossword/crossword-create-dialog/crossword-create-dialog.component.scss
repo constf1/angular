@@ -1,4 +1,4 @@
-.crossword-data-tree {
+.crossword-dialog-content {
   width: 60vmin;
   height: 60vmin;
   overflow: auto;
@@ -11,8 +11,8 @@ fieldset {
 
 .crossword-settings-difficulty {
   display: inline-block;
-  padding-right: 1em;
-  padding-bottom: 1em;
+  margin-right: 1em;
+  margin-bottom: 1em;
   vertical-align: top;
 
   >label {
