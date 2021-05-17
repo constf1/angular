@@ -24,7 +24,7 @@ export class SampleDialogComponent implements OnInit {
   tabSelection = -1;
   tabItems: string[];
   selection = -1;
-  errorMessage: string;
+  errorMessage?: string;
 
   get selectedPath() {
     if (this.samples && this.selection >= 0) {
