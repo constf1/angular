@@ -2,7 +2,7 @@ import { Grader, pickSome } from 'src/app/common/array-utils';
 import { Point } from 'src/app/common/math2d';
 
 export type Word = Point & {
-  letters: string[];
+  letters: ReadonlyArray<string>;
 };
 
 export type Grid = {
@@ -98,7 +98,7 @@ function canAddX(grid: Readonly<Grid>, xWord: Readonly<Word>) {
   return true;
 }
 
-function getNextY(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
+function getNextY(grid: Readonly<Grid>, letters: ReadonlyArray<string>, accum: Grid[]) {
   const done: { [key: string]: boolean } = {};
 
   for (const wx of grid.xWords) {
@@ -128,7 +128,7 @@ function getNextY(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
   }
 }
 
-function getNextX(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
+function getNextX(grid: Readonly<Grid>, letters: ReadonlyArray<string>, accum: Grid[]) {
   const done: { [key: string]: boolean } = {};
 
   for (const wy of grid.yWords) {
@@ -158,10 +158,11 @@ function getNextX(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
   }
 }
 
-export function getNext(grid: Readonly<Grid>, letters: string[], accum: Grid[]) {
+export function getNext(grid: Readonly<Grid>, letters: ReadonlyArray<string>, accum: Grid[]) {
   getNextY(grid, letters, accum);
   getNextX(grid, letters, accum);
 }
+
 function getArea(grid: Readonly<Grid>): number {
   return (grid.xMax - grid.xMin) * (grid.yMax - grid.yMin);
 }
