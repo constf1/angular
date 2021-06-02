@@ -17,14 +17,14 @@ export interface CrosswordSettingsState {
 
 export const minState: Readonly<SubType<CrosswordSettingsState, number>> = {
   crosswordDifficulty: 0,
-  crosswordMaxHeight: 32,
-  crosswordMaxWidth: 32,
+  crosswordMaxHeight: 30,
+  crosswordMaxWidth: 30,
 };
 
 export const maxState: Readonly<SubType<CrosswordSettingsState, number>> = {
   crosswordDifficulty: CrosswordDifficultyNames.length - 1,
-  crosswordMaxHeight: 64,
-  crosswordMaxWidth: 64,
+  crosswordMaxHeight: 60,
+  crosswordMaxWidth: 60,
 };
 
 function midpoint(a: number, b: number) {
