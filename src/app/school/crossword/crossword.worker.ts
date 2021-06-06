@@ -17,10 +17,10 @@ addEventListener('message', (event: MessageEvent<CrosswordWorkerInput>) => {
     let index = 0;
     let input: Grid[];
     player.play(() => {
-      const letters = toLetters(words[index]);
       let output: Grid[];
       if (index === 0) {
         shuffle(words);
+        const letters = toLetters(words[index]);
         output = [{
           xWords: [{ letters, x: 0, y: 0 }],
           yWords: [],
@@ -31,6 +31,7 @@ addEventListener('message', (event: MessageEvent<CrosswordWorkerInput>) => {
         }];
         skipCount = 0;
       } else {
+        const letters = toLetters(words[index]);
         output = [];
         for (const node of input) {
           getNext(node, letters, output);
