@@ -693,6 +693,82 @@
       "tail": "хвост",
       "welcome back!": "с возвращением!",
       "year": "год"
+    },
+    "Spotlight 4. Английский в фокусе 4 класс": {
+      "Starter Unit": {
+        "Page 4 Ex. 1. Sing along!": {
+          "everybody": "все, каждый",
+          "back together": "снова вместе",
+          "feel": "чувствовать",
+          "hope": "надеяться",
+          "join": "присоединяться",
+          "remember": "помнить",
+          "same": "так же, такой же"
+        }
+      },
+      "Module 1. Family & Friends!": {
+        "Unit 1. One big happy family!": {
+          "Page 10 Ex. 1. Vocabulary": {
+            "tall": "высокий",
+            "slim": "стройный",
+            "fair hair": "светлые волосы",
+            "funny": "смешной, забавный",
+            "short": "короткий",
+            "dark hair": "тёмные волосы",
+            "kind": "добрый",
+            "friendly": "дружелюбный"
+          },
+          "Page 11 Ex. 4. Listen and read": {
+            "plane": "самолёт",
+            "uncle": "дядя",
+            "what does he look like?": "как он выглядит?",
+            "vet": "ветеринар",
+            "aunt": "тётя",
+            "cousin": "двоюродная сестра или двоюродный брат",
+            "welcome": "добро пожаловать",
+            "a few": "немного, несколько",
+            "more": "больше, ещё"
+          },
+          "Page 12 Ex. 1. Vocabulary": {
+            "camera": "камера",
+            "gloves": "перчатки",
+            "guitar": "гитара",
+            "hairbrush": "расчёска",
+            "helmet": "шлем",
+            "keys": "ключи",
+            "mobile phone": "мобильный телефон",
+            "roller blades": "роликовые коньки",
+            "watch": "часы"
+          }
+        },
+        "Unit 2. My best friends!": {
+          "Page 14 Ex. 1. Vocabulary": {
+            "skiing": "катание на лыжах",
+            "sailing": "плавание под парусами",
+            "skating": "катание на коньках",
+            "playing the violin": "играть на скрипке",
+            "surfing": "сёрфинг, скольжения на волне",
+            "diving": "ныряние, прыжки в воду"
+          },
+          "Page 16 Ex. 1. Vocabulary": {
+            "thirty": "тридцать",
+            "forty": "сорок",
+            "fifty": "пятьдесят",
+            "sixty": "шестьдесят",
+            "seventy": "семьдесят",
+            "eighty": "восемьдесят",
+            "ninety": "девяносто",
+            "a hundred": "сто"
+          },
+          "Page 16 Ex. 3. Sing along!": {
+            "a lot of": "много",
+            "people": "люди",
+            "crew": "команда",
+            "stick together": "держаться вместе",
+            "glue": "клей"
+          }
+        }
+      }
     }
   }
 }
