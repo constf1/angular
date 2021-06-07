@@ -768,6 +768,53 @@
             "glue": "клей"
           }
         }
+      },
+      "Module 2. A working day!": {
+        "Unit 3. The Animal Hospital": {
+          "Page 26 Ex. 1. Vocabulary": {
+            "station": "вокзал, станция",
+            "garage": "гараж",
+            "café": "кафе",
+            "theatre": "театр",
+            "baker's": "булочная",
+            "hospital": "больница",
+            "greengrocer's": "овощной магазин",
+            "post office": "почта"
+          },
+          "Page 27 Ex. 3. Listen and read": {
+            "street": "улица",
+            "need": "нуждаться",
+            "injection": "укол",
+            "behind": "позади, сзади",
+            "curtain": "штора"
+          },
+          "Page 28 Ex. 1. Vocabulary": {
+            "baker": "пекарь, булочник",
+            "greengrocer": "продавец овощей и фруктов",
+            "mechanic": "механик",
+            "postman": "почтальон",
+            "waiter": "официант",
+            "nurse": "медсестра"
+          }
+        },
+        "Unit 4. Work and play!": {
+          "Page 30 Ex. 1. Vocabulary": {
+            "volleyball": "волейбол",
+            "tennis": "теннис",
+            "badminton": "бадминтон",
+            "baseball": "бейсбол",
+            "table tennis": "настольный теннис",
+            "hockey": "хоккей"
+          },
+          "Page 32 Ex.3 Sing along!": {
+            "parcel": "посылка",
+            "letter": "письмо",
+            "better": "лучше",
+            "whistle": "свистеть",
+            "bring": "приносить",
+            "postcard": "открытка"
+          }
+        }
       }
     }
   }
