@@ -35,6 +35,10 @@ $active-tile-bg-color: #fadc9a;
     background-color: $tile-bg-color;
   }
 
+  &.transition_auto {
+    transition: transform 1s ease-in-out;
+  }
+
   &.transition_norm {
     transition: transform 0.5s ease-out;
   }

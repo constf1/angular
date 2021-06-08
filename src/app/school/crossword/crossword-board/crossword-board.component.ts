@@ -92,8 +92,11 @@ function makeLayout(cols: number, rows: number, charCount = 26) {
 
 type StaticLayout = Readonly<ReturnType<typeof makeLayout>>;
 
+const DRAG_THRESHOLD = 4;
+
 type DragData = {
   index: number;
+  dragged?: boolean;
 };
 
 function joinLines(a: string[], b: string[]): string[] | undefined {
@@ -563,6 +566,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
         Math.max(0, Math.min(this.layout.width - 1, x)),
         Math.max(0, Math.min(this.layout.height - 1, y)));
       tile.className = 'transition_drag';
+
+      if (Math.abs(this._dragListener.pageDeltaX) > DRAG_THRESHOLD || Math.abs(this._dragListener.pageDeltaY) > DRAG_THRESHOLD) {
+        data.dragged = true;
+      }
     }
   }
 
@@ -588,13 +595,18 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       // }
       tile.transform = transform(tile.x, tile.y);
 
-      const left = this.layout.baseLeft;
-      const top = this.layout.baseTop;
-      const cell = this.cells.find((it) => it.x === x - left && it.y === y - top);
+      const x0 = x - this.layout.baseLeft;
+      const y0 = y - this.layout.baseTop;
+      const cell = this.cells.find((it) => it.x === x0 && it.y === y0);
       if (cell) {
         append(cell, tile);
       } else {
         detach(tile);
+
+        // Auto move the tile into selected word.
+        if (!data.dragged && this._selection) {
+          this._moveAuto(tile);
+        }
       }
       // if (this.isAllPairs()) {
       //   console.log('Done!');
@@ -603,6 +615,46 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
       this.onBoardChange();
     }
+  }
+
+  private _moveAuto(tile: Tile): void {
+    const cell = this._getNextCell();
+    if (cell) {
+      tile.x = cell.x + this.layout.baseLeft;
+      tile.y = cell.y + this.layout.baseTop;
+      tile.transform = transform(tile.x, tile.y);
+      tile.className = 'transition_auto';
+
+      append(cell, tile);
+    }
+  }
+
+  private _getNextCell(): Cell | undefined {
+    if (this._selection) {
+      const { groupIndex, itemIndex } = this._selection;
+      if (groupIndex === Axis.x) {
+        const wx = this._grid.xWords[itemIndex];
+        if (wx) {
+          for (let dx = 0; dx < wx.letters.length; dx++) {
+            const cell = this.cells.find((it) => it.x === wx.x + dx && it.y === wx.y);
+            if (cell && !cell.list || cell.list.length <= 1) {
+              return cell;
+            }
+          }
+        }
+      } else if (groupIndex === Axis.y) {
+        const wy = this._grid.yWords[itemIndex];
+        if (wy) {
+          for (let dy = 0; dy < wy.letters.length; dy++) {
+            const cell = this.cells.find((it) => it.x === wy.x && it.y === wy.y + dy);
+            if (cell && !cell.list || cell.list.length <= 1) {
+              return cell;
+            }
+          }
+        }
+      }
+    }
+    return undefined;
   }
 
   private _getSelectionPath() {
