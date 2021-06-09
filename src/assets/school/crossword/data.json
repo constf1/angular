@@ -665,12 +665,10 @@
       },
       "basketball": "баскетбол",
       "begin": "начинать",
-      "behind": "позади, сзади",
       "car": "автомобиль",
       "day off": "выходной день",
       "drink": "пить",
       "drive": "водить машину",
-      "everyone": "все, каждый",
       "find out": "выяснять",
       "fly a kite": "запускать воздушного змея",
       "hot dog": "сосиска в булочке",
@@ -680,7 +678,6 @@
       "long": "длинный",
       "lunch box": "коробка с завтраком",
       "mac": "резиновый плащ, макинтош",
-      "need": "нуждаться",
       "next to": "рядом, близко",
       "nice to see you": "рад тебя видеть",
       "object": "предмет",
@@ -913,6 +910,150 @@
             "neck": "шея",
             "faster": "быстрее",
             "than": "чем"
+          }
+        }
+      },
+      "Module 5. Where were you yesterday?": {
+        "Unit 9. Tea party!": {
+          "Page 6 Ex. 1. Vocabulary": {
+            "first": "первый",
+            "second": "второй",
+            "third": "третий",
+            "fourth": "четвертый",
+            "fifth": "пятый",
+            "eleventh": "одиннадцатый",
+            "twelfth": "двенадцатый",
+            "twentieth": "двадцатый"
+          },
+          "Page 7 Ex 3. Listen and read": {
+            "delicious": "очень вкусный",
+            "sixteenth": "шестнадцатый",
+            "while": "промежуток времени; в то время как",
+            "later": "позже, позднее",
+            "yesterday": "вчера"
+          }
+        },
+        "Unit 10. All our yesterdays!": {
+          "Page 10 Ex. 1. Vocabulary": {
+            "sad": "грустный",
+            "bored": "скучающий",
+            "angry": "сердитый",
+            "scared": "испуганный",
+            "tired": "усталый, уставший",
+            "hungry": "голодный"
+          },
+          "Page 12 Ex. 2. Sing along!": {
+            "dream": "сон; видеть во сне",
+            "last": "последний, прошлый",
+            "beauty": "красота, красавица",
+            "beast": "зверь, чудовище",
+            "really": "на самом деле",
+            "sight": "взгляд, вид, зрелище"
+          }
+        }
+      },
+      "Module 6. Tell the tale!": {
+        "Unit 11. The Hare and the Tortoise!": {
+          "Page 22 Ex. 1. Listen and read": {
+            "once upon a time": "давным-давно",
+            "fast": "быстрый",
+            "hare": "заяц",
+            "slow": "медленный",
+            "tortois": "черепаха",
+            "because": "потому что",
+            "then": "затем, тогда",
+            "rest": "отдых, отдыхать",
+            "next": "следующий",
+            "forward": "вперёд",
+            "soon": "скоро, вскоре",
+            "far ahead": "далеко впереди",
+            "hour": "час",
+            "suddenly": "вдруг, внезапно",
+            "saw": "увидел",
+            "finish line": "финишная линия",
+            "winner": "победитель",
+            "keep on": "продолжать",
+            "until": "прежде чем, до того как",
+            "cross": "крест, пересекать"
+          }
+        },
+        "Unit 12. Once upon a time!": {
+          "Page 28 Ex. 2. Sing along!": {
+            "mystery": "тайна",
+            "study": "изучать, учиться",
+            "saxophone": "саксофон",
+            "bumblebee": "шмель",
+            "dive": "нырять"
+          }
+        }
+      },
+      "Module 7. Days to remember!": {
+        "Unit 13. The best of times!": {
+          "Page 38 Ex. 1. Vocabulary": {
+            "museum": "музей",
+            "dinosaur": "динозавр",
+            "concert": "концерт",
+            "funfair": "ярмарка с аттракционами",
+            "ride": "поездка"
+          },
+          "Page 39 Ex. 1. Listen and read": {
+            "best": "лучший",
+            "went": "ходил, ходили",
+            "now": "сейчас",
+            "nicest": "самый хороший, лучший"
+          }
+        },
+        "Unit 14. Magic moments!": {
+          "Page 44 Ex. 2. Sing along!": {
+            "ever": "когда-либо",
+            "greatest": "величайший, самый лучший",
+            "fine": "отлично, прекрасно",
+            "life": "жизнь"
+          }
+        }
+      },
+      "Module 8. Places to go!": {
+        "Unit 15. Good times ahead!": {
+          "Page 54 Ex. 1. Vocabulary": {
+            "greece": "Греция",
+            "italy": "Италия",
+            "portugal": "Португалия",
+            "russia": "Россия",
+            "mexico": "Мексика",
+            "poland": "Польша",
+            "spain": "Испания",
+            "turkey": "Турция",
+            "lake": "озеро",
+            "mountain": "гора",
+            "seaside": "берег моря, морское побережье",
+            "camping": "поход (с палатками)"
+          },
+          "Page 55 Ex. 3. Listen and read": {
+            "suitcase": "чемодан",
+            "holiday": "праздник, каникулы",
+            "australia": "Австралия",
+            "hotel": "отель, гостиница",
+            "spend": "тратить, проводить",
+            "other": "другой, иной; иначе",
+            "summer": "лето"
+          }
+        },
+        "Unit 16. Hello, sunshine!": {
+          "Page 58 Ex. 1. Vocabulary": {
+            "swimsuit": "купальник",
+            "sunglasses": "солнечные очки",
+            "swimming trunks": "плавки",
+            "jeans": "джинсы",
+            "boots": "сапоги, ботинки",
+            "tent": "палатка",
+            "flippers": "ласты",
+            "sleeping bag": "спальный мешок"
+          },
+          "Page 60 Ex. 2. Sing along!": {
+            "sunshine": "солнечный свет",
+            "lie out in the sun": "лежать на солнце",
+            "near": "возле, около; недалеко",
+            "everyone": "все, каждый"
           }
         }
       }
