@@ -9,6 +9,7 @@
       "aerial": "radio wave transmitter or receiver; operating in the air",
       "affront": "a deliberate insult",
       "amalgam": "a blend or combination; an alloy of mercury with another metal",
+      "amenity": "a desirable or useful feature or facility of a building or place",
       "animalcule": "a microscopic animal",
       "ante": "a stake put up by a player in poker before receiving cards",
       "apt": "suitable or right for a particular situation",
@@ -73,7 +74,9 @@
       "esprit de corps": "the feelings, such as being proud and loyal, shared by members of a group of people",
       "exasperation": "the feeling of being annoyed",
       "exert": "to use influence, authority, etc. forcefully or effectively",
-      "exhume": "to dig up something buried, esp. a corpse"
+      "exhume": "to dig up something buried, esp. a corpse",
+      "exodus": "a mass departure of people, especially emigrants",
+      "extol": "praise enthusiastically"
     },
     "F": {
       "facsimile": "an exact copy, especially of a document; reproduction",
@@ -99,6 +102,7 @@
       "hazardous": "dangerous",
       "heinous": "evil and shocking",
       "helical": "having the shape or form of a helix; spiral",
+      "heretofore": "(formal) before now",
       "hitherto": "until this time",
       "hoist": "to raise or lift up, esp. by mechanical means; any apparatus or device for lifting things"
     },
@@ -223,7 +227,8 @@
       "vat": "a large container for holding or storing liquids",
       "vermin": "small animals collectively, such as insects and rodents, that spread disease and damage crops",
       "vie": "to compete (with someone)",
-      "vigour": "physical strength and good health"
+      "vigour": "physical strength and good health",
+      "vista": "a pleasing view, especially one seen through a long, narrow opening"
     },
     "WXYZ": {
       "wade": "walk with effort through water or another liquid or viscous substance",
@@ -350,7 +355,7 @@
             "pretty": "прелестная, очаровательная",
             "big": "большой",
             "tall": "высокий",
-            "baby": "младенец",
+            "baby": "младенец, малыш",
             "small": "маленький",
             "great": "замечательный, великолепный"
           }
@@ -625,7 +630,7 @@
             "what do we do": "что мы делаем?",
             "want": "хотеть, желать",
             "pick": "выбирать",
-            "card": "карта",
+            "card": "карточка, карта",
             "that one": "вон тот, вон та",
             "face": "лицо",
             "numbers": "числа",
@@ -692,7 +697,7 @@
       "soccer": "футбол",
       "subject": "школьный предмет",
       "tail": "хвост",
-      "welcome back!": "с возвращением!",
+      "welcome back": "с возвращением!",
       "year": "год"
     },
     "Spotlight 4. Английский в фокусе 4 класс": {
@@ -722,7 +727,7 @@
           "Page 11 Ex. 4. Listen and read": {
             "plane": "самолёт",
             "uncle": "дядя",
-            "what does he look like?": "как он выглядит?",
+            "what does he look like": "как он выглядит?",
             "vet": "ветеринар",
             "aunt": "тётя",
             "cousin": "двоюродная сестра или двоюродный брат",
