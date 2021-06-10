@@ -437,6 +437,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       } else {
         this._setBase(this.difficulty);
         this._setFillPath();
+        this._setFailPath();
         this.onBoardChange();
         return false;
       }
@@ -510,11 +511,40 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   private _setFailPath() {
     this.failPath = '';
-    if (this.showMistakes) {
-      const { baseLeft, baseTop } = this.layout;
-      for (const cell of this.cells) {
-        if (cell.isActive && cell.next && cell.next.value !== cell.value) {
-          this.failPath += `M${cell.x + baseLeft} ${cell.y + baseTop}h1v1h-1z`;
+
+    const pad = this.layout.pad;
+    const left = this.layout.baseLeft - pad;
+    const right = this.layout.baseRight + pad;
+    const top = this.layout.baseTop - pad;
+    const bottom = this.layout.baseBottom + pad;
+
+    const fails: {[key: string]: boolean} = {};
+
+    // skip dragged tile, if any
+    const skip = (this._dragListener.isDragging && this._dragListener.data) ?
+      this.tiles[this._dragListener.data.index] : undefined;
+
+    for (const tile of this.tiles) {
+      if (tile === skip) {
+        continue;
+      }
+
+      // restrict the area
+      if (tile.x >= left && tile.x < right && tile.y >= top && tile.y < bottom) {
+        if (
+          // the tile is not on a cell
+          !tile.list
+          // a pile of tiles
+          || tile.list.length > 3
+          // a pile of two or more tiles and no tile is draggged away
+          || (tile.list !== skip?.list && tile.list.length > 2)
+          // a mistake
+          || (this.showMistakes && tile.value !== tile.list.head.value)) {
+          const path = `M${tile.x} ${tile.y}h1v1h-1z`;
+          if (!fails[path]) {
+            fails[path] = true;
+            this.failPath += path;
+          }
         }
       }
     }
@@ -553,6 +583,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const tile = this.tiles[data.index];
     if (tile) {
       tile.className = 'transition_grab';
+      this._setFailPath();
     }
   }
 
@@ -613,6 +644,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       // }
       // console.log('Pairs:', this.getPairedCount());
 
+      this._setFailPath();
       this.onBoardChange();
     }
   }
