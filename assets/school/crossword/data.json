@@ -9,6 +9,7 @@
       "aerial": "radio wave transmitter or receiver; operating in the air",
       "affront": "a deliberate insult",
       "amalgam": "a blend or combination; an alloy of mercury with another metal",
+      "amenity": "a desirable or useful feature or facility of a building or place",
       "animalcule": "a microscopic animal",
       "ante": "a stake put up by a player in poker before receiving cards",
       "apt": "suitable or right for a particular situation",
@@ -60,6 +61,7 @@
       "dictum": "a formal pronouncement from an authoritative source",
       "dilute": "(of a liquid) made thinner or weaker by having had water or another solvent added to it",
       "diminutive": "very small; tiny",
+      "disgruntled": "angry or dissatisfied",
       "disseminate": "to spread (information, ideas, etc.) widely",
       "dollop": "a small amount of a substance/food",
       "dwindle": "diminish gradually in size, amount, or strength"
@@ -72,7 +74,9 @@
       "esprit de corps": "the feelings, such as being proud and loyal, shared by members of a group of people",
       "exasperation": "the feeling of being annoyed",
       "exert": "to use influence, authority, etc. forcefully or effectively",
-      "exhume": "to dig up something buried, esp. a corpse"
+      "exhume": "to dig up something buried, esp. a corpse",
+      "exodus": "a mass departure of people, especially emigrants",
+      "extol": "praise enthusiastically"
     },
     "F": {
       "facsimile": "an exact copy, especially of a document; reproduction",
@@ -98,6 +102,7 @@
       "hazardous": "dangerous",
       "heinous": "evil and shocking",
       "helical": "having the shape or form of a helix; spiral",
+      "heretofore": "(formal) before now",
       "hitherto": "until this time",
       "hoist": "to raise or lift up, esp. by mechanical means; any apparatus or device for lifting things"
     },
@@ -109,7 +114,9 @@
       "incentive": "something that encourages a person to do something",
       "inception": "the beginning of a project or an organization or official activity",
       "infraction": "an occasion when someone breaks a rule or law",
+      "instigate": "bring about or initiate (an action or event); get going",
       "intermittent": "irregular, sporadic, occasional, random",
+      "intramural": "situated or done within the walls (of a building)",
       "intrepid": "extremely brave, fearless or bold",
       "ipso facto": "by that very fact or act",
       "jettison": "to abandon or give up; to throw overboard"
@@ -118,6 +125,7 @@
       "kinship": "blood relationship; the state of having common characteristics",
       "laudatory": "(of speech or writing) expressing praise",
       "lax": "not sufficiently strict, severe, or careful; (of the limbs or muscles) relaxed",
+      "lest": "with the intention of preventing (something undesirable); to avoid the risk of",
       "liaison": "communication or cooperation which facilitates a close working relationship between people or organizations",
       "longevity": "living for a long time",
       "lusty": "healthy, energetic, and full of strength and power",
@@ -219,7 +227,8 @@
       "vat": "a large container for holding or storing liquids",
       "vermin": "small animals collectively, such as insects and rodents, that spread disease and damage crops",
       "vie": "to compete (with someone)",
-      "vigour": "physical strength and good health"
+      "vigour": "physical strength and good health",
+      "vista": "a pleasing view, especially one seen through a long, narrow opening"
     },
     "WXYZ": {
       "wade": "walk with effort through water or another liquid or viscous substance",
@@ -346,7 +355,7 @@
             "pretty": "прелестная, очаровательная",
             "big": "большой",
             "tall": "высокий",
-            "baby": "младенец",
+            "baby": "младенец, малыш",
             "small": "маленький",
             "great": "замечательный, великолепный"
           }
@@ -621,7 +630,7 @@
             "what do we do": "что мы делаем?",
             "want": "хотеть, желать",
             "pick": "выбирать",
-            "card": "карта",
+            "card": "карточка, карта",
             "that one": "вон тот, вон та",
             "face": "лицо",
             "numbers": "числа",
@@ -661,12 +670,10 @@
       },
       "basketball": "баскетбол",
       "begin": "начинать",
-      "behind": "позади, сзади",
       "car": "автомобиль",
       "day off": "выходной день",
       "drink": "пить",
       "drive": "водить машину",
-      "everyone": "все, каждый",
       "find out": "выяснять",
       "fly a kite": "запускать воздушного змея",
       "hot dog": "сосиска в булочке",
@@ -676,7 +683,6 @@
       "long": "длинный",
       "lunch box": "коробка с завтраком",
       "mac": "резиновый плащ, макинтош",
-      "need": "нуждаться",
       "next to": "рядом, близко",
       "nice to see you": "рад тебя видеть",
       "object": "предмет",
@@ -691,7 +697,7 @@
       "soccer": "футбол",
       "subject": "школьный предмет",
       "tail": "хвост",
-      "welcome back!": "с возвращением!",
+      "welcome back": "с возвращением!",
       "year": "год"
     },
     "Spotlight 4. Английский в фокусе 4 класс": {
@@ -721,7 +727,7 @@
           "Page 11 Ex. 4. Listen and read": {
             "plane": "самолёт",
             "uncle": "дядя",
-            "what does he look like?": "как он выглядит?",
+            "what does he look like": "как он выглядит?",
             "vet": "ветеринар",
             "aunt": "тётя",
             "cousin": "двоюродная сестра или двоюродный брат",
@@ -909,6 +915,150 @@
             "neck": "шея",
             "faster": "быстрее",
             "than": "чем"
+          }
+        }
+      },
+      "Module 5. Where were you yesterday?": {
+        "Unit 9. Tea party!": {
+          "Page 6 Ex. 1. Vocabulary": {
+            "first": "первый",
+            "second": "второй",
+            "third": "третий",
+            "fourth": "четвертый",
+            "fifth": "пятый",
+            "eleventh": "одиннадцатый",
+            "twelfth": "двенадцатый",
+            "twentieth": "двадцатый"
+          },
+          "Page 7 Ex 3. Listen and read": {
+            "delicious": "очень вкусный",
+            "sixteenth": "шестнадцатый",
+            "while": "промежуток времени; в то время как",
+            "later": "позже, позднее",
+            "yesterday": "вчера"
+          }
+        },
+        "Unit 10. All our yesterdays!": {
+          "Page 10 Ex. 1. Vocabulary": {
+            "sad": "грустный",
+            "bored": "скучающий",
+            "angry": "сердитый",
+            "scared": "испуганный",
+            "tired": "усталый, уставший",
+            "hungry": "голодный"
+          },
+          "Page 12 Ex. 2. Sing along!": {
+            "dream": "сон; видеть во сне",
+            "last": "последний, прошлый",
+            "beauty": "красота, красавица",
+            "beast": "зверь, чудовище",
+            "really": "на самом деле",
+            "sight": "взгляд, вид, зрелище"
+          }
+        }
+      },
+      "Module 6. Tell the tale!": {
+        "Unit 11. The Hare and the Tortoise!": {
+          "Page 22 Ex. 1. Listen and read": {
+            "once upon a time": "давным-давно",
+            "fast": "быстрый",
+            "hare": "заяц",
+            "slow": "медленный",
+            "tortois": "черепаха",
+            "because": "потому что",
+            "then": "затем, тогда",
+            "rest": "отдых, отдыхать",
+            "next": "следующий",
+            "forward": "вперёд",
+            "soon": "скоро, вскоре",
+            "far ahead": "далеко впереди",
+            "hour": "час",
+            "suddenly": "вдруг, внезапно",
+            "saw": "увидел",
+            "finish line": "финишная линия",
+            "winner": "победитель",
+            "keep on": "продолжать",
+            "until": "прежде чем, до того как",
+            "cross": "крест, пересекать"
+          }
+        },
+        "Unit 12. Once upon a time!": {
+          "Page 28 Ex. 2. Sing along!": {
+            "mystery": "тайна",
+            "study": "изучать, учиться",
+            "saxophone": "саксофон",
+            "bumblebee": "шмель",
+            "dive": "нырять"
+          }
+        }
+      },
+      "Module 7. Days to remember!": {
+        "Unit 13. The best of times!": {
+          "Page 38 Ex. 1. Vocabulary": {
+            "museum": "музей",
+            "dinosaur": "динозавр",
+            "concert": "концерт",
+            "funfair": "ярмарка с аттракционами",
+            "ride": "поездка"
+          },
+          "Page 39 Ex. 1. Listen and read": {
+            "best": "лучший",
+            "went": "ходил, ходили",
+            "now": "сейчас",
+            "nicest": "самый хороший, лучший"
+          }
+        },
+        "Unit 14. Magic moments!": {
+          "Page 44 Ex. 2. Sing along!": {
+            "ever": "когда-либо",
+            "greatest": "величайший, самый лучший",
+            "fine": "отлично, прекрасно",
+            "life": "жизнь"
+          }
+        }
+      },
+      "Module 8. Places to go!": {
+        "Unit 15. Good times ahead!": {
+          "Page 54 Ex. 1. Vocabulary": {
+            "greece": "Греция",
+            "italy": "Италия",
+            "portugal": "Португалия",
+            "russia": "Россия",
+            "mexico": "Мексика",
+            "poland": "Польша",
+            "spain": "Испания",
+            "turkey": "Турция",
+            "lake": "озеро",
+            "mountain": "гора",
+            "seaside": "берег моря, морское побережье",
+            "camping": "поход (с палатками)"
+          },
+          "Page 55 Ex. 3. Listen and read": {
+            "suitcase": "чемодан",
+            "holiday": "праздник, каникулы",
+            "australia": "Австралия",
+            "hotel": "отель, гостиница",
+            "spend": "тратить, проводить",
+            "other": "другой, иной; иначе",
+            "summer": "лето"
+          }
+        },
+        "Unit 16. Hello, sunshine!": {
+          "Page 58 Ex. 1. Vocabulary": {
+            "swimsuit": "купальник",
+            "sunglasses": "солнечные очки",
+            "swimming trunks": "плавки",
+            "jeans": "джинсы",
+            "boots": "сапоги, ботинки",
+            "tent": "палатка",
+            "flippers": "ласты",
+            "sleeping bag": "спальный мешок"
+          },
+          "Page 60 Ex. 2. Sing along!": {
+            "sunshine": "солнечный свет",
+            "lie out in the sun": "лежать на солнце",
+            "near": "возле, около; недалеко",
+            "everyone": "все, каждый"
           }
         }
       }
