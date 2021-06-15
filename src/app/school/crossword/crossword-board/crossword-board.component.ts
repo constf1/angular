@@ -219,6 +219,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     this.cells = [];
     this.tiles = [];
     this.fillPath = '';
+    this.failPath = '';
 
     for (const item of this._grid.xWords) {
       const y = this._grid.yMin + item.y;
@@ -380,9 +381,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   onBoardChange() {
-    if (this._showMistakes) {
-      this._setMistakes();
-    }
+    this._setMistakes();
 
     this.boardChange.emit(this.cells.map((c) => ({
       x: c.x,
@@ -437,7 +436,6 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       } else {
         this._setBase(this.difficulty);
         this._setFillPath();
-        this._setFailPath();
         this.onBoardChange();
         return false;
       }
@@ -644,7 +642,6 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       // }
       // console.log('Pairs:', this.getPairedCount());
 
-      this._setFailPath();
       this.onBoardChange();
     }
   }
