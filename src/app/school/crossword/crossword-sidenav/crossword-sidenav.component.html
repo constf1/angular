@@ -15,8 +15,8 @@
       <button mat-list-item (click)="openCreateDialog()">
         <mat-icon>developer_board</mat-icon>Create...
       </button>
-      <button mat-list-item [disabled]="!canCheckCrossword" (click)="checkCrossword()">
-        <mat-icon [ngClass]="canCheckCrossword ? 'mat-accent' : 'disabled-color'">mode</mat-icon>Check
+      <button mat-list-item [disabled]="showMistakes" (click)="checkCrossword()">
+        <mat-icon [ngClass]="!showMistakes ? 'mat-accent' : 'disabled-color'">mode</mat-icon>Check
       </button>
       <!-- <button mat-list-item > Undo </button> -->
     </mat-action-list>

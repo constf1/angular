@@ -15,8 +15,8 @@ export class CrosswordSidenavComponent implements OnInit {
   clues: TabListGroup[];
   selection: TabListSelection;
 
-  canCheckCrossword = false;
-  showMistakes = false;
+  hasMistakes = false;
+  showMistakes = true;
 
   get mode() {
     return this.settings.state.sidenavModeSide ? 'side' : 'over';
@@ -43,14 +43,18 @@ export class CrosswordSidenavComponent implements OnInit {
   }
 
   onBoardChange(cells: CellState[]) {
-    this.canCheckCrossword = !this.showMistakes && cells.findIndex((cell) => !cell.answer) < 0;
+    // this.canCheckCrossword = !this.showMistakes && cells.findIndex((cell) => !cell.answer) < 0;
+    const hasMistakes = cells?.length > 0 && cells.findIndex((it) => it.isActive && it.value !== it.answer) >= 0;
+    if (hasMistakes === !this.hasMistakes) {
+      this.hasMistakes = hasMistakes;
+      this._onStateChange();
+    }
   }
 
   checkCrossword() {
-    if (this.canCheckCrossword) {
-      this._resetSelection();
+    if (!this.showMistakes) {
       this.showMistakes = true;
-      this.canCheckCrossword = false;
+      this._onStateChange();
     }
   }
 
@@ -81,10 +85,15 @@ export class CrosswordSidenavComponent implements OnInit {
     this.game = value;
     this._resetSelection();
     this.showMistakes = false;
-    this.canCheckCrossword = false;
   }
 
   private _resetSelection() {
     this.selection = { groupIndex: 0, itemIndex: -1 };
+  }
+
+  private _onStateChange() {
+    if (this.showMistakes && !this.hasMistakes) {
+      this._resetSelection();
+    }
   }
 }
