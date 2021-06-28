@@ -1,22 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+// tslint:disable: variable-name
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
+
 import { TabListGroup, TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
-import { CellState } from '../crossword-board/crossword-board.component';
+
+import { CrosswordBoard } from '../crossword-board/crossword-board';
+import { CrosswordBoardService } from '../crossword-board/crossword-board.service';
 import { CrosswordCreateDialogComponent, Game } from '../crossword-create-dialog/crossword-create-dialog.component';
 import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
 
 @Component({
   selector: 'app-crossword-sidenav',
   templateUrl: './crossword-sidenav.component.html',
-  styleUrls: ['./crossword-sidenav.component.scss']
+  styleUrls: ['./crossword-sidenav.component.scss'],
+  providers: [CrosswordBoardService]
 })
-export class CrosswordSidenavComponent implements OnInit {
+export class CrosswordSidenavComponent implements OnInit, OnDestroy {
+  private _subscription: Subscription;
+
   game: Readonly<Game>;
   clues: TabListGroup[];
-  selection: TabListSelection;
-
-  hasMistakes = false;
-  showMistakes = true;
+  selection: TabListSelection = { groupIndex: 0, itemIndex: -1 };
 
   get mode() {
     return this.settings.state.sidenavModeSide ? 'side' : 'over';
@@ -37,24 +42,46 @@ export class CrosswordSidenavComponent implements OnInit {
     return (di - lo) / (hi - lo);
   }
 
-  constructor(public settings: CrosswordSettingsService, public dialog: MatDialog) { }
+  get showMistakes() {
+    return this.boardService.state.showMistakes;
+  }
+
+  get showMistakesText() {
+    const state = this.boardService.state;
+    return state.stage !== 'done' ? state.showMistakes ? 'Checking' : 'Check' : 'Done!';
+  }
+
+  get showMistakesIcon() {
+    const state = this.boardService.state;
+    return state.stage !== 'done' ? 'mode' : 'done';
+  }
+
+  get showMistakesIconClassName() {
+    const state = this.boardService.state;
+    return state.stage !== 'done' ? state.showMistakes ? 'disabled-color' : 'mat-accent' : 'mat-warn';
+  }
+
+  constructor(
+    public boardService: CrosswordBoardService,
+    public settings: CrosswordSettingsService,
+    public dialog: MatDialog) { }
 
   ngOnInit(): void {
+    this._subscription = this.boardService.stateChange.subscribe((state) => {
+      if (state.stage === 'born') {
+        // Reset selection
+        this.selection = { groupIndex: 0, itemIndex: -1 };
+      } else if (state.stage === 'done') {
+        // Reset only selection index
+        this.selection = { groupIndex: this.selection.groupIndex, itemIndex: -1 };
+      }
+    });
   }
 
-  onBoardChange(cells: CellState[]) {
-    // this.canCheckCrossword = !this.showMistakes && cells.findIndex((cell) => !cell.answer) < 0;
-    const hasMistakes = cells?.length > 0 && cells.findIndex((it) => it.isActive && it.value !== it.answer) >= 0;
-    if (hasMistakes === !this.hasMistakes) {
-      this.hasMistakes = hasMistakes;
-      this._onStateChange();
-    }
-  }
-
-  checkCrossword() {
-    if (!this.showMistakes) {
-      this.showMistakes = true;
-      this._onStateChange();
+  ngOnDestroy(): void {
+    if (this._subscription) {
+      this._subscription.unsubscribe();
+      this._subscription = undefined;
     }
   }
 
@@ -83,17 +110,12 @@ export class CrosswordSidenavComponent implements OnInit {
       { label: 'Down', items: value.yClues }
     ];
     this.game = value;
-    this._resetSelection();
-    this.showMistakes = false;
-  }
 
-  private _resetSelection() {
-    this.selection = { groupIndex: 0, itemIndex: -1 };
-  }
-
-  private _onStateChange() {
-    if (this.showMistakes && !this.hasMistakes) {
-      this._resetSelection();
-    }
+    this.boardService.set({
+      stage: 'born',
+      board: new CrosswordBoard(value),
+      showMistakes: false,
+      difficulty: this.difficulty
+    });
   }
 }

@@ -15,9 +15,13 @@
       <button mat-list-item (click)="openCreateDialog()">
         <mat-icon>developer_board</mat-icon>Create...
       </button>
-      <button mat-list-item [disabled]="showMistakes" (click)="checkCrossword()">
-        <mat-icon [ngClass]="!showMistakes ? 'mat-accent' : 'disabled-color'">mode</mat-icon>Check
-      </button>
+      <ng-container *ngIf="boardService.state.board as board">
+        <button mat-list-item [disabled]="showMistakes" (click)="boardService.set({ showMistakes: true })">
+          <mat-icon [ngClass]="showMistakesIconClassName">{{showMistakesIcon}}</mat-icon>{{showMistakesText}}
+          <mat-progress-bar style="margin-left: 1em;" *ngIf="showMistakes && !board.isSolved" mode="determinate"
+            [value]="board.progress"></mat-progress-bar>
+        </button>
+      </ng-container>
       <!-- <button mat-list-item > Undo </button> -->
     </mat-action-list>
     <div *ngIf="clues" style="margin: 1em;">
@@ -67,16 +71,12 @@
 
   <mat-sidenav-content>
     <div style="padding: 1px;">
-      <app-crossword-board *ngIf="game" [difficulty]="difficulty" [grid]="game" [showMistakes]="showMistakes"
-        [selection]="selection" (selectionChange)="onSelectionChange($event)"
-        (boardChange)="onBoardChange($event)"></app-crossword-board>
+      <app-crossword-board [selection]="selection" (selectionChange)="onSelectionChange($event)"></app-crossword-board>
 
       <button *ngIf="closed" class="sidenav-open-button" (click)="settings.set({ sidenavClosed: false })"
         mat-icon-button color="primary">
         <mat-icon>double_arrow</mat-icon>
       </button>
     </div>
-    <!-- <app-crossword-game *ngIf="items" [items]="items"></app-crossword-game> -->
-
   </mat-sidenav-content>
 </mat-sidenav-container>

@@ -1,30 +1,17 @@
 // tslint:disable: variable-name
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, Renderer2, ViewChildren } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 import { Autoplay } from 'src/app/common/autoplay';
 import { DragListener } from 'src/app/common/drag-listener';
-import { append, detach, Linkable } from 'src/app/common/linkable';
-import { Point } from 'src/app/common/math2d';
+import { append, detach } from 'src/app/common/linkable';
 import { TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
 
 import { SQUARE_SIDE, transform } from '../../squared-paper/squared-paper.component';
-import { Grid } from '../crossword-model';
+import { Cell, CrosswordBoard } from './crossword-board';
+import { CrosswordBoardService } from './crossword-board.service';
 
 enum Axis { x = 0, y = 1 }
-
-type Cell = Linkable<Cell> & Point & {
-  value: string;
-  isActive?: boolean;
-  // neighbours, if any
-  hasLeft?: boolean;
-  hasRight?: boolean;
-  hasTop?: boolean;
-  hasBottom?: boolean;
-};
-
-type CellMap = {
-  [key: string]: Cell[];
-};
 
 type Tile = Cell & {
   order: number;
@@ -32,17 +19,32 @@ type Tile = Cell & {
   className: string;
 };
 
-export type CellState = Point & {
-  value: string;
-  answer?: string;
-  isActive?: boolean;
-};
-
 type MouseState = TabListSelection & {
   x: number;
   y: number;
   time: number;
 };
+
+function makeTiles(board: Readonly<CrosswordBoard>, left: number, top: number, width: number): Tile[] {
+  const { letters, plan } = board;
+
+  const tiles: Tile[] = [];
+  for (let i = 0; i < letters.length; i++) {
+    for (const cell of plan[letters[i]]) {
+      const x = left + i % width;
+      const y = top + Math.floor(i / width);
+      tiles.push({
+        x, y,
+        value: cell.value,
+        order: tiles.length + 1,
+        className: '',
+        transform: transform(x, y)
+      });
+    }
+  }
+
+  return tiles;
+}
 
 function makeLayout(cols: number, rows: number, charCount = 26) {
   const pad = 1; // 1 square padding
@@ -90,7 +92,7 @@ function makeLayout(cols: number, rows: number, charCount = 26) {
   };
 }
 
-type StaticLayout = Readonly<ReturnType<typeof makeLayout>>;
+type Layout = Readonly<ReturnType<typeof makeLayout>>;
 
 const DRAG_THRESHOLD = 4;
 
@@ -98,6 +100,28 @@ type DragData = {
   index: number;
   dragged?: boolean;
 };
+
+function makeLines(cells: ReadonlyArray<Readonly<Cell>>, left: number, top: number) {
+  const buf = [] as string[][];
+  for (const cell of cells) {
+    const x = cell.x + left;
+    const y = cell.y + top;
+
+    if (!cell.hasTop) {
+      buf.push([`${x},${y}`, `${x + 1},${y}`]);
+    }
+    if (!cell.hasRight) {
+      buf.push([`${x + 1},${y}`, `${x + 1},${y + 1}`]);
+    }
+    if (!cell.hasBottom) {
+      buf.push([`${x + 1},${y + 1}`, `${x},${y + 1}`]);
+    }
+    if (!cell.hasLeft) {
+      buf.push([`${x},${y + 1}`, `${x},${y}`]);
+    }
+  }
+  return buf;
+}
 
 function joinLines(a: string[], b: string[]): string[] | undefined {
   return a[a.length - 1] === b[0] ? a.concat(b.slice(1))
@@ -122,6 +146,65 @@ function mergeLines(lines: string[][]) {
   }
 }
 
+function makeFillPath(cells: ReadonlyArray<Readonly<Cell>>, layout: Readonly<Layout>): string {
+  const pad = layout.pad;
+  const left = layout.baseLeft;
+  const top = layout.baseTop;
+  const width = layout.baseRight - left + pad + pad;
+  const height = layout.baseBottom - top + pad + pad;
+
+  const lines = makeLines(cells, left, top);
+  mergeLines(lines);
+
+  let path = `M${left - pad} ${top - pad}v${height}h${width}v${-height}z`;
+  for (const shape of lines) {
+    path += 'M' + shape.join(' ') + (shape[0] === shape[shape.length - 1] ? 'z' : ' ');
+  }
+  return path;
+}
+
+function makeFailPath(
+  tiles: ReadonlyArray<Readonly<Tile>>,
+  layout: Readonly<Layout>,
+  showMistakes?: boolean,
+  skip?: Readonly<Tile>
+  ): string {
+  const pad = layout.pad;
+  const left = layout.baseLeft - pad;
+  const right = layout.baseRight + pad;
+  const top = layout.baseTop - pad;
+  const bottom = layout.baseBottom + pad;
+
+  const fails: {[key: string]: boolean} = {};
+
+  let failPath = '';
+  for (const tile of tiles) {
+    if (tile === skip) {
+      continue;
+    }
+
+    // restrict the area
+    if (tile.x >= left && tile.x < right && tile.y >= top && tile.y < bottom) {
+      if (
+        // the tile is not on a cell
+        !tile.list
+        // a pile of tiles
+        || tile.list.length > 3
+        // a pile of two or more tiles and no tile is draggged away
+        || (tile.list !== skip?.list && tile.list.length > 2)
+        // a mistake
+        || (showMistakes && tile.value !== tile.list.head.value)) {
+        const path = `M${tile.x} ${tile.y}h1v1h-1z`;
+        if (!fails[path]) {
+          fails[path] = true;
+          failPath += path;
+        }
+      }
+    }
+  }
+  return failPath;
+}
+
 @Component({
   selector: 'app-crossword-board',
   templateUrl: './crossword-board.component.html',
@@ -130,17 +213,12 @@ function mergeLines(lines: string[][]) {
 export class CrosswordBoardComponent implements OnInit, OnDestroy {
   private _mouse?: MouseState; // Word on click selection workaround.
   private _dragListener = new DragListener<DragData>();
-  private _play = new Autoplay();
-  private _grid: Readonly<Grid>;
+  private _player = new Autoplay();
   private _selection: TabListSelection;
-  private _showMistakes = false;
-  cols: number;
-  rows: number;
-  plan: CellMap;
-  cells: Cell[];
+  private _subs: Subscription[] = [];
+
   tiles: Tile[];
-  letters: ReadonlyArray<string>;
-  layout: StaticLayout;
+  layout: Layout;
   fillPath: string;
   wordPath: string;
   failPath: string;
@@ -156,43 +234,17 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return this._selection;
   }
 
-  @Input() set showMistakes(value: boolean) {
-    if (this._showMistakes === !value) {
-      this._showMistakes = value;
-      this._setMistakes();
-    }
-  }
-
-  get showMistakes() {
-    return this._showMistakes;
-  }
-
-  /* Crossword difficulty: number in the range [0, 1] */
-  @Input() difficulty = 0;
-
-  @Input() set grid(value: Readonly<Grid>) {
-    this._grid = value;
-    this.onNewPuzzle();
-  }
-
-  get grid() {
-    return this._grid;
-  }
-
   @Output() selectionChange = new EventEmitter<TabListSelection>();
-  @Output() boardChange = new EventEmitter<CellState[]>();
 
-  get isActive(): boolean {
-    return this.cells?.length > 0 && this.cells.findIndex((it) => it.isActive) >= 0;
+  get isSolved(): boolean | undefined {
+    const state = this.boardService.state;
+    return state.showMistakes && state.board?.isSolved;
   }
 
-  constructor(private _renderer: Renderer2) {
-    this.grid = { xWords: [], yWords: [], xMin: 0, xMax: 0, yMin: 0, yMax: 0 };
-  }
+  constructor(public boardService: CrosswordBoardService, private _renderer: Renderer2) {}
 
   ngOnInit(): void {
-    // tslint:disable-next-line: deprecation
-    this._dragListener.dragChange.subscribe(event => {
+    this._subs.push(this._dragListener.dragChange.subscribe(event => {
       this._mouse = undefined;
       switch (event) {
         case 'DragStart':
@@ -205,63 +257,26 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
           this._onDragStop();
           break;
       }
-    });
+    }));
+
+    this._subs.push(this.boardService.subscribe((state) => {
+      if (state.board) {
+        if (this.boardService.previousState.board !== state.board) {
+          this._onNewPuzzle();
+        } else if (state.stage === 'live' && state.showMistakes && !this.boardService.previousState.showMistakes) {
+          this._onBoardChange();
+        }
+      }
+    }));
   }
 
   ngOnDestroy(): void {
-    this._play.stop();
-  }
+    this._player.stop();
 
-  onNewPuzzle() {
-    this.cols = this._grid.xMax - this._grid.xMin;
-    this.rows = this._grid.yMax - this._grid.yMin;
-    this.plan = {};
-    this.cells = [];
-    this.tiles = [];
-    this.fillPath = '';
-    this.failPath = '';
-
-    for (const item of this._grid.xWords) {
-      const y = this._grid.yMin + item.y;
-      for (let i = item.letters.length; i-- > 0;) {
-        const x = this._grid.xMin + item.x + i;
-        const value = item.letters[i];
-        const row = this.plan[value] || (this.plan[value] = []);
-        let index = row.findIndex((c) => c.x === x && c.y === y);
-        if (index < 0) {
-          index = row.length;
-          row.push({ x, y, value });
-        }
-        row[index].hasLeft = i > 0;
-        row[index].hasRight = i < item.letters.length - 1;
-      }
+    for (const sub of this._subs) {
+      sub.unsubscribe();
     }
-
-    for (const item of this._grid.yWords) {
-      const x = this._grid.xMin + item.x;
-      for (let i = item.letters.length; i-- > 0;) {
-        const y = this._grid.yMin + item.y + i;
-        const value = item.letters[i];
-        const row = this.plan[value] || (this.plan[value] = []);
-        let index = row.findIndex((c) => c.x === x && c.y === y);
-        if (index < 0) {
-          index = row.length;
-          row.push({ x, y, value });
-        }
-        row[index].hasTop = i > 0;
-        row[index].hasBottom = i < item.letters.length - 1;
-      }
-    }
-
-    this.letters = Object.keys(this.plan).sort();
-    for (const key of this.letters) {
-      for (const cell of this.plan[key]) {
-        this.cells.push(cell);
-      }
-    }
-
-    this.layout = makeLayout(this.cols, this.rows, this.letters.length);
-    this._playIntro();
+    this._subs.length = 0;
   }
 
   onMouseDown(event: MouseEvent, index: number) {
@@ -318,26 +333,22 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   getXItemIndex(x: number, y: number): TabListSelection | null {
-    const grid = this._grid;
-    if (grid) {
-      for (let index = grid.xWords.length; index-- > 0;) {
-        const wx = grid.xWords[index];
-        if (y === wx.y && x >= wx.x && x < wx.x + wx.letters.length) {
-          return { groupIndex: Axis.x, itemIndex: index };
-        }
+    const board = this.boardService.state.board;
+    if (board) {
+      const itemIndex = board.getXWordIndex(x, y);
+      if (itemIndex >= 0) {
+        return { groupIndex: Axis.x, itemIndex };
       }
     }
     return null;
   }
 
   getYItemIndex(x: number, y: number): TabListSelection | null {
-    const grid = this._grid;
-    if (grid) {
-      for (let index = grid.yWords.length; index-- > 0;) {
-        const wy = grid.yWords[index];
-        if (x === wy.x && y >= wy.y && y < wy.y + wy.letters.length) {
-          return { groupIndex: Axis.y, itemIndex: index };
-        }
+    const board = this.boardService.state.board;
+    if (board) {
+      const itemIndex = board.getYWordIndex(x, y);
+      if (itemIndex >= 0) {
+        return { groupIndex: Axis.y, itemIndex };
       }
     }
     return null;
@@ -357,8 +368,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
     const rc = board.getBoundingClientRect();
 
-    const x = Math.floor((event.clientX - rc.left) / SQUARE_SIDE) - this.layout.baseLeft - this._grid.xMin;
-    const y = Math.floor((event.clientY - rc.top) / SQUARE_SIDE) - this.layout.baseTop - this._grid.yMin;
+    const x = Math.floor((event.clientX - rc.left) / SQUARE_SIDE) - this.layout.baseLeft;
+    const y = Math.floor((event.clientY - rc.top) / SQUARE_SIDE) - this.layout.baseTop;
 
     const sel = this.getItemIndex(x, y);
     if (sel) {
@@ -380,18 +391,6 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  onBoardChange() {
-    this._setMistakes();
-
-    this.boardChange.emit(this.cells.map((c) => ({
-      x: c.x,
-      y: c.y,
-      value: c.value,
-      isActive: c.isActive,
-      answer: c.next?.value
-    })));
-  }
-
   moveTileToFront(index: number) {
     const front = this.tiles[index];
     if (front) {
@@ -404,67 +403,31 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     front.order = this.tiles.length;
   }
 
-  isAllPairs() {
-    for (const cell of this.cells) {
-      if (cell.list?.length !== 2) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  getPairedCount() {
-    let count = 0;
-    for (const cell of this.cells) {
-      if (cell.list?.length === 2) {
-        count++;
-      }
-    }
-    return count;
-  }
-
   private _playIntro() {
-    const tiles = this._makeTiles();
+    const { board, difficulty } = this.boardService.state;
+    const layout = this.layout;
+
+    const tiles = makeTiles(board, layout.bankLeft, layout.bankTop, layout.bankRight - layout.bankLeft);
+
     let count = 0;
-    this._play.timeout = 50;
-    this._play.play(() => {
-      if (count < this.letters.length) {
-        const value = this.letters[count];
+    this._player.timeout = 50;
+    this._player.play(() => {
+      if (count < board.letters.length) {
+        const value = board.letters[count];
         this.tiles = this.tiles.concat(tiles.filter((tile) => tile.value === value));
         count++;
+        this.boardService.set({ stage: 'init' });
         return true;
       } else {
-        this._setBase(this.difficulty);
-        this._setFillPath();
-        this.onBoardChange();
+        this._setBase(board.cells, difficulty);
+        this.fillPath = makeFillPath(board.cells, layout);
+        this.boardService.set({ stage: 'live' });
         return false;
       }
     });
   }
 
-  private _makeTiles() {
-    const left = this.layout.bankLeft;
-    const top = this.layout.bankTop;
-    const width = this.layout.bankRight - this.layout.bankLeft;
-
-    const tiles: Tile[] = [];
-    for (let i = 0; i < this.letters.length; i++) {
-      for (const cell of this.plan[this.letters[i]]) {
-        const x = left + i % width;
-        const y = top + Math.floor(i / width);
-        tiles.push({
-          ...cell, x, y,
-          order: tiles.length + 1,
-          className: '',
-          transform: transform(x, y)
-        });
-      }
-    }
-
-    return tiles;
-  }
-
-  private _setBase(difficulty: number) {
+  private _setBase(cells: ReadonlyArray<Cell>, difficulty: number) {
     // Activate all the tiles
     for (const tile of this.tiles) {
       tile.isActive = true;
@@ -473,106 +436,38 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const left = this.layout.baseLeft;
     const top = this.layout.baseTop;
 
-    for (const cell of this.cells) {
+    for (const cell of cells) {
       cell.isActive = (Math.random() < difficulty) ||
         ((cell.hasBottom || cell.hasTop) && (cell.hasLeft || cell.hasRight));
       if (!cell.isActive) {
         const tile = this.tiles.find((it) => it.isActive && it.value === cell.value);
 
-        tile.isActive = false;
-        tile.x = cell.x + left;
-        tile.y = cell.y + top;
-        tile.transform = transform(tile.x, tile.y);
-        tile.className = 'transition_deal';
+        if (tile) {
+          cell.isStatic = true;
 
-        append(cell, tile);
+          tile.isActive = false;
+          tile.x = cell.x + left;
+          tile.y = cell.y + top;
+          tile.transform = transform(tile.x, tile.y);
+          tile.className = 'transition_deal';
+
+          append(cell, tile);
+        } else {
+          // Somehow someone was fast enough to deactivate the dedicated tile before intro finish.
+          // It's impossible. But the linter doesn't understand this. Let's reactivate the cell.
+          cell.isActive = true;
+        }
       }
     }
   }
 
-  private _setFillPath() {
-    const lines = this._getLines();
-    mergeLines(lines);
-
-    const pad = this.layout.pad;
-    const left = this.layout.baseLeft - pad;
-    const top = this.layout.baseTop - pad;
-    const width = this.layout.baseRight + pad - left;
-    const height = this.layout.baseBottom + pad - top;
-
-    let path = `M${left} ${top}v${height}h${width}v${-height}z`;
-    for (const shape of lines) {
-      path += 'M' + shape.join(' ') + (shape[0] === shape[shape.length - 1] ? 'z' : ' ');
-    }
-    this.fillPath = path;
-  }
-
   private _setFailPath() {
-    this.failPath = '';
-
-    const pad = this.layout.pad;
-    const left = this.layout.baseLeft - pad;
-    const right = this.layout.baseRight + pad;
-    const top = this.layout.baseTop - pad;
-    const bottom = this.layout.baseBottom + pad;
-
-    const fails: {[key: string]: boolean} = {};
-
+    const showMistakes = this.boardService.state.showMistakes;
     // skip dragged tile, if any
     const skip = (this._dragListener.isDragging && this._dragListener.data) ?
       this.tiles[this._dragListener.data.index] : undefined;
 
-    for (const tile of this.tiles) {
-      if (tile === skip) {
-        continue;
-      }
-
-      // restrict the area
-      if (tile.x >= left && tile.x < right && tile.y >= top && tile.y < bottom) {
-        if (
-          // the tile is not on a cell
-          !tile.list
-          // a pile of tiles
-          || tile.list.length > 3
-          // a pile of two or more tiles and no tile is draggged away
-          || (tile.list !== skip?.list && tile.list.length > 2)
-          // a mistake
-          || (this.showMistakes && tile.value !== tile.list.head.value)) {
-          const path = `M${tile.x} ${tile.y}h1v1h-1z`;
-          if (!fails[path]) {
-            fails[path] = true;
-            this.failPath += path;
-          }
-        }
-      }
-    }
-  }
-
-  private _getLines() {
-    const left = this.layout.baseLeft;
-    const top = this.layout.baseTop;
-
-    const buf = [] as string[][];
-    for (const key of this.letters) {
-      for (const cell of this.plan[key]) {
-        const x = cell.x + left;
-        const y = cell.y + top;
-
-        if (!cell.hasTop) {
-          buf.push([`${x},${y}`, `${x + 1},${y}`]);
-        }
-        if (!cell.hasRight) {
-          buf.push([`${x + 1},${y}`, `${x + 1},${y + 1}`]);
-        }
-        if (!cell.hasBottom) {
-          buf.push([`${x + 1},${y + 1}`, `${x},${y + 1}`]);
-        }
-        if (!cell.hasLeft) {
-          buf.push([`${x},${y + 1}`, `${x},${y}`]);
-        }
-      }
-    }
-    return buf;
+    this.failPath = makeFailPath(this.tiles, this.layout, showMistakes, skip);
   }
 
   private _onDragStart() {
@@ -605,7 +500,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   private _onDragStop() {
     const data = this._dragListener.data;
     const tile = this.tiles[data.index];
-    if (tile) {
+    const board = this.boardService.state.board;
+    if (tile && board) {
       let x = Math.round(tile.x + this._dragListener.pageDeltaX / SQUARE_SIDE);
       x = Math.max(0, Math.min(this.layout.width - 1, x));
       let y = Math.round(tile.y + this._dragListener.pageDeltaY / SQUARE_SIDE);
@@ -614,19 +510,11 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       tile.x = x;
       tile.y = y;
       tile.className = 'transition_fast';
-
-      // if (this.tiles.findIndex((it) => !it.isActive && it.x === x && it.y === y) < 0) {
-      //   tile.x = x;
-      //   tile.y = y;
-      //   tile.className = 'transition_fast';
-      // } else {
-      //   tile.className = 'transition_norm';
-      // }
       tile.transform = transform(tile.x, tile.y);
 
       const x0 = x - this.layout.baseLeft;
       const y0 = y - this.layout.baseTop;
-      const cell = this.cells.find((it) => it.x === x0 && it.y === y0);
+      const cell = board.findCell(x0, y0);
       if (cell) {
         append(cell, tile);
       } else {
@@ -637,12 +525,21 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
           this._moveAuto(tile);
         }
       }
-      // if (this.isAllPairs()) {
-      //   console.log('Done!');
-      // }
-      // console.log('Pairs:', this.getPairedCount());
 
-      this.onBoardChange();
+      this._onBoardChange();
+    }
+  }
+
+  private _onBoardChange(): void {
+    this._setMistakes();
+    this._setFailPath();
+
+    if (this.isSolved) {
+      this._player.timeout = 500;
+      this._player.play(() => {
+        this.boardService.set({ stage: 'done' });
+        return false;
+      });
     }
   }
 
@@ -659,48 +556,34 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _getNextCell(): Cell | undefined {
-    if (this._selection) {
+    const board = this.boardService.state.board;
+    if (board && this._selection) {
       const { groupIndex, itemIndex } = this._selection;
       if (groupIndex === Axis.x) {
-        const wx = this._grid.xWords[itemIndex];
-        if (wx) {
-          for (let dx = 0; dx < wx.letters.length; dx++) {
-            const cell = this.cells.find((it) => it.x === wx.x + dx && it.y === wx.y);
-            if (cell && !cell.list || cell.list.length <= 1) {
-              return cell;
-            }
-          }
-        }
+        return board.getXWordFreeCell(itemIndex);
       } else if (groupIndex === Axis.y) {
-        const wy = this._grid.yWords[itemIndex];
-        if (wy) {
-          for (let dy = 0; dy < wy.letters.length; dy++) {
-            const cell = this.cells.find((it) => it.x === wy.x && it.y === wy.y + dy);
-            if (cell && !cell.list || cell.list.length <= 1) {
-              return cell;
-            }
-          }
-        }
+        return board.getYWordFreeCell(itemIndex);
       }
     }
     return undefined;
   }
 
   private _getSelectionPath() {
-    if (this._selection && this._grid) {
+    const board = this.boardService.state.board;
+    if (board && this._selection) {
       const { groupIndex, itemIndex } = this._selection;
       if (groupIndex === Axis.x) {
-        const wx = this._grid.xWords[itemIndex];
+        const wx = board.xWords[itemIndex];
         if (wx) {
-          const x = this.layout.baseLeft + this._grid.xMin + wx.x;
-          const y = this.layout.baseTop + this._grid.yMin + wx.y + 1;
+          const x = this.layout.baseLeft + wx.x;
+          const y = this.layout.baseTop + wx.y + 1;
           return `M${x} ${y}v-1h${wx.letters.length}v1z`;
         }
       } else if (groupIndex === Axis.y) {
-        const wy = this._grid.yWords[itemIndex];
+        const wy = board.yWords[itemIndex];
         if (wy) {
-          const x = this.layout.baseLeft + this._grid.xMin + wy.x;
-          const y = this.layout.baseTop + this._grid.yMin + wy.y;
+          const x = this.layout.baseLeft + wy.x;
+          const y = this.layout.baseTop + wy.y;
           return `M${x} ${y}h1v${wy.letters.length}h-1z`;
         }
       }
@@ -709,11 +592,12 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _setMistakes() {
-    if (this._showMistakes) {
+    const { showMistakes, board } = this.boardService.state;
+    if (showMistakes && board) {
       const { baseLeft, baseTop, bankLeft, bankTop, bankRight } = this.layout;
       const bankWidth = bankRight - bankLeft;
 
-      for (const cell of this.cells) {
+      for (const cell of board.cells) {
         if (cell.isActive && cell.next?.value === cell.value) {
           const tile = cell.next as Tile;
           cell.isActive = tile.isActive = false;
@@ -727,7 +611,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
             const extra = cell.list.tail as Tile;
             detach(extra);
 
-            const i = this.letters.findIndex((it) => it === extra.value);
+            const i = board.findLetterIndex(extra.value);
             extra.x = bankLeft + i % bankWidth;
             extra.y = bankTop + Math.floor(i / bankWidth);
             extra.transform = transform(extra.x, extra.y);
@@ -736,6 +620,17 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
         }
       }
     }
-    this._setFailPath();
+  }
+
+  private _onNewPuzzle() {
+    this._player.stop();
+
+    const { cols, rows, letters } = this.boardService.state.board;
+
+    this.tiles = [];
+    this.fillPath = '';
+    this.failPath = '';
+    this.layout = makeLayout(cols, rows, letters.length);
+    this._playIntro();
   }
 }
