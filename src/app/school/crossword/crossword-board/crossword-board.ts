@@ -9,6 +9,7 @@ export type Cell = Linkable<Cell> & Point & {
   value: string;
   isActive?: boolean;
   isStatic?: boolean;
+  hasError?: boolean;
   // neighbours, if any
   hasLeft?: boolean;
   hasRight?: boolean;
@@ -198,6 +199,14 @@ export class CrosswordBoard {
     while (index-- > 0 && letter !== letters[index]) {
     }
     return index;
+  }
+
+  markErrors(): void {
+    for (const cell of this.cells) {
+      if (cell.isActive && cell.next && cell.next.value !== cell.value) {
+        cell.hasError = true;
+      }
+    }
   }
 
   // emit(event: BoardEvent): void {

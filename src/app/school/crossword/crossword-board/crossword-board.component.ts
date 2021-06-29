@@ -205,6 +205,17 @@ function makeFailPath(
   return failPath;
 }
 
+// function makeSlipPath(cells: ReadonlyArray<Readonly<Cell>>, left: number, top: number): string {
+//   let slipPath = '';
+//   for (const cell of cells) {
+//     if (cell.hasError) {
+//       slipPath +=
+//         `M${left + cell.x} ${top + cell.y}c0.28-0.28 0.72-0.28 1 0s0.28 0.72 0 1-0.72 0.28-1 0-0.28-0.72 0-1z`;
+//     }
+//   }
+//   return slipPath;
+// }
+
 @Component({
   selector: 'app-crossword-board',
   templateUrl: './crossword-board.component.html',
@@ -219,9 +230,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   tiles: Tile[];
   layout: Layout;
+
+  failPath: string;
   fillPath: string;
   wordPath: string;
-  failPath: string;
 
   @ViewChildren('tiles') tileList: QueryList<ElementRef<HTMLElement>>;
 
@@ -235,6 +247,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   @Output() selectionChange = new EventEmitter<TabListSelection>();
+
+  get isDone(): boolean {
+    return this.boardService.state.stage === 'done';
+  }
 
   get isSolved(): boolean | undefined {
     const state = this.boardService.state;
@@ -605,6 +621,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
           tile.y = cell.y + baseTop;
           tile.transform = transform(tile.x, tile.y);
           tile.className = 'transition_deal';
+          if (cell.hasError) {
+            tile.hasError = true;
+            tile.className += ' has_error';
+          }
 
           // Move any extra tiles to the bank.
           while (cell.list?.length > 2) {
@@ -619,6 +639,8 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
           }
         }
       }
+
+      board.markErrors();
     }
   }
 

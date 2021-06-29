@@ -87,22 +87,12 @@ line.crossword-line {
   transition: opacity 1s ease-in;
 }
 
-.solved line.crossword-line {
-  opacity: 0;
-}
-
 path.crossword-fill {
   stroke: none;
   // stroke-dasharray: 100;
   fill: rgba(0, 0, 0, 0.15);
   animation: keyframes-fade-in 2s ease 1;
   transition: fill 1.5s ease-in;
-}
-
-.solved path.crossword-fill {
-  stroke: green;
-  stroke-width: 0.04px;
-  fill: rgba(40, 240, 40, 0.3);
 }
 
 path.crossword-fail {
@@ -179,12 +169,6 @@ div.crossword-sign {
   background-size: 100% 100%;
 }
 
-.solved div.crossword-sign {
-  display: block;
-  animation: bounce-in-bck 1.1s both;
-  transform-origin: bottom right;
-}
-
 // button.crossword-check {
 //   position: absolute;
 //   right: 0;
@@ -194,3 +178,31 @@ div.crossword-sign {
 //   width: 4 * $X;
 //   height: 2 * $X;
 // }
+
+.solved {
+  line.crossword-line {
+    opacity: 0;
+  }
+
+  path.crossword-fill {
+    stroke: green;
+    stroke-width: 0.04px;
+    fill: rgba(40, 240, 40, 0.3);
+  }
+
+  div.crossword-sign {
+    display: block;
+    animation: bounce-in-bck 1.1s both;
+    transform-origin: bottom right;
+  }
+
+  .crossword-tile {
+    transition: all 2s ease;
+    background-color: transparent;
+    border-radius: unset;
+
+    &.has_error {
+      background-color: #ee88aa;
+    }
+  }
+}

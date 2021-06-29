@@ -1,5 +1,5 @@
 <ng-container *ngIf="boardService.state.board">
-  <div #board class="crossword-board" [class.solved]="isSolved" (mousedown)="onBoardMouse($event, board, true)"
+  <div #board class="crossword-board" [class.solved]="isDone" (mousedown)="onBoardMouse($event, board, true)"
     (mouseup)="onBoardMouse($event, board, false)" (touchstart)="onTouchStart($event)" (touchend)="onTouchStop($event)"
     (touchcancel)="onTouchStop($event)" (touchmove)="onTouchMove($event)">
     <app-squared-paper [colNum]="layout.width" [rowNum]="layout.height">
