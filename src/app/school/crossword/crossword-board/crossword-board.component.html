@@ -1,4 +1,4 @@
-<ng-container *ngIf="boardService.state.board">
+<ng-container *ngIf="gamester.state.game">
   <div #board class="crossword-board" [class.solved]="isDone" (mousedown)="onBoardMouse($event, board, true)"
     (mouseup)="onBoardMouse($event, board, false)" (touchstart)="onTouchStart($event)" (touchend)="onTouchStop($event)"
     (touchcancel)="onTouchStop($event)" (touchmove)="onTouchMove($event)">

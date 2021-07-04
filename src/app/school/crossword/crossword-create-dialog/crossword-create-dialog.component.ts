@@ -3,14 +3,10 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Data } from '../crossword-data-tree/crossword-data-tree.component';
-import { Grid, normalize, toWord } from '../crossword-model';
+import { CrosswordGame } from '../crossword-game';
+import { normalize, toWord } from '../crossword-model';
 import { CrosswordMakerService } from '../services/crossword-maker.service';
 import { CrosswordDifficultyNames, CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
-
-export type Game = Grid & {
-  xClues: string[];
-  yClues: string[];
-};
 
 @Component({
   selector: 'app-crossword-create-dialog',
@@ -56,20 +52,17 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
     this.subscription = this.maker.subscribe((state) => {
       if (this.closeOnSuccess && !state.isWorking && state.grid) {
         const grid = state.grid;
+
+        const cols = grid.xMax - grid.xMin;
+        const rows = grid.yMax - grid.yMin;
+
         const xWords = normalize(grid.xWords, -grid.xMin, -grid.yMin);
         const yWords = normalize(grid.yWords, -grid.xMin, -grid.yMin);
 
-        const game: Game = {
-          xWords,
-          yWords,
-          xMin: 0,
-          xMax: grid.xMax - grid.xMin,
-          yMin: 0,
-          yMax: grid.yMax - grid.yMin,
-          xClues: xWords.map((wx) => this.data[toWord(wx.letters)]),
-          yClues: yWords.map((wy) => this.data[toWord(wy.letters)]),
-        };
+        const xClues = xWords.map((wx) => this.data[toWord(wx.letters)]);
+        const yClues = yWords.map((wy) => this.data[toWord(wy.letters)]);
 
+        const game = new CrosswordGame(cols, rows, xWords, yWords, xClues, yClues);
         this.dialogRef.close(game);
       }
     });

@@ -1,9 +1,9 @@
 // tslint:disable: variable-name
-import { Subject } from 'rxjs';
+// import { Subject } from 'rxjs';
 
 import { Linkable } from 'src/app/common/linkable';
 import { Point } from 'src/app/common/math2d';
-import { Grid, Word } from '../crossword-model';
+import { Word } from './crossword-model';
 
 export type Cell = Linkable<Cell> & Point & {
   value: string;
@@ -66,18 +66,12 @@ export function toCells(plan: Readonly<CellMap>, letters: ReadonlyArray<string>)
 
 // export type BoardEvent = 'init' | 'move' | 'done';
 
-export class CrosswordBoard {
+export class CrosswordGame {
   // private readonly _events = new Subject<BoardEvent>();
 
   // get boardChange() {
   //   return this._events.asObservable();
   // }
-
-  readonly cols: number;
-  readonly rows: number;
-
-  readonly xWords: ReadonlyArray<Readonly<Word>>;
-  readonly yWords: ReadonlyArray<Readonly<Word>>;
 
   readonly cells: ReadonlyArray<Cell>;
   readonly letters: ReadonlyArray<string>;
@@ -126,13 +120,13 @@ export class CrosswordBoard {
     return count > 0 ? (100 * (count - this.countActive) / count) : 0;
   }
 
-  constructor(grid: Readonly<Grid>) {
-    this.cols = grid.xMax - grid.xMin;
-    this.rows = grid.yMax - grid.yMin;
-
-    this.xWords = grid.xWords.map((w) => ({ letters: w.letters, x: w.x - grid.xMin, y: w.y - grid.yMin }));
-    this.yWords = grid.yWords.map((w) => ({ letters: w.letters, x: w.x - grid.xMin, y: w.y - grid.yMin }));
-
+  constructor(
+    readonly cols: number,
+    readonly rows: number,
+    readonly xWords: ReadonlyArray<Readonly<Word>>,
+    readonly yWords: ReadonlyArray<Readonly<Word>>,
+    readonly xClues: ReadonlyArray<string>,
+    readonly yClues: ReadonlyArray<string>) {
     this.plan = toCellMap(this.xWords, this.yWords);
     this.letters = Object.keys(this.plan).sort();
     this.cells = toCells(this.plan, this.letters);

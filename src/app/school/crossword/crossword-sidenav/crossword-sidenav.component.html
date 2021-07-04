@@ -15,11 +15,11 @@
       <button mat-list-item (click)="openCreateDialog()">
         <mat-icon>developer_board</mat-icon>Create...
       </button>
-      <ng-container *ngIf="boardService.state.board as board">
-        <button mat-list-item [disabled]="showMistakes" (click)="boardService.set({ showMistakes: true })">
+      <ng-container *ngIf="gamester.state.game as game">
+        <button mat-list-item [disabled]="showMistakes" (click)="gamester.set({ showMistakes: true })">
           <mat-icon [ngClass]="showMistakesIconClassName">{{showMistakesIcon}}</mat-icon>{{showMistakesText}}
-          <mat-progress-bar style="margin-left: 1em;" *ngIf="showMistakes && !board.isSolved" mode="determinate"
-            [value]="board.progress"></mat-progress-bar>
+          <mat-progress-bar style="margin-left: 1em;" *ngIf="showMistakes && !game.isSolved" mode="determinate"
+            [value]="game.progress"></mat-progress-bar>
         </button>
       </ng-container>
       <!-- <button mat-list-item > Undo </button> -->

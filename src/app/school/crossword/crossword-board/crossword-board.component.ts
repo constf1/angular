@@ -8,8 +8,8 @@ import { append, detach } from 'src/app/common/linkable';
 import { TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
 
 import { SQUARE_SIDE, transform } from '../../squared-paper/squared-paper.component';
-import { Cell, CrosswordBoard } from './crossword-board';
-import { CrosswordBoardService } from './crossword-board.service';
+import { Cell, CrosswordGame } from '../crossword-game';
+import { CrosswordGameService } from '../services/crossword-game.service';
 
 enum Axis { x = 0, y = 1 }
 
@@ -25,7 +25,7 @@ type MouseState = TabListSelection & {
   time: number;
 };
 
-function makeTiles(board: Readonly<CrosswordBoard>, left: number, top: number, width: number): Tile[] {
+function makeTiles(board: Readonly<CrosswordGame>, left: number, top: number, width: number): Tile[] {
   const { letters, plan } = board;
 
   const tiles: Tile[] = [];
@@ -249,15 +249,15 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   @Output() selectionChange = new EventEmitter<TabListSelection>();
 
   get isDone(): boolean {
-    return this.boardService.state.stage === 'done';
+    return this.gamester.state.stage === 'done';
   }
 
   get isSolved(): boolean | undefined {
-    const state = this.boardService.state;
-    return state.showMistakes && state.board?.isSolved;
+    const state = this.gamester.state;
+    return state.showMistakes && state.game?.isSolved;
   }
 
-  constructor(public boardService: CrosswordBoardService, private _renderer: Renderer2) {}
+  constructor(public gamester: CrosswordGameService, private _renderer: Renderer2) {}
 
   ngOnInit(): void {
     this._subs.push(this._dragListener.dragChange.subscribe(event => {
@@ -275,11 +275,11 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
       }
     }));
 
-    this._subs.push(this.boardService.subscribe((state) => {
-      if (state.board) {
-        if (this.boardService.previousState.board !== state.board) {
+    this._subs.push(this.gamester.subscribe((state) => {
+      if (state.game) {
+        if (this.gamester.previousState.game !== state.game) {
           this._onNewPuzzle();
-        } else if (state.stage === 'live' && state.showMistakes && !this.boardService.previousState.showMistakes) {
+        } else if (state.stage === 'live' && state.showMistakes && !this.gamester.previousState.showMistakes) {
           this._onBoardChange();
         }
       }
@@ -349,7 +349,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   getXItemIndex(x: number, y: number): TabListSelection | null {
-    const board = this.boardService.state.board;
+    const board = this.gamester.state.game;
     if (board) {
       const itemIndex = board.getXWordIndex(x, y);
       if (itemIndex >= 0) {
@@ -360,7 +360,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   getYItemIndex(x: number, y: number): TabListSelection | null {
-    const board = this.boardService.state.board;
+    const board = this.gamester.state.game;
     if (board) {
       const itemIndex = board.getYWordIndex(x, y);
       if (itemIndex >= 0) {
@@ -420,7 +420,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _playIntro() {
-    const { board, difficulty } = this.boardService.state;
+    const { game: board, difficulty } = this.gamester.state;
     const layout = this.layout;
 
     const tiles = makeTiles(board, layout.bankLeft, layout.bankTop, layout.bankRight - layout.bankLeft);
@@ -432,12 +432,12 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
         const value = board.letters[count];
         this.tiles = this.tiles.concat(tiles.filter((tile) => tile.value === value));
         count++;
-        this.boardService.set({ stage: 'init' });
+        this.gamester.set({ stage: 'init' });
         return true;
       } else {
         this._setBase(board.cells, difficulty);
         this.fillPath = makeFillPath(board.cells, layout);
-        this.boardService.set({ stage: 'live' });
+        this.gamester.set({ stage: 'live' });
         return false;
       }
     });
@@ -478,7 +478,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _setFailPath() {
-    const showMistakes = this.boardService.state.showMistakes;
+    const showMistakes = this.gamester.state.showMistakes;
     // skip dragged tile, if any
     const skip = (this._dragListener.isDragging && this._dragListener.data) ?
       this.tiles[this._dragListener.data.index] : undefined;
@@ -516,7 +516,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   private _onDragStop() {
     const data = this._dragListener.data;
     const tile = this.tiles[data.index];
-    const board = this.boardService.state.board;
+    const board = this.gamester.state.game;
     if (tile && board) {
       let x = Math.round(tile.x + this._dragListener.pageDeltaX / SQUARE_SIDE);
       x = Math.max(0, Math.min(this.layout.width - 1, x));
@@ -553,7 +553,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     if (this.isSolved) {
       this._player.timeout = 500;
       this._player.play(() => {
-        this.boardService.set({ stage: 'done' });
+        this.gamester.set({ stage: 'done' });
         return false;
       });
     }
@@ -572,7 +572,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _getNextCell(): Cell | undefined {
-    const board = this.boardService.state.board;
+    const board = this.gamester.state.game;
     if (board && this._selection) {
       const { groupIndex, itemIndex } = this._selection;
       if (groupIndex === Axis.x) {
@@ -585,7 +585,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _getSelectionPath() {
-    const board = this.boardService.state.board;
+    const board = this.gamester.state.game;
     if (board && this._selection) {
       const { groupIndex, itemIndex } = this._selection;
       if (groupIndex === Axis.x) {
@@ -608,7 +608,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   }
 
   private _setMistakes() {
-    const { showMistakes, board } = this.boardService.state;
+    const { showMistakes, game: board } = this.gamester.state;
     if (showMistakes && board) {
       const { baseLeft, baseTop, bankLeft, bankTop, bankRight } = this.layout;
       const bankWidth = bankRight - bankLeft;
@@ -647,7 +647,7 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
   private _onNewPuzzle() {
     this._player.stop();
 
-    const { cols, rows, letters } = this.boardService.state.board;
+    const { cols, rows, letters } = this.gamester.state.game;
 
     this.tiles = [];
     this.fillPath = '';

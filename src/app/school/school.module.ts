@@ -16,7 +16,6 @@ import { MathExpressionDialogComponent } from './math/math-expression-dialog/mat
 import { SimpleMultiplicationComponent } from './math/simple-multiplication/simple-multiplication.component';
 
 import { CrosswordBoardComponent } from './crossword/crossword-board/crossword-board.component';
-import { CrosswordGameComponent } from './crossword/crossword-game/crossword-game.component';
 import { CrosswordMakerService } from './crossword/services/crossword-maker.service';
 import { CrosswordSettingsService } from './crossword/services/crossword-settings.service';
 
@@ -27,6 +26,7 @@ import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/w
 import { CrosswordSidenavComponent } from './crossword/crossword-sidenav/crossword-sidenav.component';
 import { CrosswordCreateDialogComponent } from './crossword/crossword-create-dialog/crossword-create-dialog.component';
 import { CrosswordDataTreeComponent } from './crossword/crossword-data-tree/crossword-data-tree.component';
+import { CrosswordUpshotComponent } from './crossword/crossword-upshot/crossword-upshot.component';
 
 /**
  * Routes:
@@ -36,6 +36,7 @@ const routes: Routes = [
   { path: 'word-puzzle', component: WordSearchGameComponent },
   { path: 'missing-letters', component: MissingLettersComponent },
   { path: 'crossword', component: CrosswordSidenavComponent },
+  { path: 'crossword-upshot', component: CrosswordUpshotComponent },
   { path: '', component: MentalMathComponent },
 ];
 
@@ -54,10 +55,10 @@ const routes: Routes = [
     MissingLettersComponent,
     SimpleDiffComponent,
     CrosswordBoardComponent,
-    CrosswordGameComponent,
     CrosswordSidenavComponent,
     CrosswordCreateDialogComponent,
-    CrosswordDataTreeComponent
+    CrosswordDataTreeComponent,
+    CrosswordUpshotComponent
   ],
   imports: [
     RouterModule.forChild(routes),
