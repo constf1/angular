@@ -16,12 +16,13 @@ addEventListener('message', (event: MessageEvent<CrosswordWorkerInput>) => {
     let skipCount = 0;
     let index = 0;
     let input: Grid[];
+
     player.play(() => {
-      let output: Grid[];
       if (index === 0) {
+        // Initialization.
         shuffle(words);
         const letters = toLetters(words[index]);
-        output = [{
+        input = [{
           xWords: [{ letters, x: 0, y: 0 }],
           yWords: [],
           xMin: 0,
@@ -30,38 +31,39 @@ addEventListener('message', (event: MessageEvent<CrosswordWorkerInput>) => {
           yMax: 1
         }];
         skipCount = 0;
+        index = 1;
       } else {
+        // Next iteration.
         const letters = toLetters(words[index]);
-        output = [];
+        let output: Grid[] = [];
         for (const node of input) {
           getNext(node, letters, output);
         }
         output = output.filter((gr) => (gr.xMax - gr.xMin <= maxWidth && gr.yMax - gr.yMin <= maxHeight));
+
+        if (output.length < 1) {
+          skipCount += 1;
+
+          const w = words[index];
+          words.splice(index, 1);
+          words.push(w);
+        } else {
+          skipCount = 0;
+          index += 1;
+          input = sifter(words, index, output);
+        }
       }
 
-      if (output.length === 0) {
-        skipCount += 1;
-
-        const w = words[index];
-        words.splice(index, 1);
-        words.push(w);
-      } else {
-        skipCount = 0;
-        index += 1;
-        input = sifter(words, index, output);
-      }
-
-      let grid: Grid | null = null;
-      if (input.length > 0) {
-        grid = randomItem(input);
-      } else {
+      // Comprehend results.
+      const done = input.length < 1 || index + skipCount >= words.length;
+      if (done) {
         index = 0;
         count--;
       }
 
-      const isWorking = (index + skipCount < words.length && count > 0);
+      const isWorking = (!done || (count > 0 && skipCount > 0));
 
-      const response: CrosswordWorkerOutput = { requestId, isWorking, grid };
+      const response: CrosswordWorkerOutput = { requestId, isWorking, grid: input.length > 0 ? randomItem(input) : null };
       postMessage(response);
 
       return isWorking;
