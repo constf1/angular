@@ -26,7 +26,8 @@ import { WordSearchGameComponent, WordSearchGameSvgComponent } from './english/w
 import { CrosswordSidenavComponent } from './crossword/crossword-sidenav/crossword-sidenav.component';
 import { CrosswordCreateDialogComponent } from './crossword/crossword-create-dialog/crossword-create-dialog.component';
 import { CrosswordDataTreeComponent } from './crossword/crossword-data-tree/crossword-data-tree.component';
-import { CrosswordUpshotComponent } from './crossword/crossword-upshot/crossword-upshot.component';
+// import { CrosswordUpshotComponent } from './crossword/crossword-upshot/crossword-upshot.component';
+import { CrosswordStatsDialogComponent } from './crossword/crossword-stats-dialog/crossword-stats-dialog.component';
 
 /**
  * Routes:
@@ -36,7 +37,7 @@ const routes: Routes = [
   { path: 'word-puzzle', component: WordSearchGameComponent },
   { path: 'missing-letters', component: MissingLettersComponent },
   { path: 'crossword', component: CrosswordSidenavComponent },
-  { path: 'crossword-upshot', component: CrosswordUpshotComponent },
+  // { path: 'crossword-upshot', component: CrosswordUpshotComponent },
   { path: '', component: MentalMathComponent },
 ];
 
@@ -58,7 +59,8 @@ const routes: Routes = [
     CrosswordSidenavComponent,
     CrosswordCreateDialogComponent,
     CrosswordDataTreeComponent,
-    CrosswordUpshotComponent
+    // CrosswordUpshotComponent,
+    CrosswordStatsDialogComponent
   ],
   imports: [
     RouterModule.forChild(routes),

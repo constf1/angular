@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Crossword Results <mat-icon *ngIf="isFlawless" color="accent">verified</mat-icon></h1>
+<div mat-dialog-content>
+  <div [class.flawless]="percentDifficulty === 100">
+    Difficulty Level: <span class="percent">{{percentDifficulty}}</span><span>({{difficulty}})</span>
+  </div>
+  <div>
+    Solved
+    <ul>
+      <li [class.flawless]="percentWords === 100">
+        Words: <span class="percent">{{percentWords}}</span>(<span>{{data.wordSolved}} of {{data.wordTotal}}</span>).
+      </li>
+      <li [class.flawless]="percentLetters === 100">
+        Letters: <span class="percent">{{percentLetters}}</span>(<span>{{data.letterSolved}} of {{data.letterTotal - data.letterStatic}})</span>.
+      </li>
+    </ul>
+  </div>
+</div>

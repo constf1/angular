@@ -1,0 +1,13 @@
+.percent {
+  &::after {
+    content: "%";
+    padding-right: 0.5em;
+  }
+}
+
+.flawless {
+  .percent {
+    color: blue;
+    font-weight: 600;
+  }
+}
