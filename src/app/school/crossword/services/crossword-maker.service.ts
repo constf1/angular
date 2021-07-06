@@ -59,10 +59,10 @@ export class CrosswordMakerService extends StateSubject<CrosswordMakerState> {
     }
     this.stop();
 
+    const tryCount = words.length < 100 ? words.length < 50 ? words.length < 25 ? 8 : 4 : 2 : 1;
     const requestId = JSON.stringify(words);
     const message: CrosswordWorkerInput = {
-      requestId, maxWidth, maxHeight,
-      tryCount: 2,
+      requestId, maxWidth, maxHeight, tryCount,
       words: words.slice()
     };
     this._worker.postMessage(message);
