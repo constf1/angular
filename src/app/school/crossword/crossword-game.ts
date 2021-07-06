@@ -95,6 +95,16 @@ export class CrosswordGame {
     return false;
   }
 
+  get countSolved(): number {
+    let count = 0;
+    for (const cell of this.cells) {
+      if (!(cell.isStatic || cell.hasError) && cell.next && cell.next.value === cell.value) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   get countStatic(): number {
     let count = 0;
     for (const cell of this.cells) {
@@ -201,6 +211,32 @@ export class CrosswordGame {
         cell.hasError = true;
       }
     }
+  }
+
+  getSolvedXWordIndices(): number[] {
+    const indices = this.xWords.map((_, index) => index);
+    for (const cell of this.cells) {
+      if (cell.hasError || cell.next?.value !== cell.value) {
+        const i = this.getXWordIndex(cell.x, cell.y);
+        if (i >= 0) {
+          indices[i] = -1;
+        }
+      }
+    }
+    return indices.filter((index) => index >= 0);
+  }
+
+  getSolvedYWordIndices(): number[] {
+    const indices = this.yWords.map((_, index) => index);
+    for (const cell of this.cells) {
+      if (cell.hasError || cell.next?.value !== cell.value) {
+        const i = this.getYWordIndex(cell.x, cell.y);
+        if (i >= 0) {
+          indices[i] = -1;
+        }
+      }
+    }
+    return indices.filter((index) => index >= 0);
   }
 
   // emit(event: BoardEvent): void {

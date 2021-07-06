@@ -8,6 +8,8 @@ import { TabListGroup, TabListSelection } from 'src/app/core/components/tab-list
 import { CrosswordGameService } from '../services/crossword-game.service';
 import { CrosswordCreateDialogComponent } from '../crossword-create-dialog/crossword-create-dialog.component';
 import { CrosswordSettingsService, maxState, minState } from '../services/crossword-settings.service';
+import { CrosswordStatsDialogComponent } from '../crossword-stats-dialog/crossword-stats-dialog.component';
+import { getStats } from '../crossword-stats';
 
 @Component({
   selector: 'app-crossword-sidenav',
@@ -38,6 +40,11 @@ export class CrosswordSidenavComponent implements OnInit, OnDestroy {
     const hi = maxState.crosswordDifficulty;
     const di = this.settings.state.crosswordDifficulty;
     return (di - lo) / (hi - lo);
+  }
+
+  get isActionDisabled() {
+    const state = this.gamester.state;
+    return !state.game || (state.showMistakes && state.stage !== 'done');
   }
 
   get showMistakes() {
@@ -109,5 +116,16 @@ export class CrosswordSidenavComponent implements OnInit, OnDestroy {
     }
     this.clues[selection.groupIndex].selection = selection.itemIndex;
     this.selection = selection;
+  }
+
+  onAction() {
+    if (!this.gamester.state.showMistakes) {
+      this.gamester.set({ showMistakes: true });
+    } else {
+      const { stage, game } = this.gamester.state;
+      if (game && stage === 'done') {
+        this.dialog.open(CrosswordStatsDialogComponent, { data: getStats(game) });
+      }
+    }
   }
 }

@@ -16,7 +16,7 @@
         <mat-icon>developer_board</mat-icon>Create...
       </button>
       <ng-container *ngIf="gamester.state.game as game">
-        <button mat-list-item [disabled]="showMistakes" (click)="gamester.set({ showMistakes: true })">
+        <button mat-list-item [disabled]="isActionDisabled" (click)="onAction()">
           <mat-icon [ngClass]="showMistakesIconClassName">{{showMistakesIcon}}</mat-icon>{{showMistakesText}}
           <mat-progress-bar style="margin-left: 1em;" *ngIf="showMistakes && !game.isSolved" mode="determinate"
             [value]="game.progress"></mat-progress-bar>
