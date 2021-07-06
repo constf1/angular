@@ -1,0 +1,15 @@
+<h2>Your Statistics</h2>
+<table>
+  <caption>Crossword Results</caption>
+  <thead>
+    <tr>
+      <th scope="col" *ngFor="let label in labels">{{label}}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of items;trackBy:trackByWord">
+      <th scope="row">{{item.word}}</th>
+      <td>{{item.clue}}</td>
+    </tr>
+  </tbody>
+</table>
