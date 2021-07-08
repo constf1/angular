@@ -1,3 +1,27 @@
+@keyframes twist-in {
+  0% {
+    transform: rotate(-1200deg);
+    opacity: 0;
+  }
+
+  59% {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
+
+  60% {
+    transform: scale(1);
+  }
+
+  85% {
+    transform: scale(2);
+  }
+
+  100% {
+    transform: scale(1.5);
+  }
+}
+
 .percent {
   &::after {
     content: "%";
@@ -9,5 +33,21 @@
   .percent {
     color: blue;
     font-weight: 600;
+  }
+}
+
+h1.flawless {
+  >mat-icon {
+    animation: twist-in 1.4s both 1s;
+    // transform-origin: center;
+  }
+}
+
+mat-progress-bar {
+  opacity: 0;
+  transition: opacity 1s ease;
+
+  &[active=true] {
+    opacity: 1;
   }
 }

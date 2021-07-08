@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CrosswordStats } from '../crossword-stats';
 
@@ -7,12 +7,13 @@ import { CrosswordStats } from '../crossword-stats';
   templateUrl: './crossword-stats-dialog.component.html',
   styleUrls: ['./crossword-stats-dialog.component.scss']
 })
-export class CrosswordStatsDialogComponent implements OnInit {
+export class CrosswordStatsDialogComponent implements OnInit, AfterViewInit {
   difficulty: string;
 
   percentDifficulty: number;
   percentLetters: number;
   percentWords: number;
+  percentTotal: number;
 
   isFlawless = false;
 
@@ -21,6 +22,7 @@ export class CrosswordStatsDialogComponent implements OnInit {
     this.percentDifficulty = 0;
     this.percentLetters = 0;
     this.percentWords = 0;
+    this.percentTotal = 0;
 
     const { letterTotal, letterStatic, letterSolved, wordTotal, wordSolved } = data;
 
@@ -52,6 +54,15 @@ export class CrosswordStatsDialogComponent implements OnInit {
       this.percentWords = Math.round(wordSolved * 100 / wordTotal);
 
       this.isFlawless = letterSolved === letterTotal;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    const { letterTotal, letterSolved } = this.data;
+    if (letterSolved > 0 && letterTotal > 0) {
+      setTimeout(() => {
+        this.percentTotal = letterSolved * 100 / letterTotal;
+      }, 1000);
     }
   }
 

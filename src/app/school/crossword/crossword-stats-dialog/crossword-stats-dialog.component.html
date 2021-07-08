@@ -1,6 +1,7 @@
-<h1 mat-dialog-title>Crossword Results <mat-icon *ngIf="isFlawless" color="accent">verified</mat-icon></h1>
+<h1 [class.flawless]="isFlawless" mat-dialog-title>Crossword Results <mat-icon *ngIf="isFlawless" color="accent">verified</mat-icon></h1>
 <div mat-dialog-content>
-  <div [class.flawless]="percentDifficulty === 100">
+  <mat-progress-bar [attr.active]="percentTotal > 0" [value]="percentTotal" [color]="isFlawless ? 'accent' : 'primary'"></mat-progress-bar>
+  <div [class.flawless]="percentDifficulty === 100" style="padding-top: 1em;">
     Difficulty Level: <span class="percent">{{percentDifficulty}}</span><span>({{difficulty}})</span>
   </div>
   <div>
