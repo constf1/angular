@@ -179,14 +179,26 @@ div.crossword-sign {
 //   height: 2 * $X;
 // }
 
+@keyframes path-in-animation {
+  0% {
+    stroke-dashoffset: -100px;
+  }
+
+  100% {
+    stroke-dashoffset: 0px;
+  }
+}
+
 .solved {
   line.crossword-line {
     opacity: 0;
   }
 
   path.crossword-fill {
+    animation: path-in-animation 5s 1 linear 0.5s both;
     stroke: rgb(0, 128, 0);
     stroke-width: 0.04px;
+    stroke-dasharray: 100px;
     fill: rgba(0, 128, 0, 0.2);
   }
 
