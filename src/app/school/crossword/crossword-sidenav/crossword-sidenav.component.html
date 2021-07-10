@@ -26,9 +26,16 @@
     </mat-action-list>
     <div *ngIf="clues" style="margin: 1em;">
       <h3>Clues</h3>
-      <app-tab-list [groups]="clues" [selection]="selection" [panelStyle]="{ maxHeight: '30em', overflowY: 'auto' }"
+      <app-tab-list [groups]="clues" [selection]="selection" [panelStyle]="{ maxHeight: '24em', overflowY: 'auto' }"
         (selectionChange)="onSelectionChange($event)">
       </app-tab-list>
+      <mat-form-field appearance="standard" style="width: 100%;margin-top: 0.5em;">
+        <mat-label>{{inputInfo}}</mat-label>
+        <input matInput type="text" autocomplete="off" placeholder="..." (keydown)="onInputKeyDown($event)"
+          [disabled]="isInputDisabled" [errorStateMatcher]="inputState" [(ngModel)]="inputState.value">
+        <mat-hint *ngIf="!isInputDisabled">You can type your answer here.</mat-hint>
+        <mat-error *ngIf="inputState.isErrorState()">{{inputState.error}}</mat-error>
+      </mat-form-field>
     </div>
 
     <!-- <mat-accordion>
