@@ -17,11 +17,16 @@ export type Cell = Linkable<Cell> & Point & {
   hasBottom?: boolean;
 };
 
+export type Item = Word & {
+  clue: string;
+  cells: Cell[];
+};
+
 export type CellMap = {
   [key: string]: Cell[];
 };
 
-export function getCell(plan: CellMap, value: string, x: number, y: number): Cell {
+function getCell(plan: CellMap, value: string, x: number, y: number): Cell {
   const row = plan[value] || (plan[value] = []);
   for (const cell of row) {
     if (x === cell.x && y === cell.y) {
@@ -31,37 +36,6 @@ export function getCell(plan: CellMap, value: string, x: number, y: number): Cel
   const next: Cell = { x, y, value };
   row.push(next);
   return next;
-}
-
-export function toCellMap(xWords: ReadonlyArray<Readonly<Word>>, yWords: ReadonlyArray<Readonly<Word>>): CellMap {
-  const plan: CellMap = {};
-
-  for (const item of xWords) {
-    for (let dx = item.letters.length; dx-- > 0;) {
-      const cell = getCell(plan, item.letters[dx], item.x + dx, item.y);
-      cell.hasLeft = dx > 0;
-      cell.hasRight = dx < item.letters.length - 1;
-    }
-  }
-
-  for (const item of yWords) {
-    for (let dy = item.letters.length; dy-- > 0;) {
-      const cell = getCell(plan, item.letters[dy], item.x, item.y + dy);
-      cell.hasTop = dy > 0;
-      cell.hasBottom = dy < item.letters.length - 1;
-    }
-  }
-  return plan;
-}
-
-export function toCells(plan: Readonly<CellMap>, letters: ReadonlyArray<string>): Cell[] {
-  const cells: Cell[] = [];
-  for (const key of letters) {
-    for (const cell of plan[key]) {
-      cells.push(cell);
-    }
-  }
-  return cells;
 }
 
 // export type BoardEvent = 'init' | 'move' | 'done';
@@ -133,13 +107,50 @@ export class CrosswordGame {
   constructor(
     readonly cols: number,
     readonly rows: number,
-    readonly xWords: ReadonlyArray<Readonly<Word>>,
-    readonly yWords: ReadonlyArray<Readonly<Word>>,
-    readonly xClues: ReadonlyArray<string>,
-    readonly yClues: ReadonlyArray<string>) {
-    this.plan = toCellMap(this.xWords, this.yWords);
-    this.letters = Object.keys(this.plan).sort();
-    this.cells = toCells(this.plan, this.letters);
+    readonly xItems: ReadonlyArray<Item>,
+    readonly yItems: ReadonlyArray<Item>) {
+
+    const plan: CellMap = {};
+    for (const item of xItems) {
+      item.cells.length = 0;
+      for (let dx = item.letters.length; dx-- > 0;) {
+        const cell = getCell(plan, item.letters[dx], item.x + dx, item.y);
+        cell.hasLeft = dx > 0;
+        cell.hasRight = dx < item.letters.length - 1;
+        item.cells[dx] = cell;
+      }
+    }
+
+    for (const item of yItems) {
+      item.cells.length = 0;
+      for (let dy = item.letters.length; dy-- > 0;) {
+        const cell = getCell(plan, item.letters[dy], item.x, item.y + dy);
+        cell.hasTop = dy > 0;
+        cell.hasBottom = dy < item.letters.length - 1;
+        item.cells[dy] = cell;
+      }
+    }
+
+    const letters = Object.keys(plan).sort();
+
+    const cells: Cell[] = [];
+    for (const key of letters) {
+      for (const cell of plan[key]) {
+        cells.push(cell);
+      }
+    }
+
+    this.cells = cells;
+    this.letters = letters;
+    this.plan = plan;
+  }
+
+  getItem(groupIndex: number, itemIndex: number): Item | undefined {
+    return groupIndex === 0
+      ? this.xItems[itemIndex]
+      : groupIndex === 1
+        ? this.yItems[itemIndex]
+        : undefined;
   }
 
   findCell(x: number, y: number): Cell | undefined {
@@ -152,8 +163,8 @@ export class CrosswordGame {
   }
 
   getXWordIndex(x: number, y: number): number {
-    for (let index = this.xWords.length; index-- > 0;) {
-      const wx = this.xWords[index];
+    for (let index = this.xItems.length; index-- > 0;) {
+      const wx = this.xItems[index];
       if (y === wx.y && x >= wx.x && x < wx.x + wx.letters.length) {
         return index;
       }
@@ -162,8 +173,8 @@ export class CrosswordGame {
   }
 
   getYWordIndex(x: number, y: number): number {
-    for (let index = this.yWords.length; index-- > 0;) {
-      const wy = this.yWords[index];
+    for (let index = this.yItems.length; index-- > 0;) {
+      const wy = this.yItems[index];
       if (x === wy.x && y >= wy.y && y < wy.y + wy.letters.length) {
         return index;
       }
@@ -172,10 +183,9 @@ export class CrosswordGame {
   }
 
   getXWordFreeCell(index: number): Cell | undefined {
-    const wx = this.xWords[index];
-    if (wx) {
-      for (let dx = 0; dx < wx.letters.length; dx++) {
-        const cell = this.findCell(wx.x + dx, wx.y);
+    const item = this.xItems[index];
+    if (item) {
+      for (const cell of item.cells) {
         if (cell && !cell.next) {
           return cell;
         }
@@ -185,10 +195,9 @@ export class CrosswordGame {
   }
 
   getYWordFreeCell(index: number): Cell | undefined {
-    const wy = this.yWords[index];
-    if (wy) {
-      for (let dy = 0; dy < wy.letters.length; dy++) {
-        const cell = this.findCell(wy.x, wy.y + dy);
+    const item = this.yItems[index];
+    if (item) {
+      for (const cell of item.cells) {
         if (cell && !cell.next) {
           return cell;
         }
@@ -214,7 +223,7 @@ export class CrosswordGame {
   }
 
   getSolvedXWordIndices(): number[] {
-    const indices = this.xWords.map((_, index) => index);
+    const indices = this.xItems.map((_, index) => index);
     for (const cell of this.cells) {
       if (cell.hasError || cell.next?.value !== cell.value) {
         const i = this.getXWordIndex(cell.x, cell.y);
@@ -227,7 +236,7 @@ export class CrosswordGame {
   }
 
   getSolvedYWordIndices(): number[] {
-    const indices = this.yWords.map((_, index) => index);
+    const indices = this.yItems.map((_, index) => index);
     for (const cell of this.cells) {
       if (cell.hasError || cell.next?.value !== cell.value) {
         const i = this.getYWordIndex(cell.x, cell.y);

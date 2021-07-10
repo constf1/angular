@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { Autoplay } from 'src/app/common/autoplay';
 import { DragListener } from 'src/app/common/drag-listener';
-import { append, detach } from 'src/app/common/linkable';
+import { append, detach, List } from 'src/app/common/linkable';
 import { TabListSelection } from 'src/app/core/components/tab-list/tab-list.component';
 
 import { SQUARE_SIDE, transform } from '../../squared-paper/squared-paper.component';
@@ -295,6 +295,21 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     this._subs.length = 0;
   }
 
+  assignTile(cell: Cell, letter: string): boolean {
+    const tiles = this.tiles;
+    if (cell.isActive && tiles) {
+      const index = tiles.findIndex((t) => t.isActive && t.value === letter && !t.list);
+      if (index >= 0) {
+        this.moveTileToFront(index);
+        this._appendAuto(cell, tiles[index]);
+        this._removeExtraTiles(cell.list, 2);
+        this._onBoardChange();
+        return true;
+      }
+    }
+    return false;
+  }
+
   onMouseDown(event: MouseEvent, index: number) {
     // console.log('Mousedown:', index);
     if (event.button !== 0) {
@@ -538,7 +553,10 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
         // Auto move the tile into selected word.
         if (!data.dragged && this._selection) {
-          this._moveAuto(tile);
+          const next = this._getNextCell();
+          if (next) {
+            this._appendAuto(next, tile);
+          }
         }
       }
 
@@ -559,16 +577,12 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private _moveAuto(tile: Tile): void {
-    const cell = this._getNextCell();
-    if (cell) {
-      tile.x = cell.x + this.layout.baseLeft;
-      tile.y = cell.y + this.layout.baseTop;
-      tile.transform = transform(tile.x, tile.y);
-      tile.className = 'transition_auto';
-
-      append(cell, tile);
-    }
+  private _appendAuto(cell: Cell, tile: Tile): void {
+    tile.x = cell.x + this.layout.baseLeft;
+    tile.y = cell.y + this.layout.baseTop;
+    tile.transform = transform(tile.x, tile.y);
+    tile.className = 'transition_auto';
+    append(cell, tile);
   }
 
   private _getNextCell(): Cell | undefined {
@@ -589,14 +603,14 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     if (board && this._selection) {
       const { groupIndex, itemIndex } = this._selection;
       if (groupIndex === Axis.x) {
-        const wx = board.xWords[itemIndex];
+        const wx = board.xItems[itemIndex];
         if (wx) {
           const x = this.layout.baseLeft + wx.x;
           const y = this.layout.baseTop + wx.y + 1;
           return `M${x} ${y}v-1h${wx.letters.length}v1z`;
         }
       } else if (groupIndex === Axis.y) {
-        const wy = board.yWords[itemIndex];
+        const wy = board.yItems[itemIndex];
         if (wy) {
           const x = this.layout.baseLeft + wy.x;
           const y = this.layout.baseTop + wy.y;
@@ -607,13 +621,32 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  private _setMistakes() {
-    const { showMistakes, game: board } = this.gamester.state;
-    if (showMistakes && board) {
-      const { baseLeft, baseTop, bankLeft, bankTop, bankRight } = this.layout;
+  private _removeExtraTiles(list: List<Cell> | undefined, newLength: number) {
+    if (list && newLength > 0) {
+      const game = this.gamester.state.game;
+      const { bankLeft, bankTop, bankRight } = this.layout;
       const bankWidth = bankRight - bankLeft;
 
-      for (const cell of board.cells) {
+      // Move any extra tiles to the bank.
+      while (list.length > newLength) {
+        const tile = list.tail as Tile;
+        detach(tile);
+
+        const i = game.findLetterIndex(tile.value);
+        tile.x = bankLeft + i % bankWidth;
+        tile.y = bankTop + Math.floor(i / bankWidth);
+        tile.transform = transform(tile.x, tile.y);
+        tile.className = 'transition_norm';
+      }
+    }
+  }
+
+  private _setMistakes() {
+    const { showMistakes, game } = this.gamester.state;
+    if (showMistakes && game) {
+      const { baseLeft, baseTop } = this.layout;
+
+      for (const cell of game.cells) {
         if (cell.isActive && cell.next?.value === cell.value) {
           const tile = cell.next as Tile;
           cell.isActive = tile.isActive = false;
@@ -626,21 +659,11 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
             tile.className += ' has_error';
           }
 
-          // Move any extra tiles to the bank.
-          while (cell.list?.length > 2) {
-            const extra = cell.list.tail as Tile;
-            detach(extra);
-
-            const i = board.findLetterIndex(extra.value);
-            extra.x = bankLeft + i % bankWidth;
-            extra.y = bankTop + Math.floor(i / bankWidth);
-            extra.transform = transform(extra.x, extra.y);
-            extra.className = 'transition_norm';
-          }
+          this._removeExtraTiles(cell.list, 2);
         }
       }
 
-      board.markErrors();
+      game.markErrors();
     }
   }
 

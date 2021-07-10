@@ -56,13 +56,12 @@ export class CrosswordCreateDialogComponent implements OnInit, OnDestroy {
         const cols = grid.xMax - grid.xMin;
         const rows = grid.yMax - grid.yMin;
 
-        const xWords = normalize(grid.xWords, -grid.xMin, -grid.yMin);
-        const yWords = normalize(grid.yWords, -grid.xMin, -grid.yMin);
+        const xItems = normalize(grid.xWords, -grid.xMin, -grid.yMin)
+          .map((w) => ({ ...w, cells: [], clue: this.data[toWord(w.letters)] }));
+        const yItems = normalize(grid.yWords, -grid.xMin, -grid.yMin)
+          .map((w) => ({ ...w, cells: [], clue: this.data[toWord(w.letters)] }));
 
-        const xClues = xWords.map((wx) => this.data[toWord(wx.letters)]);
-        const yClues = yWords.map((wy) => this.data[toWord(wy.letters)]);
-
-        const game = new CrosswordGame(cols, rows, xWords, yWords, xClues, yClues);
+        const game = new CrosswordGame(cols, rows, xItems, yItems);
         this.dialogRef.close(game);
       }
     });

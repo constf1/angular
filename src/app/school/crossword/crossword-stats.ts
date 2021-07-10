@@ -10,7 +10,7 @@ export type CrosswordStats = {
 
 export function getStats(game: Readonly<CrosswordGame>) {
   return {
-    wordTotal: game.xWords.length + game.yWords.length,
+    wordTotal: game.xItems.length + game.yItems.length,
     wordSolved: game.getSolvedXWordIndices().length + game.getSolvedYWordIndices().length,
     letterTotal: game.cells.length,
     letterStatic: game.countStatic,
