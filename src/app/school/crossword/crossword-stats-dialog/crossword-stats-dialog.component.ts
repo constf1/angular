@@ -49,9 +49,12 @@ export class CrosswordStatsDialogComponent implements OnInit, AfterViewInit {
         this.difficulty = 'Master';
       }
 
-      this.percentDifficulty = Math.round(density * 100);
-      this.percentLetters = Math.round(letterSolved * 100 / (letterTotal - letterStatic));
-      this.percentWords = Math.round(wordSolved * 100 / wordTotal);
+      const NUMER = 10000;
+      const DENOM = 100;
+
+      this.percentDifficulty = Math.floor(NUMER * density) / DENOM;
+      this.percentLetters = Math.floor(NUMER * letterSolved / (letterTotal - letterStatic)) / DENOM;
+      this.percentWords = Math.floor(NUMER * wordSolved / wordTotal) / DENOM;
 
       this.isFlawless = letterSolved === letterTotal;
     }
