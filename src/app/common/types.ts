@@ -19,3 +19,7 @@ export type KeyOfType<T, V> = {
 
 export type ReadonlyByKey<T extends {} , K extends keyof T> = Readonly<Pick<T, K>> & Omit<T, K>;
 export type ReadonlyByType<T, V> = ReadonlyByKey<T, KeyOfType<T, V>>;
+
+type RecursivePartial<T> = {
+  [P in keyof T]? : T[P] extends (infer U)[] ? RecursivePartial<U>[] : T[P] extends object ? RecursivePartial<T[P]> : T[P];
+};
