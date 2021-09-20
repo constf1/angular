@@ -22,6 +22,7 @@
     "B": {
       "balk": "hesitate or be unwilling to accept an idea or undertaking",
       "bayonet": "a blade that can be attached to the end of a rifle and used as a weapon",
+      "behest": "a person's orders or command",
       "bereft": "deprived of or lacking (something)",
       "biddy": "an old gossipy woman",
       "bifurcate": "to divide into two parts; to fork into two branches",
@@ -52,6 +53,7 @@
       "cornucopia": "a symbol of plenty; a goat's horn overflowing with flowers, fruit, and corn",
       "crag": "a steep rugged rock or peak",
       "crass": "stupid and insensitive",
+      "crux": "the most important or serious part of a matter, problem, or argument",
       "cul-de-sac": "a road with one end blocked off"
     },
     "D": {
@@ -64,6 +66,7 @@
       "dictum": "a formal pronouncement from an authoritative source",
       "dilute": "(of a liquid) made thinner or weaker by having had water or another solvent added to it",
       "diminutive": "very small; tiny",
+      "dire": "(of a situation or event) extremely serious or urgent",
       "disgruntled": "angry or dissatisfied",
       "disseminate": "to spread (information, ideas, etc.) widely",
       "dollop": "a small amount of a substance/food",
@@ -80,6 +83,7 @@
       "exert": "to use influence, authority, etc. forcefully or effectively",
       "exhume": "to dig up something buried, esp. a corpse",
       "exodus": "a mass departure of people, especially emigrants",
+      "extant": "(especially of a document) still in existence; surviving",
       "extol": "praise enthusiastically"
     },
     "F": {
@@ -96,6 +100,7 @@
     },
     "G": {
       "gambol": "to run and jump in a happy way",
+      "genesis": "the origin or mode of formation of something",
       "gerund": "a word ending in '-ing' that is made from a verb and is used like a noun",
       "girdle": "something that surrounds another thing",
       "gist": "essence, the main point",
@@ -115,11 +120,13 @@
       "immiscible": "(of liquids) not forming a homogeneous mixture when added together",
       "impetus": "the force or energy with which a body moves",
       "impostor": "a person who pretends to be someone else in order to deceive others",
+      "in situ": "in the original place, or the place where something should be",
       "in vitro": "happening outside the body in artificial conditions, often in a test tube",
       "incarnation": "a person who embodies in the flesh a deity, spirit, or abstract quality",
       "incentive": "something that encourages a person to do something",
       "inception": "the beginning of a project or an organization or official activity",
       "infraction": "an occasion when someone breaks a rule or law",
+      "insatiable": "(of an appetite or desire) impossible to satisfy",
       "instigate": "bring about or initiate (an action or event); get going",
       "intermittent": "irregular, sporadic, occasional, random",
       "intramural": "situated or done within the walls (of a building)",
@@ -154,19 +161,23 @@
     },
     "P": {
       "pane": "a flat piece of glass, used in a window or door",
+      "panoply": "a wide range or collection of different things",
       "penultimate": "next to the last; second to last",
       "perennial": "lasting throughout the year or through many years",
       "permeate": "to spread through something and be present in every part of it",
+      "pernicious": "having a very harmful effect or influence, especially in a gradual or subtle way",
       "peruse": "read, study, scan, examine",
       "pervade": "(esp. of a smell) spread through and be perceived in every part of",
       "pest": "an insect or small animal that is harmful or damages crops; (informal) an annoying person, esp. a child",
       "pester": "to annoy or nag continually",
+      "pincer": "one of a pair of curved claws of an animal such as a crab; (plural) a tool for holding or pulling something",
       "precarious": "in a dangerous state",
       "precedence": "formal order of rank or position",
       "preclude": "to prevent something from happening or make it impossible",
       "pristine": "new or almost new, and in very good condition",
       "procure": "to obtain something, esp. after an effort",
       "prodigious": "extremely great in ability, amount, or strength",
+      "propensity": "an inclination or natural tendency to behave in a particular way",
       "provenance": "the place of origin of something"
     },
     "QR": {
@@ -198,6 +209,7 @@
       "slither": "to move easily and quickly across a surface while twisting or curving",
       "smithereens": "a lot of very small broken pieces",
       "smoking gun": "a piece of incontrovertible incriminating evidence",
+      "smorgasbord": "a buffet offering a variety of hot and cold meats, salads, etc.",
       "snare": "a trap for birds or small animals",
       "soliloquy": "a speech made by a person while alone, esp. in a play",
       "solstice": "the time (twice each year) at which the sun reaches its maximum or minimum declination, marked by the longest and shortest days",
@@ -237,6 +249,7 @@
       "vascular": "relating to the vessels that conduct and circulate body fluids",
       "vat": "a large container for holding or storing liquids",
       "vermin": "small animals collectively, such as insects and rodents, that spread disease and damage crops",
+      "versed": "experienced or skilled in; knowledgeable about",
       "vie": "to compete (with someone)",
       "vigour": "physical strength and good health",
       "vista": "a pleasing view, especially one seen through a long, narrow opening"
@@ -248,7 +261,8 @@
       "wayward": "erratic, selfish, or stubborn",
       "wicked": "morally wrong and bad",
       "witticism": "a remark that is both clever and humorous",
-      "woe": "big problems or troubles; extreme sadness"
+      "woe": "big problems or troubles; extreme sadness",
+      "yank": "pull with a jerk"
     }
   },
   "En-Ru": {
