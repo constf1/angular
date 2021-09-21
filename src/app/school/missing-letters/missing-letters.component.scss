@@ -69,11 +69,29 @@
 //     opacity: 0;
 //   }
 // }
+.missing-letters {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+
+  overflow: auto;
+
+  background-color: antiquewhite;
+  background-image: url('../../../assets/school/paper.jpg');
+  background-size: 100% 100%;
+}
 
 div.missing-letters-frame {
   position: relative;
   width: 1024px;
   height: 768px;
+
+  @media (min-height: 800px) {
+    margin-top: 16px;
+  }
+
   background-color: #7fffd4;
   background-image: url('../../../assets/school/board.png');
   background-repeat: no-repeat;
@@ -110,6 +128,7 @@ div.missing-letters-frame {
       content: ",\00a0";
       // margin-right: 0.4em;
     }
+
     > :last-child::after {
       visibility: hidden;
       color: #0000;

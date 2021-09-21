@@ -1,46 +1,49 @@
-<div class="missing-letters-frame">
-  <canvas *ngIf="sfx && !chatBot.currentItem" class="missing-letters-sfx" appCanvasAnimation [animationCallback]="sfx.animation"
-    [style.left.px]="board.offsetLeft" [style.top.px]="board.offsetTop"
-    [width]="board.offsetWidth" [height]="board.offsetHeight"></canvas>
-  <div class="missing-letters-board" [style.font-size.px]="fontSize" #board (mousemove)="onMouseMove($event, board)" (mouseout)="onMouseOut()">
-    <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer"
-      [nextValue]="a.realAnswer"></app-simple-diff>
-    <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered">
-      <span>{{quizPrefix}}</span>
-      <span class="missing-letters-answer">{{quizUserAnswer}}</span>
-      <span>{{quizSuffix}}</span>
-      <!-- <span style="visibility: hidden;color: #0000;padding-right: 0.4em">,</span> -->
-    </span>
-  </div>
-  <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="onAudioClick()">
-  </div>
-  <img class="missing-letters-effects" #imageRef [ngStyle]="imageStyles" (click)="explodeImage()" >
-  <div class="missing-letters-front">
-    <button *ngIf="state === 'ready'" (click)="onStart()">START</button>
-    <ng-container *ngIf="state === 'active'">
-      <button *ngFor="let q of questions;trackBy:trackByIndex" [disabled]="isAnswered"
-        (click)="onAnswer(q, board)">{{q || '_'}}</button>
-    </ng-container>
-    <button *ngIf="state === 'done'" (click)="onRestart()">RESTART</button>
-  </div>
-  <button mat-fab color="warn" style="position: absolute; left: 872px; top: 220px"
-    (click)="isAudioEnabled = !isAudioEnabled">
-    <mat-icon>{{isAudioEnabled ? 'volume_up' : 'volume_off'}}</mat-icon>
-  </button>
-  <button mat-fab color="primary" [disabled]="fontSizeMin >= fontSize"
-    style="position: absolute; left: 960px; top: 132px"
-    (click)="fontSize = fontSize - (fontSizeMin >= fontSize ? 0 : 1)">
-    <mat-icon>zoom_out</mat-icon>
-  </button>
-  <button mat-fab color="primary" [disabled]="fontSize >= fontSizeMax"
-    style="position: absolute; left: 954px; top: 204px"
-    (click)="fontSize = fontSize + (fontSize >= fontSizeMax ? 0 : 1)">
-    <mat-icon>zoom_in</mat-icon>
-  </button>
+<div class="missing-letters">
+  <div class="missing-letters-frame">
+    <canvas *ngIf="sfx && !chatBot.currentItem" class="missing-letters-sfx" appCanvasAnimation
+      [animationCallback]="sfx.animation" [style.left.px]="board.offsetLeft" [style.top.px]="board.offsetTop"
+      [width]="board.offsetWidth" [height]="board.offsetHeight"></canvas>
+    <div class="missing-letters-board" [style.font-size.px]="fontSize" #board (mousemove)="onMouseMove($event, board)"
+      (mouseout)="onMouseOut()">
+      <app-simple-diff *ngFor="let a of answers" [pastValue]="a.userAnswer" [nextValue]="a.realAnswer">
+      </app-simple-diff>
+      <span *ngIf="state === 'active'" [class.missing-letters-input]="!isAnswered">
+        <span>{{quizPrefix}}</span>
+        <span class="missing-letters-answer">{{quizUserAnswer}}</span>
+        <span>{{quizSuffix}}</span>
+        <!-- <span style="visibility: hidden;color: #0000;padding-right: 0.4em">,</span> -->
+      </span>
+    </div>
+    <div *ngIf="isAudioEnabled" class="missing-letters-audio" [class.active]="isAudioPlaying" (click)="onAudioClick()">
+    </div>
+    <img class="missing-letters-effects" #imageRef [ngStyle]="imageStyles" (click)="explodeImage()">
+    <div class="missing-letters-front">
+      <button *ngIf="state === 'ready'" (click)="onStart()">START</button>
+      <ng-container *ngIf="state === 'active'">
+        <button *ngFor="let q of questions;trackBy:trackByIndex" [disabled]="isAnswered"
+          (click)="onAnswer(q, board)">{{q || '_'}}</button>
+      </ng-container>
+      <button *ngIf="state === 'done'" (click)="onRestart()">RESTART</button>
+    </div>
+    <button mat-fab color="warn" style="position: absolute; left: 872px; top: 220px"
+      (click)="isAudioEnabled = !isAudioEnabled">
+      <mat-icon>{{isAudioEnabled ? 'volume_up' : 'volume_off'}}</mat-icon>
+    </button>
+    <button mat-fab color="primary" [disabled]="fontSizeMin >= fontSize"
+      style="position: absolute; left: 960px; top: 132px"
+      (click)="fontSize = fontSize - (fontSizeMin >= fontSize ? 0 : 1)">
+      <mat-icon>zoom_out</mat-icon>
+    </button>
+    <button mat-fab color="primary" [disabled]="fontSize >= fontSizeMax"
+      style="position: absolute; left: 954px; top: 204px"
+      (click)="fontSize = fontSize + (fontSize >= fontSizeMax ? 0 : 1)">
+      <mat-icon>zoom_in</mat-icon>
+    </button>
 
-  <div class="missing-letters-popup" *ngIf="chatBot.currentItem as item" (click)="chatBot.next()">
-    <div [class]="item.who === 'teacher' ? 'missing-letters-teacher' : 'missing-letters-student'">
-      <div class="missing-letters-message" [innerHTML]="item.message"></div>
+    <div class="missing-letters-popup" *ngIf="chatBot.currentItem as item" (click)="chatBot.next()">
+      <div [class]="item.who === 'teacher' ? 'missing-letters-teacher' : 'missing-letters-student'">
+        <div class="missing-letters-message" [innerHTML]="item.message"></div>
+      </div>
     </div>
   </div>
 </div>
