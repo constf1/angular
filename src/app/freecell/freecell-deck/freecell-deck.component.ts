@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import {
   Component,
   OnInit,
@@ -36,6 +38,7 @@ export interface LineChangeEvent {
   destination?: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 const Transitions = ['transition_deal', 'transition_norm', 'transition_fast'] as const;
 type Transition = typeof Transitions[number];
 type TransitionMap = Partial<{ [key in Transition]: boolean }>;
@@ -70,10 +73,6 @@ interface DragData {
   styleUrls: ['./freecell-deck.component.scss']
 })
 export class FreecellDeckComponent extends UnsubscribableComponent implements OnInit {
-  private _dragListener = new DragListener<DragData>();
-  private _emptySpotCount = 0;
-  private _layout: FreecellLayout;
-
   public get layout(): FreecellLayout {
     return this._layout;
   }
@@ -96,14 +95,18 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
   spotSelection = -1;
 
   get isTouchDisabled() {
-    // tslint:disable-next-line: no-bitwise
+    // eslint-disable-next-line no-bitwise
     return !(this.settings.state.inputMode & InputMode.Touch);
   }
 
   get isMouseDisabled() {
-    // tslint:disable-next-line: no-bitwise
+    // eslint-disable-next-line no-bitwise
     return !(this.settings.state.inputMode & InputMode.Mouse);
   }
+
+  private _dragListener = new DragListener<DragData>();
+  private _emptySpotCount = 0;
+  private _layout: FreecellLayout;
 
   constructor(
     public settings: FreecellSettingsService,
@@ -111,7 +114,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     private _renderer: Renderer2,
     private _playService: FreecellAutoplayService,
     private _gameService: FreecellGameService
-    ) {
+  ) {
     super();
   }
 
@@ -145,9 +148,9 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     return index;
   }
 
-  getTransforms(tableau: Readonly<number[]>): { x: number, y: number }[] {
+  getTransforms(tableau: Readonly<number[]>): { x: number; y: number }[] {
     const D = 100;
-    const transforms: { x: number, y: number }[] = [];
+    const transforms: { x: number; y: number }[] = [];
 
     const elements = this.cardList.toArray();
     const rc0 = elements[tableau[0]].nativeElement.parentElement.getBoundingClientRect();
@@ -166,7 +169,7 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     return transforms;
   }
 
-  onTouch({ type, event }: { type: DragEvent, event: TouchEvent }) {
+  onTouch({ type, event }: { type: DragEvent; event: TouchEvent }) {
     if (this.isTouchDisabled) {
       return;
     }
@@ -214,64 +217,6 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     const transforms = this.getTransforms(tableau);
 
     this._dragListener.mouseStart(event, this._renderer, { game, tableau, transforms });
-  }
-
-  private _onDragStart() {
-    // this._playService.lock();
-    this._playService.stop();
-    const { tableau, transforms } = this._dragListener.data;
-
-    for (let i = tableau.length; i-- > 0;) {
-      const card = this.cards[tableau[i]];
-      card.ngStyle.zIndex += CARD_NUM;
-      card.ngStyle.transform = translate(transforms[i].x, transforms[i].y);
-      card.ngClass.grabbing = true;
-      setTransition(card.ngClass);
-    }
-  }
-
-  private _onDragMove() {
-    const { tableau, transforms } = this._dragListener.data;
-    const dx = this._dragListener.pageDeltaX;
-    const dy = this._dragListener.pageDeltaY;
-
-    for (let i = tableau.length; i-- > 0;) {
-      const card = this.cards[tableau[i]];
-      card.ngClass.dragging = true;
-      card.ngStyle.transform = translate(transforms[i].x + dx, transforms[i].y + dy);
-    }
-    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-      this._dragListener.data.dragged = true;
-    }
-  }
-
-  private _onDragStop() {
-    // this._playService.unlock();
-    const { game, tableau, dragged } = this._dragListener.data;
-
-    for (const index of tableau) {
-      const card = this.cards[index];
-
-      card.ngStyle.zIndex -= CARD_NUM;
-      card.ngStyle.transform = this.getCardTransform(game, game.toLine(index), index);
-      delete card.ngClass.grabbing;
-      delete card.ngClass.dragging;
-      setTransition(card.ngClass, 'transition_fast');
-    }
-
-    if (dragged) {
-      const dstLine = this.getDestination(game, tableau);
-      if (dstLine >= 0) {
-        const srcLine = game.toLine(tableau[0]);
-        if (srcLine !== dstLine) {
-          this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
-        }
-      }
-    } else {
-      const srcLine = game.toLine(tableau[0]);
-      const dstLine = this.spotSelection >= 0 ? this.spotSelection : undefined;
-      this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
-    }
   }
 
   onDeal() {
@@ -458,6 +403,64 @@ export class FreecellDeckComponent extends UnsubscribableComponent implements On
     // SoundService is not activated by default to comply with the Chrome autoplay policy.
     if (event.isTrusted) {
       this.soundService.activate();
+    }
+  }
+
+  private _onDragStart() {
+    // this._playService.lock();
+    this._playService.stop();
+    const { tableau, transforms } = this._dragListener.data;
+
+    for (let i = tableau.length; i-- > 0;) {
+      const card = this.cards[tableau[i]];
+      card.ngStyle.zIndex += CARD_NUM;
+      card.ngStyle.transform = translate(transforms[i].x, transforms[i].y);
+      card.ngClass.grabbing = true;
+      setTransition(card.ngClass);
+    }
+  }
+
+  private _onDragMove() {
+    const { tableau, transforms } = this._dragListener.data;
+    const dx = this._dragListener.pageDeltaX;
+    const dy = this._dragListener.pageDeltaY;
+
+    for (let i = tableau.length; i-- > 0;) {
+      const card = this.cards[tableau[i]];
+      card.ngClass.dragging = true;
+      card.ngStyle.transform = translate(transforms[i].x + dx, transforms[i].y + dy);
+    }
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      this._dragListener.data.dragged = true;
+    }
+  }
+
+  private _onDragStop() {
+    // this._playService.unlock();
+    const { game, tableau, dragged } = this._dragListener.data;
+
+    for (const index of tableau) {
+      const card = this.cards[index];
+
+      card.ngStyle.zIndex -= CARD_NUM;
+      card.ngStyle.transform = this.getCardTransform(game, game.toLine(index), index);
+      delete card.ngClass.grabbing;
+      delete card.ngClass.dragging;
+      setTransition(card.ngClass, 'transition_fast');
+    }
+
+    if (dragged) {
+      const dstLine = this.getDestination(game, tableau);
+      if (dstLine >= 0) {
+        const srcLine = game.toLine(tableau[0]);
+        if (srcLine !== dstLine) {
+          this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
+        }
+      }
+    } else {
+      const srcLine = game.toLine(tableau[0]);
+      const dstLine = this.spotSelection >= 0 ? this.spotSelection : undefined;
+      this.lineChange.emit({ source: srcLine, destination: dstLine, tableau });
     }
   }
 }

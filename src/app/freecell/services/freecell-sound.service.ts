@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Injectable } from '@angular/core';
 
@@ -71,7 +73,7 @@ function createSource(
 // }
 // type PlaySound = typeof dummy;
 
-export const FreecellSoundNames = [ 'deal', 'card', 'shuffle', 'victory'] as const;
+export const FreecellSoundNames = ['deal', 'card', 'shuffle', 'victory'] as const;
 export type FreecellSoundType = typeof FreecellSoundNames[number];
 export type FreecellSounds = { [key in FreecellSoundType]: () => void };
 
@@ -160,14 +162,6 @@ export class FreecellSoundService extends UnsubscribableComponent {
     }));
   }
 
-  private async _next(state: () => Promise<any>) {
-    try {
-      await this._nextState;
-    } finally {
-      this._nextState = state();
-    }
-  }
-
   activate() {
     this._activated = true;
   }
@@ -189,22 +183,6 @@ export class FreecellSoundService extends UnsubscribableComponent {
     });
   }
 
-  private _getBuffers() {
-    if (!this._buffers) {
-      this._buffers = this._loadAll();
-    }
-    return this._buffers;
-  }
-
-  private _loadAll() {
-    const resources: string[] = [];
-    // tslint:disable-next-line: prefer-for-of
-    for (let i = 0; i < Resources.length; i++) {
-      resources.push(RESOURCE_DIR + Resources[i] + RESOURCE_EXT);
-    }
-    return loadAudioFiles(this._context, resources);
-  }
-
   async play(soundName: FreecellSoundType) {
     await this._nextState;
     if (this._enabled && this._activated) {
@@ -220,5 +198,29 @@ export class FreecellSoundService extends UnsubscribableComponent {
         }
       }
     }
+  }
+
+  private async _next(state: () => Promise<any>) {
+    try {
+      await this._nextState;
+    } finally {
+      this._nextState = state();
+    }
+  }
+
+  private _getBuffers() {
+    if (!this._buffers) {
+      this._buffers = this._loadAll();
+    }
+    return this._buffers;
+  }
+
+  private _loadAll() {
+    const resources: string[] = [];
+    // eslint-disable-next-line @typescript-eslint/prefer-for-of
+    for (let i = 0; i < Resources.length; i++) {
+      resources.push(RESOURCE_DIR + Resources[i] + RESOURCE_EXT);
+    }
+    return loadAudioFiles(this._context, resources);
   }
 }

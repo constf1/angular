@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
 
 import { Injectable } from '@angular/core';
 
@@ -84,6 +85,14 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
     this.set(initialState);
   }
 
+  set(params: Partial<Readonly<FreecellSettingsState>>): boolean {
+    const ok = this._set(params);
+    if (ok) {
+      this.saveLocal(KEY);
+    }
+    return ok;
+  }
+
   protected _validate(state: FreecellSettingsState) {
     if (FreecellSettingsViewTypes.indexOf(state.view) < 0) {
       state.view = initialState.view;
@@ -93,13 +102,5 @@ export class FreecellSettingsService extends StateSubject<FreecellSettingsState>
       state[key] = Math.max(minState[key], Math.min(maxState[key], state[key]));
     }
     return super._validate(state);
-  }
-
-  set(params: Partial<Readonly<FreecellSettingsState>>): boolean {
-    const ok = this._set(params);
-    if (ok) {
-      this.saveLocal(KEY);
-    }
-    return ok;
   }
 }

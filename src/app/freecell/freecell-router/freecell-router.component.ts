@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, OnInit, Input } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
@@ -26,39 +27,6 @@ export class FreecellRouterComponent extends UnsubscribableComponent implements 
     private _route: ActivatedRoute,
     private _gameService: FreecellGameService) {
     super();
-   }
-
-  private _update(params: Params) {
-    // Validate params and update the game.
-    const path = params.path || '';
-
-    let deal = parseInt(params.deal, 10);
-    if (isNaN(deal) || deal < 0) {
-      deal = -1;
-    }
-
-    let mark = parseInt(params.mark, 10);
-    if (isNaN(mark) || mark < 0 || mark + mark > path.length) {
-      mark = Math.floor(path.length / 2);
-    }
-    if (deal !== this.deal || path !== this.path || mark !== this.mark) {
-      this.deal = deal;
-      this.path = path;
-      this.mark = mark;
-
-      this._lock = true;
-      Promise
-        .resolve()
-        .then(() => {
-          const state = this._gameService.state;
-          if (state.deal !== deal || state.path !== path || state.mark !== mark) {
-            this._gameService.set(deal, path, mark);
-          }
-        })
-        .finally(() => this._lock = false);
-    } else {
-      this._lock = false;
-    }
   }
 
   ngOnInit(): void {
@@ -97,5 +65,38 @@ export class FreecellRouterComponent extends UnsubscribableComponent implements 
       relativeTo: this._route,
       queryParams: { deal, path, mark }
     });
+  }
+
+  private _update(params: Params) {
+    // Validate params and update the game.
+    const path = params.path || '';
+
+    let deal = parseInt(params.deal, 10);
+    if (isNaN(deal) || deal < 0) {
+      deal = -1;
+    }
+
+    let mark = parseInt(params.mark, 10);
+    if (isNaN(mark) || mark < 0 || mark + mark > path.length) {
+      mark = Math.floor(path.length / 2);
+    }
+    if (deal !== this.deal || path !== this.path || mark !== this.mark) {
+      this.deal = deal;
+      this.path = path;
+      this.mark = mark;
+
+      this._lock = true;
+      Promise
+        .resolve()
+        .then(() => {
+          const state = this._gameService.state;
+          if (state.deal !== deal || state.path !== path || state.mark !== mark) {
+            this._gameService.set(deal, path, mark);
+          }
+        })
+        .finally(() => this._lock = false);
+    } else {
+      this._lock = false;
+    }
   }
 }

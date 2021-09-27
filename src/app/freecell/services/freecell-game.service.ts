@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
 
 import { Injectable } from '@angular/core';
 import { UnsubscribableStateSubject } from '../../common/unsubscribable-state-subject';
@@ -64,6 +64,24 @@ export class FreecellGameService extends UnsubscribableStateSubject<IFreecellRep
     }));
   }
 
+  move(giver: number, taker: number) {
+    const state = this.state;
+    const path = nextPath(state.path, state.mark, giver, taker);
+    const mark = path.length / 2;
+
+    this._set({
+      mark,
+      path: state.path.startsWith(path) ? state.path : path // keep the longest path
+    });
+  }
+
+  set(deal: number, path: string, mark: number) {
+    const state = this.state;
+    if (deal !== state.deal || path !== state.path || mark !== state.mark) {
+      this._set({ deal, path, mark });
+    }
+  }
+
   protected _validate(state: IFreecellReplay) {
     // Path validation:
     const path = getValidPath(state);
@@ -82,23 +100,5 @@ export class FreecellGameService extends UnsubscribableStateSubject<IFreecellRep
       this._game = null;
     }
     return state;
-  }
-
-  move(giver: number, taker: number) {
-    const state = this.state;
-    const path = nextPath(state.path, state.mark, giver, taker);
-    const mark = path.length / 2;
-
-    this._set({
-      mark,
-      path: state.path.startsWith(path) ? state.path : path // keep the longest path
-    });
-  }
-
-  set(deal: number, path: string, mark: number) {
-    const state = this.state;
-    if (deal !== state.deal || path !== state.path || mark !== state.mark) {
-      this._set({ deal, path, mark });
-    }
   }
 }

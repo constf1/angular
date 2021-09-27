@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
 
 import { Injectable } from '@angular/core';
 
@@ -25,6 +25,10 @@ export class FreecellBasisService extends StateSubject<IFreecellBasis> {
     super(initialState);
   }
 
+  set(basis: Partial<Readonly<IFreecellBasis>>) {
+    return this._set(basis);
+  }
+
   protected _validate(state: IFreecellBasis) {
     if (state.base > 0 && state.cell > 0 && state.pile > 0) {
       state = super._validate(state);
@@ -35,9 +39,5 @@ export class FreecellBasisService extends StateSubject<IFreecellBasis> {
       }
     }
     return null;
-  }
-
-  set(basis: Partial<Readonly<IFreecellBasis>>) {
-    return this._set(basis);
   }
 }

@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { IFreecellPlay, numberAt, nextPath, IFreecellReplay } from './freecell-model';
 import { FreecellGameView, FreecellGame } from './freecell-game';

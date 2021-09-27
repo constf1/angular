@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';

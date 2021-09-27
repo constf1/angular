@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, OnInit, Input } from '@angular/core';
 
 import { UnsubscribableComponent } from '../../common/unsubscribable-component';
@@ -13,15 +14,16 @@ import { FreecellGameService } from '../services/freecell-game.service';
   styleUrls: ['./freecell-deal-menu.component.scss']
 })
 export class FreecellDealMenuComponent extends UnsubscribableComponent implements OnInit {
-  readonly minDeal = 0;
-  readonly maxDeal = 0x80000000;
-  readonly digitCount = this.maxDeal.toString(10).length;
 
   @Input() listItem = false;
 
   deal: number;
   dealLabel = '';
   isMenuOpened = false;
+
+  readonly minDeal = 0;
+  readonly maxDeal = 0x80000000;
+  readonly digitCount = this.maxDeal.toString(10).length;
 
   constructor(private _gameService: FreecellGameService) {
     super();

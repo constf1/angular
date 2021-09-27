@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Injectable } from '@angular/core';
 import { getDate } from '../../common/date-utils';
@@ -24,29 +25,16 @@ function toPromise<T>(request: IDBRequest<T>) {
 
 @Injectable()
 export class FreecellDbService {
-  private _openPromise: Promise<void>; // Note: .then() may be called many times on the same promise.
-
-  // Our connection to the database.
-  private _db: IDBDatabase;
   openError: string;
 
   get isOpen(): boolean {
     return !!this._db;
   }
 
-  private _createTransaction(
-    storeNames: string | string[],
-    mode: IDBTransactionMode = 'readonly'
-  ): Promise<IDBTransaction> {
-    return this._openPromise.then(() => this._db.transaction(storeNames, mode));
-  }
+  private _openPromise: Promise<void>; // Note: .then() may be called many times on the same promise.
 
-  private _getStore(
-    name: StoreName,
-    mode: IDBTransactionMode = 'readonly'
-  ): Promise<IDBObjectStore> {
-    return this._createTransaction([name], mode).then(transaction => transaction.objectStore(name));
-  }
+  // Our connection to the database.
+  private _db: IDBDatabase;
 
   constructor() {
     this._openPromise = new Promise<void>((resolve, reject) => {
@@ -98,5 +86,19 @@ export class FreecellDbService {
       game.date = getDate();
     }
     return this._getStore(GAME_STORE_NAME, 'readwrite').then(store => toPromise(store.put(game)));
+  }
+
+  private _createTransaction(
+    storeNames: string | string[],
+    mode: IDBTransactionMode = 'readonly'
+  ): Promise<IDBTransaction> {
+    return this._openPromise.then(() => this._db.transaction(storeNames, mode));
+  }
+
+  private _getStore(
+    name: StoreName,
+    mode: IDBTransactionMode = 'readonly'
+  ): Promise<IDBObjectStore> {
+    return this._createTransaction([name], mode).then(transaction => transaction.objectStore(name));
   }
 }

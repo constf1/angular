@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
 
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';

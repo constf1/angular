@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Component, OnInit } from '@angular/core';
 
 import { CARD_NUM, suitFullNameOf, playNameOf } from '../../common/deck';
@@ -68,7 +70,34 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
   selection = -1;
   isSolved = false;
 
-  readonly cards: { [key: number]: { className: string, cardName: string } } = {};
+  readonly cards: { [key: number]: { className: string; cardName: string } } = {};
+
+  constructor(private _gameService: FreecellGameService) {
+    super();
+  }
+
+  ngOnInit() {
+    for (let i = 0; i < CARD_NUM; i++) {
+      this.cards[i] = {
+        className: 'history-item-' + suitFullNameOf(i),
+        cardName: playNameOf(i)
+      };
+    }
+
+    this._addSubscription(this._gameService.subscribe(state => {
+      if (this._gameService.isFirstChange || state.deal !== this._gameService.previousState?.deal) {
+        this.isSolved = false;
+        this.items.length = 0;
+      }
+      if (state.path) {
+        this.isSolved = false;
+        playForward(state, this.onMoveCallback);
+        this.items.splice(state.path.length / 2);
+      }
+      this.selection = state.mark - 1;
+      // this.isSolved = !!this.items.find(item => item.outcomeName === WIN_MESSAGE);
+    }));
+  }
 
   onMoveCallback: FreecellPlayCallback = (view, giver, taker, index) => {
     const item: Partial<HistoryItem> = this.items[index] || {};
@@ -107,34 +136,7 @@ export class FreecellHistoryComponent extends UnsubscribableComponent implements
         this.isSolved = true;
       }
     }
-  }
-
-  constructor(private _gameService: FreecellGameService) {
-    super();
-  }
-
-  ngOnInit() {
-    for (let i = 0; i < CARD_NUM; i++) {
-      this.cards[i] = {
-        className: 'history-item-' + suitFullNameOf(i),
-        cardName: playNameOf(i)
-      };
-    }
-
-    this._addSubscription(this._gameService.subscribe(state => {
-      if (this._gameService.isFirstChange || state.deal !== this._gameService.previousState?.deal) {
-        this.isSolved = false;
-        this.items.length = 0;
-      }
-      if (state.path) {
-        this.isSolved = false;
-        playForward(state, this.onMoveCallback);
-        this.items.splice(state.path.length / 2);
-      }
-      this.selection = state.mark - 1;
-      // this.isSolved = !!this.items.find(item => item.outcomeName === WIN_MESSAGE);
-    }));
-  }
+  };
 
   setSelection(value: number) {
     if (this.selection !== value && value <= this.items.length && value >= -1) {

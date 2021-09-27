@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
