@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
@@ -24,9 +25,6 @@ function getOrder(order: number, index: number): number {
   styleUrls: ['./sandwich.component.scss']
 })
 export class SandwichComponent implements OnInit {
-  readonly order = [0, 1, 2];
-  private _sandwichOrder = 0; // n ∈ [0, 5]
-
   get sandwichOrder() {
     return this._sandwichOrder;
   }
@@ -44,6 +42,10 @@ export class SandwichComponent implements OnInit {
 
   @Input() hideHeader = false;
   @Input() hideFooter = false;
+
+  readonly order = [0, 1, 2];
+
+  private _sandwichOrder = 0; // n ∈ [0, 5]
 
   constructor() { }
 
