@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
 import { Directive, ElementRef, AfterViewInit } from '@angular/core';
 
 @Directive({

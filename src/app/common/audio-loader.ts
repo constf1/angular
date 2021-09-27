@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 function requestArrayBuffer(url: string, onprogress?: (event: ProgressEvent) => void): Promise<ArrayBuffer> {
   return new Promise<ArrayBuffer>((resolve, reject) => {

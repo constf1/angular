@@ -1,13 +1,18 @@
+/* eslint-disable no-underscore-dangle */
+
 import { Renderer2 } from '@angular/core';
 import { Subject } from 'rxjs';
 
-// tslint:disable: variable-name
 type Listener = () => void;
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const DragEvents = ['DragStart', 'DragMove', 'DragStop'] as const;
 export type DragEvent = typeof DragEvents[number];
 
 export class DragListener<T> {
+  data?: T;
+  respectDefault?: boolean;
+
   private readonly _listeners: Listener[] = [];
   private readonly _events = new Subject<DragEvent>();
   private _clientX = 0;
@@ -26,8 +31,6 @@ export class DragListener<T> {
 
   private _touchId = NaN;
 
-  data?: T;
-  respectDefault?: boolean;
 
   get dragChange() {
     return this._events.asObservable();
