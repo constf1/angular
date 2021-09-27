@@ -8,8 +8,6 @@ export const TAB_SPLITTER = '|';
   styleUrls: ['./tab-group.component.scss']
 })
 export class TabGroupComponent {
-  labels: string[] = [];
-
   @Input() set items(value: string[] | string) {
     if (typeof value === 'string') {
       this.labels = value.split(TAB_SPLITTER);
@@ -19,6 +17,8 @@ export class TabGroupComponent {
   }
   @Input() selection = -1;
   @Output() selectionChange = new EventEmitter<number>();
+
+  labels: string[] = [];
 
   constructor() { }
 }

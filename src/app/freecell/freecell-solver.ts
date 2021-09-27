@@ -23,13 +23,13 @@ export class FreecellSolver extends FreecellBasis {
     return this.done.size;
   }
 
-  // Default do-nothing implementation.
-  onMove: (card: number, source: number, destination: number) => void =
-   (card: number, source: number, destination: number) => {};
-
   constructor(pileNum: number, cellNum: number, baseNum: number, public desk: number[][]) {
     super(pileNum, cellNum, baseNum);
   }
+
+  // Default do-nothing implementation.
+  onMove: (card: number, source: number, destination: number) => void =
+   (card: number, source: number, destination: number) => {};
 
   // Default implementation just throws a solution object.
   stop(success: boolean) {

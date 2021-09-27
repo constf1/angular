@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export type Desk = Readonly<Readonly<number[]>[]>;
 
 export class FreecellBasis {

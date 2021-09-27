@@ -17,6 +17,7 @@ const FILE_EMPTY_MESSAGE = 'Could not find any SVG path data.';
   styleUrls: ['./svg-open-dialog.component.scss']
 })
 export class SvgOpenDialogComponent implements OnInit {
+  @ViewChild('pathRef') selectedPathRef: ElementRef<SVGPathElement>;
   pageIndex = 0;
   pageSize = 0;
   pageSizeOptions: number[] = [ 5, 10, 20, 30, 40, 50 ];
@@ -30,7 +31,6 @@ export class SvgOpenDialogComponent implements OnInit {
 
   status = FILE_LOAD_MESSAGE;
 
-  @ViewChild('pathRef') selectedPathRef: ElementRef<SVGPathElement>;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: File) {
   }

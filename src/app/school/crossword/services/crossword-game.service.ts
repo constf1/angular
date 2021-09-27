@@ -1,8 +1,10 @@
+/* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
 import { SubType } from 'src/app/common/types';
 import { CrosswordGame } from '../crossword-game';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CrosswordBoardStageNames = ['born', 'init', 'live', 'done'] as const;
 export type CrosswordBoardStage = typeof CrosswordBoardStageNames[number];
 

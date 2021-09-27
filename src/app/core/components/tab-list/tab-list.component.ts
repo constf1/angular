@@ -1,5 +1,16 @@
 import { NgStyle } from '@angular/common';
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  QueryList,
+  SimpleChanges,
+  ViewChildren,
+} from '@angular/core';
 
 export type TabListGroup = {
   label: string;
@@ -67,7 +78,7 @@ export class TabListComponent implements OnInit, OnChanges {
   scrollItemIntoView(index: number) {
     const elem = this.itemList?.toArray()[index]?.nativeElement;
     if (elem && typeof elem.scrollIntoView === 'function') {
-      elem.scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'nearest'});
+      elem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
   }
 }

@@ -16,12 +16,12 @@ export class SimpleDiffComponent implements OnChanges {
   remove: string;
   insert: string;
 
-  clear() {
-    this.prefix = this.suffix = this.remove = this.insert = '';
-  }
-
   constructor() {
     this.clear();
+  }
+
+  clear() {
+    this.prefix = this.suffix = this.remove = this.insert = '';
   }
 
   ngOnChanges(): void {

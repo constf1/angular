@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { formatDecimal } from 'src/app/common/math-utils';
 import { SubType } from 'src/app/common/types';
 

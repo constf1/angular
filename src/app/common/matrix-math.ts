@@ -133,14 +133,14 @@ export function createRotateAt(angle: number, centerX: number, centerY: number):
   return { a, b, c: -b, d: a, e: (1 - a) * centerX + b * centerY, f: (1 - a) * centerY - b * centerX };
 }
 
-export function multiply(A: ReadonlyMatrix, B: ReadonlyMatrix): Matrix {
+export function multiply(ma: ReadonlyMatrix, mb: ReadonlyMatrix): Matrix {
   return {
-    a: A.a * B.a + A.c * B.b,
-    b: A.b * B.a + A.d * B.b,
-    c: A.a * B.c + A.c * B.d,
-    d: A.b * B.c + A.d * B.d,
-    e: A.a * B.e + A.c * B.f + A.e,
-    f: A.b * B.e + A.d * B.f + A.f,
+    a: ma.a * mb.a + ma.c * mb.b,
+    b: ma.b * mb.a + ma.d * mb.b,
+    c: ma.a * mb.c + ma.c * mb.d,
+    d: ma.b * mb.c + ma.d * mb.d,
+    e: ma.a * mb.e + ma.c * mb.f + ma.e,
+    f: ma.b * mb.e + ma.d * mb.f + ma.f,
   };
 }
 

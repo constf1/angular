@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { randomItem } from 'src/app/common/array-utils';
 
 const MESSAGES = {

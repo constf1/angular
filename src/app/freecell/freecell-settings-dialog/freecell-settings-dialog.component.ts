@@ -37,6 +37,8 @@ export class FreecellSettingsDialogComponent implements OnInit {
     }
   }
 
+  constructor(public settings: FreecellSettingsService) { }
+
   aspectRatioLabel = (value: number) => (value / D).toFixed(3);
 
   assistLevelLabel = (value: number) => {
@@ -58,8 +60,6 @@ export class FreecellSettingsDialogComponent implements OnInit {
       default: return 'accent';
     }
   }
-
-  constructor(public settings: FreecellSettingsService) { }
 
   ngOnInit(): void {
   }
