@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Input, Output, EventEmitter, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -253,11 +255,6 @@ export class WordSearchGameComponent implements OnInit {
     }
   }
 
-  private _nextAnswer() {
-    const index = this.answers.length;
-    this.answers.push({ index, value: '', transform: transformToTop(index) });
-  }
-
   onAnswerClick(answer: GameAnswer) {
     const active  = this.answers[this.activeAnswerIndex];
     if (answer === active) {
@@ -318,5 +315,10 @@ export class WordSearchGameComponent implements OnInit {
     return answer.index === this.activeAnswerIndex
       ? this.gameSVGLayout.prompt
       : this.gameSVGLayout.answers[answer.value];
+  }
+
+  private _nextAnswer() {
+    const index = this.answers.length;
+    this.answers.push({ index, value: '', transform: transformToTop(index) });
   }
 }

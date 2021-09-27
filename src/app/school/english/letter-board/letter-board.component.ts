@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 const DX = 1;
@@ -133,12 +135,6 @@ function frameToPath(cx: number, cy: number): string {
   styleUrls: ['./letter-board.component.scss']
 })
 export class LetterBoardComponent implements OnInit {
-  colNum: number;
-  rowNum: number;
-  pathFrame: string;
-
-  private _letters: string[][];
-
   @Input() set letters(value: string[][]) {
     this._letters = value;
     const cy = value.length;
@@ -158,6 +154,12 @@ export class LetterBoardComponent implements OnInit {
   @Input() selectionList: Selection[] = [];
 
   @Output() selectionChange = new EventEmitter<Selection>();
+
+  colNum: number;
+  rowNum: number;
+  pathFrame: string;
+
+  private _letters: string[][];
 
   constructor() {
     this.letters = [];
