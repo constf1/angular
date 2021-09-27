@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 
@@ -24,14 +25,14 @@ export type ControlPoint = {
   readonly y: number;
 };
 
-type ControlDragData = { point: ControlPoint, startX: number, startY: number };
+type ControlDragData = { point: ControlPoint; startX: number; startY: number };
 
-export type ControlDragEvent = ControlDragData & { name: DragEvent, deltaX: number, deltaY: number };
+export type ControlDragEvent = ControlDragData & { name: DragEvent; deltaX: number; deltaY: number };
 
 class MoveControlPoint implements ControlPoint {
   readonly type = 'move';
 
-  constructor(readonly itemIndex: number, readonly item: PathItem) {}
+  constructor(readonly itemIndex: number, readonly item: PathItem) { }
 
   get x() {
     return Path.getX(this.item);
@@ -45,7 +46,7 @@ class MoveControlPoint implements ControlPoint {
 class Curve1ControlPoint implements ControlPoint {
   readonly type = 'curve1';
 
-  constructor(readonly itemIndex: number, readonly item: PathItem & (Path.CurveTo | Path.QCurveTo)) {}
+  constructor(readonly itemIndex: number, readonly item: PathItem & (Path.CurveTo | Path.QCurveTo)) { }
 
   get x() {
     return this.item.x1;
@@ -59,7 +60,7 @@ class Curve1ControlPoint implements ControlPoint {
 class Curve2ControlPoint implements ControlPoint {
   readonly type = 'curve2';
 
-  constructor(readonly itemIndex: number, readonly item: PathItem & (Path.CurveTo | Path.SmoothCurveTo)) {}
+  constructor(readonly itemIndex: number, readonly item: PathItem & (Path.CurveTo | Path.SmoothCurveTo)) { }
 
   get x() {
     return this.item.x2;
@@ -76,10 +77,6 @@ class Curve2ControlPoint implements ControlPoint {
   styleUrls: ['./svg-view.component.scss']
 })
 export class SvgViewComponent implements OnInit, OnDestroy {
-  private _dragListener = new DragListener<ControlDragData>();
-  private _subscriptions: Subscription[] = [];
-  private _items: PathView = [];
-
   @Input() set pathItems(view: PathView) {
     this._items = view;
     this._createControls();
@@ -94,7 +91,7 @@ export class SvgViewComponent implements OnInit, OnDestroy {
   controls: ControlPoint[] = [];
 
   settingsState = initialState;
-  styles: { [key: string]: any; } = {};
+  styles: { [key: string]: any } = {};
 
   get viewBox(): string {
     const s = this.settingsState;
@@ -127,7 +124,7 @@ export class SvgViewComponent implements OnInit, OnDestroy {
         const prev = node.prev;
         const prevNotSelected = !(prev?.selected);
         if (prevNotSelected) {
-          nodes.push({ name: 'M', x: Path.getX(prev), y: Path.getY(prev)});
+          nodes.push({ name: 'M', x: Path.getX(prev), y: Path.getY(prev) });
         }
 
         if (prevNotSelected && Path.isSmoothCurveTo(node)) {
@@ -135,7 +132,7 @@ export class SvgViewComponent implements OnInit, OnDestroy {
         } else if (prevNotSelected && Path.isSmoothQCurveTo(node)) {
           nodes.push({ ...node, name: 'Q', x1: Path.getReflectedX1(node), y1: Path.getReflectedY1(node) });
         } else if (Path.isClosePath(node) || Path.isMoveTo(node)) {
-          nodes.push({ name: 'L', x: Path.getX(node), y: Path.getY(node)});
+          nodes.push({ name: 'L', x: Path.getX(node), y: Path.getY(node) });
         } else {
           nodes.push(node);
         }
@@ -217,6 +214,10 @@ export class SvgViewComponent implements OnInit, OnDestroy {
     }
     return Path.getBoundingRect(Path.createFromString(this.pathData));
   }
+
+  private _dragListener = new DragListener<ControlDragData>();
+  private _subscriptions: Subscription[] = [];
+  private _items: PathView = [];
 
   constructor(
     public settings: EditorSettingsService,
@@ -340,24 +341,6 @@ export class SvgViewComponent implements OnInit, OnDestroy {
     return nodes.map(node => Path.asString(node, digits)).join('');
   }
 
-  private _createControls() {
-    const points: ControlPoint[] = [];
-
-    for (let i = 0; i < this._items.length; i++) {
-      const node = this._items[i];
-      if (Path.hasControlPoint1(node)) {
-        points.push(new Curve1ControlPoint(i, node));
-      }
-      if (Path.hasControlPoint2(node)) {
-        points.push(new Curve2ControlPoint(i, node));
-      }
-      if (!Path.isClosePath(node)) {
-        points.push(new MoveControlPoint(i, node));
-      }
-    }
-    this.controls = points;
-  }
-
   getReflectedEllipticalArcs() {
     return this._items
       .filter(node => Path.isEllipticalArc(node))
@@ -374,5 +357,23 @@ export class SvgViewComponent implements OnInit, OnDestroy {
 
   getVisibility(item: PathItem) {
     return (this.activeItem && this.activeItem !== item) ? 'hidden' : 'visible';
+  }
+
+  private _createControls() {
+    const points: ControlPoint[] = [];
+
+    for (let i = 0; i < this._items.length; i++) {
+      const node = this._items[i];
+      if (Path.hasControlPoint1(node)) {
+        points.push(new Curve1ControlPoint(i, node));
+      }
+      if (Path.hasControlPoint2(node)) {
+        points.push(new Curve2ControlPoint(i, node));
+      }
+      if (!Path.isClosePath(node)) {
+        points.push(new MoveControlPoint(i, node));
+      }
+    }
+    this.controls = points;
   }
 }

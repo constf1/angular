@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
 
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
@@ -140,6 +140,20 @@ export class EditorSettingsService extends StateSubject<EditorSettingsState> {
     this.set(initialState);
   }
 
+  set(params: Partial<Readonly<EditorSettingsState>>): boolean {
+    const ok = this._set(params);
+    if (ok) {
+      if (this._timerId) {
+        clearTimeout(this._timerId);
+      }
+      this._timerId = setTimeout(() => {
+        this._timerId = null;
+        this.saveLocal(KEY);
+      }, SAVE_DELAY_MS);
+    }
+    return ok;
+  }
+
   protected _validate(state: EditorSettingsState) {
     for (const key of Object.keys(minState)) {
       state[key] = Math.max(minState[key], Math.min(maxState[key], state[key] || 0));
@@ -154,19 +168,5 @@ export class EditorSettingsService extends StateSubject<EditorSettingsState> {
     // console.log('STATE:', state);
 
     return super._validate(state);
-  }
-
-  set(params: Partial<Readonly<EditorSettingsState>>): boolean {
-    const ok = this._set(params);
-    if (ok) {
-      if (this._timerId) {
-        clearTimeout(this._timerId);
-      }
-      this._timerId = setTimeout(() => {
-        this._timerId = null;
-        this.saveLocal(KEY);
-      }, SAVE_DELAY_MS);
-    }
-    return ok;
   }
 }

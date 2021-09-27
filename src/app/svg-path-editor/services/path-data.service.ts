@@ -1,4 +1,4 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
 
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
@@ -19,7 +19,6 @@ const KEY = '[svg-path-editor.path-data]';
 
 @Injectable()
 export class PathDataService extends StateSubject<PathDataState> {
-  private _timerId: ReturnType<typeof setTimeout>;
 
   /** Save delay in milliseconds */
   saveDelay = 30 * 1000;
@@ -47,14 +46,7 @@ export class PathDataService extends StateSubject<PathDataState> {
     return !(!this.state.prev && !this.state.next);
   }
 
-  private _save = () => {
-    this._timerId = null;
-    try {
-      localStorage.setItem(KEY, this.state.data);
-    } catch (e) {
-      console.warn('localStorage error:', e);
-    }
-  }
+  private _timerId: ReturnType<typeof setTimeout>;
 
   constructor() {
     super(initialState);
@@ -106,4 +98,13 @@ export class PathDataService extends StateSubject<PathDataState> {
     }
     return ok;
   }
+
+  private _save = () => {
+    this._timerId = null;
+    try {
+      localStorage.setItem(KEY, this.state.data);
+    } catch (e) {
+      console.warn('localStorage error:', e);
+    }
+  };
 }

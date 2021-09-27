@@ -1,4 +1,7 @@
-// tslint:disable: variable-name
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Component, OnInit } from '@angular/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { MatDialog } from '@angular/material/dialog';
@@ -33,7 +36,7 @@ const SAMPLE_PATH_DATA =
 
 const SAMPLE_STEP = 25;
 
-const SAMPLE_PATH_ITEMS: { [key in Path.DrawCommand] : number[] } = {
+const SAMPLE_PATH_ITEMS: { [key in Path.DrawCommand]: number[] } = {
   M: [SAMPLE_STEP, SAMPLE_STEP],
   L: [SAMPLE_STEP, SAMPLE_STEP],
   H: [SAMPLE_STEP],
@@ -352,7 +355,7 @@ export class EditorComponent implements OnInit {
   }
 
   loadSvg(event: Event) {
-    const target = event.target as EventTarget & { files: FileList, value: any };
+    const target = event.target as EventTarget & { files: FileList; value: any };
     if (target && target.files[0]) {
       const file: File = target.files[0];
 

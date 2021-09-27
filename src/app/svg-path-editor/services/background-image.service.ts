@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Injectable } from '@angular/core';
 
 const KEY = '[svg-path-editor.background-image]';

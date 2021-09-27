@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Injectable, OnDestroy } from '@angular/core';
 
 type SvgFile = {

@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { append, connect, Linkable } from 'src/app/common/linkable';
 import { ReadonlyMatrix } from 'src/app/common/matrix-math';
 import { transformedNode } from './svg-path-transform';
@@ -113,7 +117,6 @@ const REXPS: {[key in Path.DrawCommand]: Readonly<RegExp[]>} = {
  * Helper class.
  */
 class Reader {
-  // tslint:disable-next-line: variable-name
   private _data = '';
 
   set data(value: string) {
