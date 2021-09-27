@@ -88,9 +88,9 @@ export function groupBy<T>(
 }
 
 export type Grader<T> = {
-  mapper: (item: Readonly<T>) => string | number,
-  picker: (keys: string[]) => (string | number)[],
-  fallback?: Grader<T>
+  mapper: (item: Readonly<T>) => string | number;
+  picker: (keys: string[]) => (string | number)[];
+  fallback?: Grader<T>;
 };
 
 export function pickSome<T>(items: T[], limit: number, grader: Grader<T>): T[] {

@@ -48,6 +48,7 @@ export function createTranslate(x: number, y: number): Matrix {
 
 /**
  * Creates a scale matrix.
+ *
  * @param scaleX The amount by which to scale along the x-axis.
  * @param scaleY The amount by which to scale along the y-axis.
  */
@@ -57,6 +58,7 @@ export function createScale(scaleX: number, scaleY: number): Matrix {
 
 /**
  * Creates a scale about the specified point matrix.
+ *
  * @param scaleX The amount by which to scale along the x-axis.
  * @param scaleY The amount by which to scale along the y-axis.
  * @param centerX The x-coordinate of the scale operation's center point.
@@ -75,6 +77,7 @@ export function createScaleAt(scaleX: number, scaleY: number, centerX: number, c
 
 /**
  * Creates a skew of the specified degrees in the x and y dimensions matrix.
+ *
  * @param skewX The angle in the x dimension by which to skew.
  * @param skewY The angle in the y dimension by which to skew.
  */
@@ -84,6 +87,7 @@ export function createSkew(skewX: number, skewY: number): Matrix {
 
 /**
  * Creates a skew about the specified point matrix.
+ *
  * @param skewX The angle in the x dimension by which to skew.
  * @param skewY The angle in the y dimension by which to skew.
  * @param centerX The x-coordinate of the skew operation's center point.
@@ -102,6 +106,7 @@ export function createSkewAt(skewX: number, skewY: number, centerX: number, cent
 
 /**
  * Creates a rotation matrix.
+ *
  * @param angle The rotation angle, in radians.
  */
 export function createRotate(angle: number): Matrix {
@@ -110,6 +115,7 @@ export function createRotate(angle: number): Matrix {
 
 /**
  * Creates a rotation matrix about the specified point.
+ *
  * @param angle The angle, in radians, by which to rotate.
  * @param centerX The x-coordinate of the point about which to rotate.
  * @param centerY The y-coordinate of the point about which to rotate.
@@ -140,6 +146,7 @@ export function multiply(A: ReadonlyMatrix, B: ReadonlyMatrix): Matrix {
 
 /**
  * Returns an inverted version of the matrix.
+ *
  * @param m the given matrix
  */
 export function invert(m: ReadonlyMatrix): Matrix {
@@ -197,9 +204,10 @@ export function decompose(
 
 /**
  * Gets the point (if any exists) around which a transformation is applied.
+ *
  * @param m Transformation matrix.
  */
-export function getTransformOrigin(m: ReadonlyMatrix): { x?: number, y?: number } | undefined {
+export function getTransformOrigin(m: ReadonlyMatrix): { x?: number; y?: number } | undefined {
   const { b, c, e, f } = m;
   // a * x + c * y + e = x
   // b * x + d * y + f = y

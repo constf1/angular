@@ -247,6 +247,7 @@ const MESSAGES = {
 
 /**
  * Returns score message.
+ *
  * @param score in [0, 1]
  */
 export function getScoreMessage(score: number): string {

@@ -12,7 +12,7 @@ export class MenuViewComponent implements OnInit {
 
   tabSelection = 0;
 
-  zooms: { label: string, value: number}[]  = [
+  zooms: { label: string; value: number}[]  = [
     {label: '1:4', value: 25 },
     {label: '1:2', value: 50 },
     {label: '1:1', value: 100 },

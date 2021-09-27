@@ -40,6 +40,7 @@ export interface MathExpression extends MathSymbol {
 /**
  * addition/summation: (augend) + (addend) = (total)
  * or (summand) + (summand) = (sum)
+ *
  * @param first augend
  * @param second addend
  */
@@ -75,6 +76,7 @@ export function createRandomAddition(maxValue: number): MathExpression {
 
 /**
  * subtraction: (minuend) − (subtrahend) = (difference)
+ *
  * @param first minuend
  * @param second subtrahend
  */
@@ -109,6 +111,7 @@ export function createRandomSubtraction(maxValue: number): MathExpression {
 /**
  * division: (dividend) / (divisor) = (quotient)
  * Or sometimes = (quotient) with (remainder) remaining
+ *
  * @param first dividend
  * @param second divisor
  */
@@ -143,6 +146,7 @@ export function createRandomDivision(maxValue: number, maxQuotient: number): Mat
 
 /**
  * multiplication: (multiplier) * (multiplicand) = (product)
+ *
  * @param first multiplier
  * @param second multiplicand
  */

@@ -62,7 +62,7 @@ export class FreecellPlaygroundComponent implements OnInit {
   @Output() selectionChange = new EventEmitter<number>();
 
   // Workaround. We'll be a touch proxy for cards to get around buggy firefox behaviour.
-  @Output() touchChange = new EventEmitter<{ type: DragEvent, event: TouchEvent }>();
+  @Output() touchChange = new EventEmitter<{ type: DragEvent; event: TouchEvent }>();
 
   @ViewChildren('spot') spotList: QueryList<ElementRef<HTMLElement>>;
 

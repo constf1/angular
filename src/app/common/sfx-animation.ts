@@ -24,7 +24,7 @@ export abstract class SfxAbstractAnimation implements SfxAnimation {
     ctx.restore();
 
     this.lastFrameTime = time;
-  }
+  };
 
   abstract clear(ctx: CanvasRenderingContext2D, width: number, height: number): void;
   abstract draw(ctx: CanvasRenderingContext2D, width: number, height: number): void;

@@ -36,6 +36,7 @@ export interface Linkable<T extends ILinkable> {
 
 /**
  * Detaches the `node` from its current position
+ *
  * @param node The node to detach
  */
 export function detach(node: ILinkable): void {
@@ -66,6 +67,7 @@ export function detach(node: ILinkable): void {
 /**
  * Adds the `newNode` after the `refNode`.
  * The `newNode` will be detached from its current position and attached at the new position.
+ *
  * @param refNode The node to which the `newNode` node will be attached
  * @param newNode The node to append to the given `refNode`
  * @returns The returned value is the list with these nodes
@@ -102,6 +104,7 @@ export function append<T extends Linkable<T>>(refNode: T | null, newNode: T): Li
 /**
  * Inserts the `newNode` node before the reference `refNode`.
  * The `newNode` will be detached from its current position and attached at the new position.
+ *
  * @param refNode The node before which the `newNode` node will be attached
  * @param newNode The node to be inserted
  * @returns The returned value is the list with these nodes
@@ -132,6 +135,7 @@ export function prepend<T extends Linkable<T>>(refNode: T, newNode: T): List<T> 
 
 /**
  * Connects linkables nodes
+ *
  * @param node The node to which the `next` node will be attached
  * @param next The node to append to the given `node`
  * @param others The other nodes to append

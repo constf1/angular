@@ -137,7 +137,7 @@ export class SvgOpenDialogComponent implements OnInit {
   }
 
   onSelectionItemChange() {
-    const ranges: { first: number, last: number }[] = [];
+    const ranges: { first: number; last: number }[] = [];
     let first = 0;
     let last = -1;
     for (let i = 0; i < this.items.length; i++) {

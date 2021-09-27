@@ -27,6 +27,7 @@ export function toString(value: number, minWidth: number, prefix: string = '0', 
 
 /**
  * Returns a string representing a number in fixed-point notation.
+ *
  * @param value The number.
  * @param maximumFractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
  */
@@ -108,6 +109,7 @@ export function stringToByteArray(str: string): number[] {
 
 /**
  * Linear interpolation.
+ *
  * @param a start point
  * @param b stop point
  * @param t blend factor in the interval [0, 1]
@@ -141,6 +143,7 @@ export function bezier3(p0: number, p1: number, p2: number, p3: number, t: numbe
 
 /**
  * Tests if the number is near to 0.
+ *
  * @param a the number
  */
 export function isZero(a: number): boolean {
@@ -149,6 +152,7 @@ export function isZero(a: number): boolean {
 
 /**
  * Tests if the two numbers are near to each other.
+ *
  * @param a first number
  * @param b second number
  */

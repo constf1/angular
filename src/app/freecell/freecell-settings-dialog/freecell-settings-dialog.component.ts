@@ -37,9 +37,7 @@ export class FreecellSettingsDialogComponent implements OnInit {
     }
   }
 
-  aspectRatioLabel = (value: number) => {
-    return (value / D).toFixed(3);
-  }
+  aspectRatioLabel = (value: number) => (value / D).toFixed(3);
 
   assistLevelLabel = (value: number) => {
     const delta = (this.assistLevelMax - this.assistLevelMin) / 3;
@@ -50,7 +48,7 @@ export class FreecellSettingsDialogComponent implements OnInit {
       return 'high';
     }
     return 'norm';
-  }
+  };
 
   assistLevelColor() {
     const label = this.assistLevelLabel(this.assistLevel);

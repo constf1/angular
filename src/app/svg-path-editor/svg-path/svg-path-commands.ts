@@ -204,6 +204,7 @@ export function formatParams(item: Readonly<DrawTo>, x0: number, y0: number, fra
 
 /**
  * Returns a string representing the draw command in absolute form.
+ *
  * @param item SVG path single draw command
  * @param fractionDigits Number of digits after the decimal point. Must be in the range 0 - 20, inclusive.
  */

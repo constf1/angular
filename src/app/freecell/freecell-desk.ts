@@ -35,6 +35,7 @@ export class FreecellDesk extends FreecellBasis {
 
   /**
    * Gets a card at [index, offset]
+   *
    * @param index a line index
    * @param offset an offset in the line. A negative value can be used,
    *  indicating an offset from the end of the sequence.
@@ -134,6 +135,7 @@ export class FreecellDesk extends FreecellBasis {
 
   /**
    * Makes a new deal.
+   *
    * @param seed seed number
    */
   deal(seed?: number) {
@@ -194,6 +196,7 @@ export class FreecellDesk extends FreecellBasis {
 
   /**
    * Pops the last card from the `source` line and add it to the `destination`
+   *
    * @param source source line
    * @param destination destination line
    */

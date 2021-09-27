@@ -1,7 +1,7 @@
 import { FreecellBasis } from './freecell-basis';
 import { CARD_NUM, suitOf, rankOf, isTableau, SUIT_NUM } from '../common/deck';
 
-export type Filter = { [card: number]: boolean; } | boolean[];
+export type Filter = { [card: number]: boolean } | boolean[];
 export type Desk = Readonly<Readonly<number[]>[]>;
 
 export class FreecellSolution {
@@ -25,7 +25,7 @@ export class FreecellSolver extends FreecellBasis {
 
   // Default do-nothing implementation.
   onMove: (card: number, source: number, destination: number) => void =
-   (card: number, source: number, destination: number) => {}
+   (card: number, source: number, destination: number) => {};
 
   constructor(pileNum: number, cellNum: number, baseNum: number, public desk: number[][]) {
     super(pileNum, cellNum, baseNum);
