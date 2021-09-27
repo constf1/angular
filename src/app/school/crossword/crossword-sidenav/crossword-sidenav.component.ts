@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ErrorStateMatcher } from '@angular/material/core';
@@ -32,14 +33,12 @@ class InputState implements ErrorStateMatcher {
   providers: [CrosswordGameService]
 })
 export class CrosswordSidenavComponent implements OnInit, OnDestroy {
-  private _subscription: Subscription;
+  @ViewChild(CrosswordBoardComponent) boardComponent: CrosswordBoardComponent;
 
   clues: TabListGroup[];
   selection: TabListSelection = { groupIndex: 0, itemIndex: -1 };
 
   inputState = new InputState();
-
-  @ViewChild(CrosswordBoardComponent) boardComponent: CrosswordBoardComponent;
 
   get mode() {
     return this.settings.state.sidenavModeSide ? 'side' : 'over';
@@ -103,6 +102,8 @@ export class CrosswordSidenavComponent implements OnInit, OnDestroy {
     }
     return text;
   }
+
+  private _subscription: Subscription;
 
   constructor(
     public gamester: CrosswordGameService,

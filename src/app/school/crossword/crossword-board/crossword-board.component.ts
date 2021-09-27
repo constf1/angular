@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, Renderer2, ViewChildren } from '@angular/core';
 import { Subscription } from 'rxjs';
 
@@ -222,19 +224,6 @@ function makeFailPath(
   styleUrls: ['./crossword-board.component.scss']
 })
 export class CrosswordBoardComponent implements OnInit, OnDestroy {
-  private _mouse?: MouseState; // Word on click selection workaround.
-  private _dragListener = new DragListener<DragData>();
-  private _player = new Autoplay();
-  private _selection: TabListSelection;
-  private _subs: Subscription[] = [];
-
-  tiles: Tile[];
-  layout: Layout;
-
-  failPath: string;
-  fillPath: string;
-  wordPath: string;
-
   @ViewChildren('tiles') tileList: QueryList<ElementRef<HTMLElement>>;
 
   @Input() set selection(value: TabListSelection) {
@@ -248,6 +237,14 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
 
   @Output() selectionChange = new EventEmitter<TabListSelection>();
 
+  tiles: Tile[];
+  layout: Layout;
+
+  failPath: string;
+  fillPath: string;
+  wordPath: string;
+
+
   get isDone(): boolean {
     return this.gamester.state.stage === 'done';
   }
@@ -256,6 +253,12 @@ export class CrosswordBoardComponent implements OnInit, OnDestroy {
     const state = this.gamester.state;
     return state.showMistakes && state.game?.isSolved;
   }
+
+  private _mouse?: MouseState; // Word on click selection workaround.
+  private _dragListener = new DragListener<DragData>();
+  private _player = new Autoplay();
+  private _selection: TabListSelection;
+  private _subs: Subscription[] = [];
 
   constructor(public gamester: CrosswordGameService, private _renderer: Renderer2) {}
 

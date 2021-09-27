@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
 import { Grid } from '../crossword-model';

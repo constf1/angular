@@ -1,8 +1,11 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Injectable } from '@angular/core';
 import { StateSubject } from 'src/app/common/state-subject';
 import { SubType } from 'src/app/common/types';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const CrosswordDifficultyNames = ['very easy', 'easy', 'norm', 'hard', 'very hard'] as const;
 export type CrosswordDifficulty = typeof CrosswordDifficultyNames[number];
 

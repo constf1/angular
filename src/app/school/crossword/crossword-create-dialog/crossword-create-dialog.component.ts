@@ -1,4 +1,3 @@
-// tslint:disable: variable-name
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';

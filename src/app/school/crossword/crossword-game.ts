@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 // import { Subject } from 'rxjs';
 
 import { Linkable } from 'src/app/common/linkable';

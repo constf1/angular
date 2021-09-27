@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { ArrayDataSource } from '@angular/cdk/collections';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { HttpClient } from '@angular/common/http';
@@ -128,13 +130,13 @@ export type Data = { [key: string]: string };
   styleUrls: ['./crossword-data-tree.component.scss']
 })
 export class CrosswordDataTreeComponent implements OnInit {
+  @Output() dataChange = new EventEmitter<Data>();
+
   errorMessage: string;
   root: TreeNode;
 
   treeControl = new NestedTreeControl<TreeNode>(node => node.children);
   dataSource: ArrayDataSource<TreeNode>;
-
-  @Output() dataChange = new EventEmitter<Data>();
 
   constructor(public settings: CrosswordSettingsService, private _http: HttpClient) { }
 
