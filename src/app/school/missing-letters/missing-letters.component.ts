@@ -1,4 +1,5 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
@@ -123,7 +124,7 @@ export class MissingLettersComponent implements OnInit {
 
   setQuiz(word: string) {
     const regexp = /\([^)]+\)|./g;
-    const letters: { value: string, questions?: string[]}[] = [];
+    const letters: { value: string; questions?: string[]}[] = [];
     let count = 0;
 
     while (true) {

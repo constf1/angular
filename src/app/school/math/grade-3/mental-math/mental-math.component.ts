@@ -1,4 +1,6 @@
-// tslint:disable: variable-name
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+
 import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -65,6 +67,7 @@ function getScoreMessage(score: number): string {
 
 /**
  * Removes all non-numeric characters from the string
+ *
  * @param str string
  */
 function digitsOnly(str: string): string {
@@ -83,6 +86,8 @@ type FormStatus = 'active' | 'validation' | 'done';
   styleUrls: ['./mental-math.component.scss']
 })
 export class MentalMathComponent implements OnInit, OnDestroy {
+  @ViewChild('menuButton', { read: ElementRef }) menuButtonRef: ElementRef<HTMLButtonElement>;
+
   // 'Вычисли, переставляя, где удобно, слагаемые или заменяя соседние слагаемые их суммой.'
   primeMessage = 'Найди значение каждого выражения.';
   extraMessage = 'Работа над ошибками:'; // correction of mistakes
@@ -93,7 +98,6 @@ export class MentalMathComponent implements OnInit, OnDestroy {
   primeItems: InputItem[];
   extraItems: InputItem[];
 
-  @ViewChild('menuButton', { read: ElementRef }) menuButtonRef: ElementRef<HTMLButtonElement>;
 
   canPrimeSubmit = false;
   scoreMessage = '';
@@ -158,17 +162,6 @@ export class MentalMathComponent implements OnInit, OnDestroy {
         case 'M': this._addPrimeItem(createRandomMultiplication(10, n), 'result'); break;
         case 'D': this._addPrimeItem(createRandomDivision(10, n), 'result'); break;
       }
-    }
-  }
-
-  private _addPrimeItem(expression: MathExpression, hiddenTerm?: MathExpressionTerm) {
-    const str = asString(expression);
-    if (!this.primeItems.find(item => asString(item.expression) === str)) {
-      const inputName = 'mathExpression' + this.primeItems.length;
-      const inputValue = '';
-      const inputIndex = hiddenTerm || randomItem(INPUTS);
-      const inputLength = expression[inputIndex].value.toString().length;
-      this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
     }
   }
 
@@ -389,6 +382,17 @@ export class MentalMathComponent implements OnInit, OnDestroy {
     const item = this.extraItems[index];
     if (item) {
       this._dialog.open(MathExpressionDialogComponent, { data: { ...item } });
+    }
+  }
+
+  private _addPrimeItem(expression: MathExpression, hiddenTerm?: MathExpressionTerm) {
+    const str = asString(expression);
+    if (!this.primeItems.find(item => asString(item.expression) === str)) {
+      const inputName = 'mathExpression' + this.primeItems.length;
+      const inputValue = '';
+      const inputIndex = hiddenTerm || randomItem(INPUTS);
+      const inputLength = expression[inputIndex].value.toString().length;
+      this.primeItems.push({ inputName, inputValue, inputIndex, inputLength, expression });
     }
   }
 }
