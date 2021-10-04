@@ -99,7 +99,7 @@
           </mat-button-toggle-group>
         </div>
         <div class="pad-top">
-          <mat-icon class="margin-right-8">aspect_ratio</mat-icon>Aspect ratio. The playground width divided by its height.
+          <mat-icon class="margin-right-8">aspect_ratio</mat-icon>The playground height:
           <mat-slider thumbLabel="true"
               [displayWith]="aspectRatioLabel"
               [min]="aspectRatioMin"
@@ -107,7 +107,7 @@
               [step]="aspectRatioStep"
               [(ngModel)]="aspectRatio"
           ></mat-slider>
-          {{settings.state.aspectRatio | number:'1.3-3'}}
+          {{aspectRatioPercent}}% of its width.
         </div>
       </div>
     </mat-tab>

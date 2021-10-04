@@ -66,7 +66,7 @@ export const minState: Readonly<SubType<FreecellSettingsState, number>> = {
 };
 
 export const maxState: Readonly<SubType<FreecellSettingsState, number>> = {
-  aspectRatio: 0.70,
+  aspectRatio: 0.80,
   assistLevel: 2000000,
   sandwichOrder: 5,
   inputMode: InputMode.All

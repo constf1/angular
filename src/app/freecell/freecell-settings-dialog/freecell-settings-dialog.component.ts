@@ -18,6 +18,10 @@ export class FreecellSettingsDialogComponent implements OnInit {
   readonly assistLevelMax = Math.floor(maxState.assistLevel / D);
   readonly assistLevelStep = S;
 
+  get aspectRatioPercent() {
+    return (this.settings.state.aspectRatio * 100).toFixed(1);
+  }
+
   get aspectRatio() {
     return Math.round(this.settings.state.aspectRatio * D);
   }
@@ -39,7 +43,7 @@ export class FreecellSettingsDialogComponent implements OnInit {
 
   constructor(public settings: FreecellSettingsService) { }
 
-  aspectRatioLabel = (value: number) => (value / D).toFixed(3);
+  aspectRatioLabel = (value: number) => (value * 100 / D).toFixed(1);
 
   assistLevelLabel = (value: number) => {
     const delta = (this.assistLevelMax - this.assistLevelMin) / 3;
