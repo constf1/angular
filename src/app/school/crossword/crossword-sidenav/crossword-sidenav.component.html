@@ -25,9 +25,12 @@
       <!-- <button mat-list-item > Undo </button> -->
     </mat-action-list>
     <div *ngIf="clues" style="margin: 1em;">
-      <h3>Clues</h3>
       <app-tab-list [groups]="clues" [selection]="selection" [panelStyle]="{ maxHeight: '24em', overflowY: 'auto' }"
         (selectionChange)="onSelectionChange($event)">
+        <div appTabListHead>
+          <span>Clues</span>
+          <mat-icon color="primary">business</mat-icon>
+        </div>
       </app-tab-list>
       <mat-form-field appearance="standard" style="width: 100%;margin-top: 0.5em;">
         <mat-label>{{inputInfo}}</mat-label>
