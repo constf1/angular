@@ -1,9 +1,14 @@
 <div class="tab-group" role="tabgroup">
   <ul role="tablist">
+    <li role="tabhead">
+      <ng-content select="[appTabGroupHead]"></ng-content>
+    </li>
     <li role="tabitem" *ngFor="let label of labels; index as i" [class.active]="i === selection">
       <button role="tab" (click)="selectionChange.emit(i)">{{label}}</button>
     </li>
-    <li role="space"></li>
+    <li role="tabtail">
+      <ng-content select="[appTabGroupTail]"></ng-content>
+    </li>
   </ul>
   <div role="tabpanel">
     <ng-content></ng-content>

@@ -1,6 +1,8 @@
 <app-tab-group [items]="labels" [selection]="selection.groupIndex" (selectionChange)="onGroupChange($event)">
+  <ng-content select="[appTabListHead]" appTabGroupHead></ng-content>
   <div class="tab-list-base" *ngIf="groups[selection.groupIndex] as group" [ngStyle]="panelStyle">
     <div class="tab-list-item" *ngFor="let item of group.items; index as i" #item [class.active]="i === selection.itemIndex"
       (click)="onItemChange(i)">{{item}}</div>
   </div>
+  <ng-content select="[appTabListTail]" appTabGroupTail></ng-content>
 </app-tab-group>
