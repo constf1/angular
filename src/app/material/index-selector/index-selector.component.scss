@@ -6,18 +6,25 @@
 
   .index-selector-input {
     min-width: 5em;
-    max-width: 9em;
+    max-width: 8em;
     flex: 1 1 5em;
-  }
-
-  .index-selector-buttons {
-    display: inline-block;
-    flex-grow: 0;
-    flex-shrink: 0;
   }
 
   .index-selector-slider {
     flex: 1;
-    max-width: 32em;
+    max-width: 40em;
+
+    display: flex;
+    flex-direction: column;
+
+    mat-slider {
+      flex: 1;
+      margin-bottom: 16px;
+    }
+
+    div.index-selector-buttons {
+      display: flex;
+      width: 100%;
+    }
   }
 }

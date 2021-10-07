@@ -6,15 +6,23 @@
     <mat-hint>From 1 to {{count}}</mat-hint>
   </mat-form-field>
 
-  <div class="index-selector-buttons">
-    <button mat-stroked-button [disabled]="0 >= selection" (click)="requestSelectionChange(selection - 1)">
-      <mat-icon>chevron_left</mat-icon>
-    </button>
-    <button mat-stroked-button [disabled]="selection + 1 >= count" (click)="requestSelectionChange(selection + 1)">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
+  <div class="index-selector-slider">
+    <mat-slider step="1" min="1" [max]="count" [disabled]="0 >= count" [ngModel]="selection + 1"
+      (input)="requestSelectionChange($event.value - 1)"></mat-slider>
+    <div class="index-selector-buttons">
+      <button mat-icon-button [disabled]="0 >= selection" (click)="requestSelectionChange(0)">
+        <mat-icon>first_page</mat-icon>
+      </button>
+      <button mat-icon-button [disabled]="0 >= selection" (click)="requestSelectionChange(selection - 1)">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <div class="flex-space-filler-1"></div>
+      <button mat-icon-button [disabled]="selection + 1 >= count" (click)="requestSelectionChange(selection + 1)">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <button mat-icon-button [disabled]="selection + 1 >= count" (click)="requestSelectionChange(count - 1)">
+        <mat-icon>last_page</mat-icon>
+      </button>
+    </div>
   </div>
-
-  <mat-slider class="index-selector-slider" step="1" min="1" [max]="count" [disabled]="0 >= count"
-    [ngModel]="selection + 1" (input)="requestSelectionChange($event.value - 1)"></mat-slider>
 </div>
