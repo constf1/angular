@@ -1,7 +1,11 @@
 $margin: 1em;
 
+.path-item-info {
+  padding-top: 8px;
+}
+
 .path-item-data {
-  border-bottom: 1px solid rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
   margin-bottom: $margin;
 }
 
@@ -17,6 +21,7 @@ $margin: 1em;
       margin-right: $margin;
     }
   }
+
   >mat-checkbox:nth-of-type(odd) {
     margin-right: $margin;
   }

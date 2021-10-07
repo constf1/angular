@@ -1,9 +1,10 @@
-<div>
+<div class="path-item-info">
   {{info}}
   <mat-checkbox style="float: right;" [checked]="isRelative" (change)="setRelative($event.checked)">
     Relative
   </mat-checkbox>
 </div>
+
 <div class="path-item-data">{{path}}</div>
 
 <!-- Ellipse shape -->
