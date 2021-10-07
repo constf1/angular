@@ -13,6 +13,7 @@ div.tab-group[role=tabgroup] {
       border-bottom: 1px solid $border-color;
 
       button[role=tab] {
+        height: 100%;
         cursor: pointer;
         font: inherit;
         display: inline-block;
