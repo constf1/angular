@@ -43,8 +43,8 @@
       "complacent": "feeling so satisfied with your own abilities or situation that you feel you do not need to try any harder",
       "concede": "admit that something is true or valid after first denying or resisting it; surrender or yield (something that one possesses)",
       "confabulate": "engage in conversation; talk",
-      "confabulation": "a conversation",
       "conflate": "combine (two or more texts, ideas, etc.) into one",
+      "connotation": "an idea or feeling that a word invokes in addition to its literal or primary meaning",
       "constituent": "one of the parts that a substance or combination is made of",
       "contingency": "an unknown or unforeseen future event or condition",
       "contraption": "a device or machine that looks awkward or old-fashioned",
@@ -77,7 +77,8 @@
       "elide": "omit (a sound or syllable) when speaking",
       "emanate": "to come or seem to come from someone or something",
       "eminent": "famous and respected within a particular sphere or profession; (of good qualities) unusual; excellent",
-      "ensconce": "to settle firmly or comfortably",
+      "ensconce": "settle firmly or comfortably, put yourself in a place or comfortable position as if to stay there",
+      "envisage": "imagine or expect something in the future, especially something good; form a mental picture of (something not yet existing or known)",
       "esprit de corps": "the feelings, such as being proud and loyal, shared by members of a group of people",
       "exasperation": "the feeling of being annoyed",
       "exert": "to use influence, authority, etc. forcefully or effectively",
@@ -108,11 +109,12 @@
       "grope": "feel about or search blindly or uncertainly with the hands"
     },
     "H": {
-      "hapless": "unlucky",
-      "hazardous": "dangerous",
+      "hapless": "unlucky, unfortunate",
+      "hazardous": "dangerous, risky",
       "heinous": "evil and shocking",
       "helical": "having the shape or form of a helix; spiral",
       "heretofore": "(formal) before now",
+      "heyday": "the period of a person's or thing's greatest success, popularity, or vigor",
       "hitherto": "until this time",
       "hoist": "to raise or lift up, esp. by mechanical means; any apparatus or device for lifting things"
     },
@@ -153,6 +155,7 @@
     },
     "NO": {
       "nary": "not one; none at all",
+      "nascent": "just coming into existence and beginning to display signs of future potential",
       "natter": "to talk continuously for a long time without any particular purpose",
       "noxious": "poisonous or harmful; extremely unpleasant",
       "obverse": "the other side of something, a counterpart or opposite",
@@ -194,6 +197,7 @@
       "replete": "(pleasantly) full of food and drink; well supplied",
       "reticence": "the quality of being unwilling to speak about your thoughts or feelings",
       "romp": "to play in a rough, excited, and noisy way",
+      "rudder": "a flat piece hinged vertically near the stern of a boat or ship for steering",
       "ruse": "an action intended to deceive someone; a trick"
     },
     "S": {
@@ -250,6 +254,8 @@
       "vat": "a large container for holding or storing liquids",
       "vermin": "small animals collectively, such as insects and rodents, that spread disease and damage crops",
       "versed": "experienced or skilled in; knowledgeable about",
+      "viable": "capable of working successfully; feasible",
+      "vibrant": "full of energy and enthusiasm",
       "vie": "to compete (with someone)",
       "vigour": "physical strength and good health",
       "vista": "a pleasing view, especially one seen through a long, narrow opening"
