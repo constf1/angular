@@ -87,6 +87,7 @@ div.missing-letters-frame {
   position: relative;
   width: 1024px;
   height: 768px;
+  flex-shrink: 0;
 
   @media (min-height: 800px) {
     margin-top: 16px;
