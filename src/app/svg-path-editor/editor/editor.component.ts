@@ -407,7 +407,8 @@ export class EditorComponent implements OnInit {
     const nextIndex = lastIndex + 1;
     this.path = Path.appendAt(this.path, nextIndex, next);
     if (this.editMode === EditMode.Single || this.editMode === EditMode.Group) {
-      Path.selectDistinct(this.path, this.singleSelectionIndex = nextIndex, true);
+      this.singleSelectionIndex = nextIndex;
+      Path.selectDistinct(this.path, nextIndex, true);
     }
     this.onPathModelChange();
   }
@@ -418,7 +419,8 @@ export class EditorComponent implements OnInit {
 
     this.path =  index >= 0 ? Path.bisectSelection(path) : Path.bisectAll(path);
     if (this.editMode === EditMode.Single) {
-      Path.selectDistinct(this.path, this.singleSelectionIndex = index, true);
+      this.singleSelectionIndex = index;
+      Path.selectDistinct(this.path, index, true);
     }
     this.onPathModelChange();
   }
@@ -429,7 +431,8 @@ export class EditorComponent implements OnInit {
 
     this.path = Path.approximateEllipticalArcs(path, index >= 0);
     if (this.editMode === EditMode.Single) {
-      Path.selectDistinct(this.path, this.singleSelectionIndex = index, true);
+      this.singleSelectionIndex = index;
+      Path.selectDistinct(this.path, index, true);
     }
     this.onPathModelChange();
   }
@@ -474,7 +477,8 @@ export class EditorComponent implements OnInit {
 
     // Move selection to the newly created items.
     if (this.editMode === EditMode.Single) {
-      Path.selectDistinct(next, this.singleSelectionIndex = nextIndex, true);
+      this.singleSelectionIndex = nextIndex;
+      Path.selectDistinct(next, nextIndex, true);
     } else if (this.editMode === EditMode.Group) {
       Path.selectAll(next, false);
       for (let i = nextIndex; i < nextIndex + clone.length; i++) {
