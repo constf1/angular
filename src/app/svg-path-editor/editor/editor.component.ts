@@ -88,7 +88,13 @@ export class EditorComponent implements OnInit {
 
   get selectMode(){
     const count = Path.countSelected(this.path);
-    return count === 1 ? 'Single Item' : count > 0 ? 'Selection' : 'All';
+    if (count === 1) {
+      return 'Single Item';
+    } else if (count === 0 || count === this.path.length) {
+      return 'All';
+    } else {
+      return 'Selection';
+    }
   }
 
   get isAllSelected() {
