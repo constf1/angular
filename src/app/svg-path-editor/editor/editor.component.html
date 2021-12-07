@@ -70,12 +70,19 @@
             </div>
 
             <div *ngIf="editMode === 1">
-              <div style="padding-left: 16px;padding-bottom: 10px">
+              <div class="edit-group-head">
                 <mat-checkbox [checked]="isAllSelected" [indeterminate]="isSomeSelected"
                   (change)="onSelectAll($event.checked)">Select All</mat-checkbox>
+                <span class="flex-space-filler-1"></span>
+                <button mat-icon-button aria-label="Invert selection" (click)="onInvertSelection()">
+                  <mat-icon>swap_horiz</mat-icon>
+                </button>
+                <button mat-icon-button aria-label="Clear selection" [disabled]="!hasSelection"
+                  (click)="onSelectAll(false)">
+                  <mat-icon>clear</mat-icon>
+                </button>
               </div>
-              <div
-                style="border-top: 1px solid rgba(0, 0, 0, 0.26); padding-left: 16px; padding-top: 10px; height: 280px; overflow-y: auto;">
+              <div class="edit-group-body">
                 <app-path-group *ngFor="let group of groups;index as i;trackBy:trackByIndex" [items]="group">
                 </app-path-group>
               </div>

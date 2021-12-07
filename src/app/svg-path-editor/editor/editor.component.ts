@@ -112,6 +112,10 @@ export class EditorComponent implements OnInit {
     return !!this.path.find(item => (all || item.selected) && Path.isEllipticalArc(item));
   }
 
+  get hasSelection() {
+    return Path.hasSelection(this.path);
+  }
+
   get canPromoteToCurve() {
     const all = !Path.hasSelection(this.path);
     return !!this.path.find(item => (all || item.selected) && Path.canPromoteToCurve(item));
@@ -378,6 +382,10 @@ export class EditorComponent implements OnInit {
 
   onSelectAll(value: boolean) {
     Path.selectAll(this.path, value);
+  }
+
+  onInvertSelection() {
+    Path.invertSelection(this.path);
   }
 
   onAppend(command: Path.DrawCommand) {
