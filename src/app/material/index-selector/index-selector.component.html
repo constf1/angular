@@ -1,26 +1,26 @@
 <div class="index-selector">
   <mat-form-field class="index-selector-input">
     <mat-label>{{label}}</mat-label>
-    <input matInput type="number" step="1" min="1" [max]="count" [disabled]="0 >= count" [ngModel]="selection + 1"
-      (ngModelChange)="requestSelectionChange(+$event - 1)">
-    <mat-hint>From 1 to {{count}}</mat-hint>
+    <input matInput type="number" step="1" [min]="min" [max]="max" [disabled]="disabled" [ngModel]="selection"
+      (ngModelChange)="requestSelectionChange(+$event)">
+    <mat-hint *ngIf="!disabled">From {{min}} to {{max}}</mat-hint>
   </mat-form-field>
 
   <div class="index-selector-slider">
-    <mat-slider step="1" min="1" [max]="count" [disabled]="0 >= count" [ngModel]="selection + 1"
-      (input)="requestSelectionChange($event.value - 1)"></mat-slider>
+    <mat-slider step="1" [min]="min" [max]="max" [disabled]="disabled" [ngModel]="selection"
+      (input)="requestSelectionChange($event.value)"></mat-slider>
     <div class="index-selector-buttons">
-      <button mat-icon-button [disabled]="0 >= selection" (click)="requestSelectionChange(0)">
+      <button mat-icon-button [disabled]="min >= selection" (click)="requestSelectionChange(min)">
         <mat-icon>first_page</mat-icon>
       </button>
-      <button mat-icon-button [disabled]="0 >= selection" (click)="requestSelectionChange(selection - 1)">
+      <button mat-icon-button [disabled]="min >= selection" (click)="requestSelectionChange(selection - 1)">
         <mat-icon>chevron_left</mat-icon>
       </button>
       <div class="flex-space-filler-1"></div>
-      <button mat-icon-button [disabled]="selection + 1 >= count" (click)="requestSelectionChange(selection + 1)">
+      <button mat-icon-button [disabled]="selection >= max" (click)="requestSelectionChange(selection + 1)">
         <mat-icon>chevron_right</mat-icon>
       </button>
-      <button mat-icon-button [disabled]="selection + 1 >= count" (click)="requestSelectionChange(count - 1)">
+      <button mat-icon-button [disabled]="selection >= max" (click)="requestSelectionChange(max)">
         <mat-icon>last_page</mat-icon>
       </button>
     </div>

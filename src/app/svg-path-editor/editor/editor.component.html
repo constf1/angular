@@ -89,8 +89,8 @@
             </div>
 
             <div *ngIf="editMode === 2" style="padding-left: 1em; padding-right: 1em;">
-              <app-index-selector [count]="path.length" [selection]="firstSelectionIndex"
-                (selectionChange)="onSingleSelectionChange($event)">
+              <app-index-selector [min]="1" [max]="path.length" [selection]="firstSelectionIndex + 1"
+                (selectionChange)="onSingleSelectionChange($event - 1)">
               </app-index-selector>
               <app-path-item *ngIf="activeItem as item" [item]="item"
                 [maximumFractionDigits]="settings.state.maximumFractionDigits"
@@ -163,12 +163,6 @@
           </button>
         </ng-template>
       </mat-expansion-panel>
-
-      <!-- <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-icon>design_services</mat-icon>Path
-        </mat-expansion-panel-header>
-      </mat-expansion-panel> -->
     </mat-accordion>
   </mat-sidenav>
 

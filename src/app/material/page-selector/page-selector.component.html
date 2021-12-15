@@ -9,5 +9,5 @@
   </mat-menu>
 </ng-container>
 
-<app-index-selector label="Page" [count]="pageCount" [selection]="pageIndex"
-  (selectionChange)="requestPageChange(pageSize, pageSize * $event)"></app-index-selector>
+<app-index-selector label="Page" [min]="1" [max]="pageCount" [selection]="pageIndex + 1"
+  (selectionChange)="requestPageChange(pageSize, pageSize * ($event - 1))"></app-index-selector>
