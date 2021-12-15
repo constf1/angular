@@ -52,7 +52,8 @@ export interface EditorSettingsState {
   isBackgroundImageHidden: boolean;
 
   isControlPoints: boolean;
-  controlPointsFillColor: string;
+  controlPointFillColor: string;
+  controlPointSize: number;
 
   isPathStroke: boolean;
   pathStrokeColor: string;
@@ -82,7 +83,8 @@ export const initialState: Readonly<EditorSettingsState> = {
   isBackgroundImageHidden: false,
 
   isControlPoints: true,
-  controlPointsFillColor: '#ffff00',
+  controlPointFillColor: '#ffff00',
+  controlPointSize: 10,
 
   isPathStroke: true,
   pathStrokeColor: '#ff00ff',
@@ -108,6 +110,7 @@ export const minState: Readonly<SubType<EditorSettingsState, number>> = {
   zoom: 25,
   backgroundImageZoom: 1,
   maximumFractionDigits: 0,
+  controlPointSize: 2,
 };
 
 export const maxState: Readonly<SubType<EditorSettingsState, number>> = {
@@ -119,6 +122,7 @@ export const maxState: Readonly<SubType<EditorSettingsState, number>> = {
   zoom: 400,
   backgroundImageZoom: 10000,
   maximumFractionDigits: DECIMAL_FORMAT_LABELS.length - 1,
+  controlPointSize: 32,
 };
 
 const KEY = '[svg-path-editor.settings]';

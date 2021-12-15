@@ -110,7 +110,7 @@ export class SvgViewComponent implements OnInit, OnDestroy {
 
   get pathSelectionColor() {
     const s = this.settingsState;
-    return s.controlPointsFillColor;
+    return s.controlPointFillColor;
   }
 
   get pathData() {

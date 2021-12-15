@@ -6,7 +6,7 @@ svg {
   transition: width 0.2s ease-out, height 0.2s ease-out;
 
   g.control-points {
-    &>circle {
+    &>* {
       cursor: pointer;
       stroke: black;
       stroke-opacity: 0.75;
@@ -21,7 +21,7 @@ svg {
     cursor: none;
 
     g.control-points {
-      &>circle {
+      &>* {
         cursor: none;
         stroke: magenta;
         stroke-opacity: 0.5;

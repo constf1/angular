@@ -18,11 +18,15 @@
   <mat-form-field>
     <mat-label>Color</mat-label>
     <input matInput type="color" placeholder="color" [disabled]="!settings.state.isControlPoints"
-      [ngModel]="settings.state.controlPointsFillColor"
-      (ngModelChange)="settings.set({ controlPointsFillColor: $event })">
+      [ngModel]="settings.state.controlPointFillColor"
+      (ngModelChange)="settings.set({ controlPointFillColor: $event })">
   </mat-form-field>
   <mat-slide-toggle [ngModel]="settings.state.isControlPoints"
     (ngModelChange)="settings.set({ isControlPoints: $event })">Control Points</mat-slide-toggle>
+  <app-index-selector label="Control point size"
+    [min]="controlPointMinSize" [max]="controlPointMaxSize"
+    [selection]="settings.state.controlPointSize"
+    (selectionChange)="settings.set({ controlPointSize: +$event })"></app-index-selector>
 </div>
 
 <app-tab-group items="Zoom|Viewbox|Background" [(selection)]="tabSelection">
@@ -107,15 +111,3 @@
     </div>
   </div>
 </app-tab-group>
-
-<!--
-<h3>
-  <mat-icon>photo_size_select_large</mat-icon>Zoom
-</h3>
-<h3>
-  <mat-icon>crop</mat-icon>Viewbox
-</h3>
-<h3>
-  <mat-icon>layers</mat-icon>Background
-</h3>
- -->

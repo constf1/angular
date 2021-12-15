@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { EditorSettingsService, FE_COLOR_MATRICES } from '../services/editor-settings.service';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { EditorSettingsService, FE_COLOR_MATRICES, maxState, minState } from '../services/editor-settings.service';
 import { BackgroundImageService } from '../services/background-image.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { BackgroundImageService } from '../services/background-image.service';
   templateUrl: './menu-view.component.html',
   styleUrls: ['./menu-view.component.scss']
 })
-export class MenuViewComponent implements OnInit {
+export class MenuViewComponent {
   @Output() requestSmallestViewBox = new EventEmitter<boolean>();
 
   tabSelection = 0;
@@ -20,6 +20,9 @@ export class MenuViewComponent implements OnInit {
     {label: '4:1', value: 400 },
   ];
 
+  controlPointMinSize = minState.controlPointSize;
+  controlPointMaxSize = maxState.controlPointSize;
+
   get zoom() {
     return this.settings.state.zoom;
   }
@@ -31,7 +34,4 @@ export class MenuViewComponent implements OnInit {
   imageColorMatrixNames = Object.keys(FE_COLOR_MATRICES);
 
   constructor(public settings: EditorSettingsService, public background: BackgroundImageService) { }
-
-  ngOnInit(): void {
-  }
 }
