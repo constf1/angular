@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 export interface PageEvent {
   pageIndex: number;
@@ -10,7 +10,7 @@ export interface PageEvent {
   templateUrl: './page-selector.component.html',
   styleUrls: ['./page-selector.component.scss']
 })
-export class PageSelectorComponent implements OnInit {
+export class PageSelectorComponent {
   @Input() itemCount = 0;
   @Input() pageSize = 1;
   @Input() pageIndex = 0;
@@ -19,11 +19,6 @@ export class PageSelectorComponent implements OnInit {
 
   get pageCount() {
     return this.pageSize > 0 ? Math.ceil(this.itemCount / this.pageSize) : 0;
-  }
-
-  constructor() { }
-
-  ngOnInit(): void {
   }
 
   requestPageChange(pageSize: number, itemIndex: number) {
