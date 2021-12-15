@@ -325,6 +325,10 @@ export class EditorComponent implements OnInit {
       }
     }
 
+    if (this.singleSelectionIndex >= nextPath.length) {
+      this.singleSelectionIndex = nextPath.length - 1;
+    }
+
     this.path = nextPath;
     this.onPathModelChange('history');
   }
